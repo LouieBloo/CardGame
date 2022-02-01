@@ -5460,6 +5460,7 @@ GameObject:
   - component: {fileID: 6692343202836887977}
   - component: {fileID: 6738429063007651401}
   - component: {fileID: 7680800067457878390}
+  - component: {fileID: 5464152755657257561}
   m_Layer: 0
   m_Name: AxeMan
   m_TagString: Untagged
@@ -5518,6 +5519,18 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &5464152755657257561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6689913824549537717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c4b45d152950ac498dcc2685aa3b0eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6689920214827322095
 GameObject:
   m_ObjectHideFlags: 0

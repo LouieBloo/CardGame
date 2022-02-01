@@ -8,6 +8,8 @@ public class Player : NetworkBehaviour
 {
     public GameObject myPrefab;
 
+    public GameObject grid;
+
     private int offset = 0;
 
     public override void OnDestroy()
@@ -23,16 +25,23 @@ public class Player : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        if (IsServer && IsOwner)
+        {
+            //spawnGridServerRpc();
+        }
     }
 
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0) && IsOwner)
-        {
-            axeManServerRpc(offset);
-            offset += 1;
-        }
+        //Debug.Log(IsServer);
+    }
+
+    [ServerRpc]
+    void spawnGridServerRpc()
+    {
+        GameObject go = Instantiate(grid, new Vector3(0, 0, 0), grid.transform.rotation);
+        go.GetComponent<NetworkObject>().Spawn();
     }
 
     [ServerRpc]
