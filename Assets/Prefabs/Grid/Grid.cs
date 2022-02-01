@@ -76,7 +76,7 @@ public class Grid : NetworkBehaviour
             selectedPermanent = null;
         }*/
 
-        if (IsServer && Input.GetKeyDown(KeyCode.S) && cells[mouseCoords] != null)
+        if (Input.GetKeyDown(KeyCode.S) && cells[mouseCoords] != null)
         {
             if (!cells[mouseCoords].hasPermanent())
             {
@@ -90,6 +90,7 @@ public class Grid : NetworkBehaviour
 
         if (Input.GetKeyDown(KeyCode.Mouse0) && cells[mouseCoords] != null)
         {
+            
             if (!selectedPermanent)
             {
                 selectedPermanent = cells[mouseCoords];
@@ -144,15 +145,16 @@ public class Grid : NetworkBehaviour
             }*/
         }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership =false)]
     void createPermanentServerRpc(HexCoordinates cell)
     {
         if (cells[cell] && !cells[cell].hasPermanent())
         {
+            Debug.Log("luke: " + NetworkManager.Singleton.LocalClientId);
             /*Vector3 position = hexCalculator.HexToPosition(cell);
             GameObject go = Instantiate(myPrefab, position, Quaternion.identity);
             go.GetComponent<NetworkObject>().Spawn();*/
-            cells[cell].spawnObject(myPrefab);
+            cells[cell].spawnObject(myPrefab,Quaternion.identity);
 
             //updateCellPermanentClientRpc(cell, go.GetComponent<NetworkObject>());
         }

@@ -35,6 +35,16 @@ public class Player : NetworkBehaviour
     void Update()
     {
         //Debug.Log(IsServer);
+        if (IsOwner && Input.GetKeyDown(KeyCode.P))
+        {
+            testServerRpc();
+        }
+    }
+
+    [ServerRpc]
+    void testServerRpc()
+    {
+        Debug.Log("luke: " + GetComponent<NetworkObject>().OwnerClientId);
     }
 
     [ServerRpc]

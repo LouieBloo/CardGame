@@ -9,10 +9,10 @@ public class PermanentCell : NetworkBehaviour
     private SpriteRenderer spriteRenderer;
 
     public GameObject objectToSpawnOnStartup;
-    public Quaternion objectToSpawnRotation;
+    public Quaternion objectSpawnRotation;
 
-    NetworkVariable<ulong> attachedPermanentId = new NetworkVariable<ulong>();
-    NetworkBehaviour attachedNetworkBehavior;
+    //NetworkVariable<ulong> attachedPermanentId = new NetworkVariable<ulong>();
+    NetworkVariable<NetworkObjectReference> attachedNetworkObject = new NetworkVariable<NetworkObjectReference>();
 
     // Start is called before the first frame update
     void Awake()
@@ -36,28 +36,30 @@ public class PermanentCell : NetworkBehaviour
     public GameObject spawnStartingObject()
     {
         if (!objectToSpawnOnStartup) { return null; }
-        GameObject go = Instantiate(objectToSpawnOnStartup, GetComponent<Transform>().position, Quaternion.identity);
+        return spawnObject(objectToSpawnOnStartup, objectSpawnRotation);
+    }
+
+    public GameObject spawnObject(GameObject prefab,Quaternion rotation)
+    {
+        GameObject go = Instantiate(prefab, transform.position, rotation);
         go.GetComponent<NetworkObject>().Spawn();
-        attachPermanent(go.GetComponent<NetworkObject>().NetworkObjectId);
+        attachPermanent(go.GetComponent<NetworkObject>());
         return go;
     }
 
-    public GameObject spawnObject(GameObject prefab)
+    private void attachPermanent(NetworkObjectReference networkObject)
     {
-        GameObject go = Instantiate(prefab, transform.position, Quaternion.identity);
-        go.GetComponent<NetworkObject>().Spawn();
-        attachPermanent(go.GetComponent<NetworkObject>().NetworkObjectId);
-        return go;
-    }
-
-    private void attachPermanent(ulong permanentId)
-    {
-        attachedPermanentId.Value = permanentId;
+        attachedNetworkObject.Value = networkObject;
     }
 
     public bool hasPermanent()
     {
-        return attachedPermanentId.Value > 0;
+        if (attachedNetworkObject.Value.TryGet(out NetworkObject targetObject))
+        {
+            return true;
+        }
+        return false;
+        //return attachedNetworkObject && attachedNetworkObject.Value != null;
     }
 
     public void select()
@@ -74,7 +76,7 @@ public class PermanentCell : NetworkBehaviour
 
     static public void drawString(string text, Vector3 worldPosition, Color textColor, Vector2 anchor, float textSize = 15f)
     {
-        var view = UnityEditor.SceneView.currentDrawingSceneView;
+       /* var view = UnityEditor.SceneView.currentDrawingSceneView;
         Vector3 screenPosition = view.camera.WorldToScreenPoint(worldPosition);
         if (screenPosition.y < 0 || screenPosition.y > view.camera.pixelHeight || screenPosition.x < 0 || screenPosition.x > view.camera.pixelWidth || screenPosition.z < 0)
             return;
@@ -90,6 +92,6 @@ public class PermanentCell : NetworkBehaviour
             size * ((anchor + Vector2.left + Vector2.up) / 2f)) * (Vector2.right + Vector2.down) +
             Vector2.up * view.camera.pixelHeight;
         GUI.Label(new Rect(alignedPosition, size), text, style);
-        UnityEditor.Handles.EndGUI();
+        UnityEditor.Handles.EndGUI();*/
     }
 }
