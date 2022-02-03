@@ -1,3 +1,4 @@
+using HexMapTools;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -5,11 +6,12 @@ using UnityEngine;
 
 public class PermanentCell : NetworkBehaviour
 {
-    private Permanent attachedPermanent;
     private SpriteRenderer spriteRenderer;
 
     public GameObject objectToSpawnOnStartup;
     public Quaternion objectSpawnRotation;
+
+    private HexCoordinates hexCoordinates;
 
     //NetworkVariable<ulong> attachedPermanentId = new NetworkVariable<ulong>();
     NetworkVariable<NetworkObjectReference> attachedNetworkObject = new NetworkVariable<NetworkObjectReference>();
@@ -33,16 +35,31 @@ public class PermanentCell : NetworkBehaviour
     {
     }
 
+    public void setHexCoordinates(HexCoordinates coordinates)
+    {
+        this.hexCoordinates = coordinates;
+    }
+
+    public HexCoordinates getHexCoordinates()
+    {
+        return this.hexCoordinates;
+    }
+
     public GameObject spawnStartingObject()
     {
         if (!objectToSpawnOnStartup) { return null; }
-        return spawnObject(objectToSpawnOnStartup, objectSpawnRotation);
+        return spawnObject(objectToSpawnOnStartup, objectSpawnRotation,0);
     }
 
-    public GameObject spawnObject(GameObject prefab,Quaternion rotation)
+    public GameObject spawnObject(GameObject prefab,Quaternion rotation, ulong ownerId)
     {
         GameObject go = Instantiate(prefab, transform.position, rotation);
         go.GetComponent<NetworkObject>().Spawn();
+        if(ownerId > 0)
+        {
+            go.GetComponent<NetworkObject>().ChangeOwnership(ownerId);
+        }
+        
         attachPermanent(go.GetComponent<NetworkObject>());
         return go;
     }
@@ -50,6 +67,16 @@ public class PermanentCell : NetworkBehaviour
     private void attachPermanent(NetworkObjectReference networkObject)
     {
         attachedNetworkObject.Value = networkObject;
+    }
+
+    public Permanent getAttachedPermanent()
+    {
+        if (attachedNetworkObject.Value.TryGet(out NetworkObject targetObject))
+        {
+            return targetObject.GetComponent<Permanent>();
+        }
+
+        return null;
     }
 
     public bool hasPermanent()

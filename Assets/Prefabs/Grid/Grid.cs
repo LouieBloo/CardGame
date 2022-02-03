@@ -10,13 +10,13 @@ using Unity.Netcode;
 public class Grid : NetworkBehaviour
 {
     private HexCalculator hexCalculator;
-    private HexContainer<PermanentCell> cells;
+    public HexContainer<PermanentCell> cells;
 
     private PermanentCell selectedPermanent;
     private HexCoordinates selectedCoordinates;
 
     private HexPathFinder pathFinder;
-    private List<HexCoordinates> foundPath;
+    
 
     public GameObject myPrefab;
 
@@ -29,13 +29,15 @@ public class Grid : NetworkBehaviour
         cells = new HexContainer<PermanentCell>(hexGrid);
         cells.FillWithChildren();
 
+        //set all permanent cells hex positions for easy reference
+        foreach (PermanentCell c in cells.GetCells())
+        {
+            c.setHexCoordinates(hexCalculator.HexFromPosition(c.transform.position));
+        }
+
         pathFinder = new HexPathFinder(pathCost, 1f, 1f, 2000);
 
         NetworkManager.Singleton.OnServerStarted += Singleton_OnServerStarted;
-        if (IsServer)
-        {
-            initializeGridPermanentsServerRpc();
-        }
     }
 
     private void Singleton_OnServerStarted()
@@ -48,12 +50,12 @@ public class Grid : NetworkBehaviour
 
     private void Update()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        /*Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         // Casts the ray and get the first game object hit
         Physics.Raycast(ray, out hit);
         //Debug.Log("This hit at " + hit.point);
-        HexCoordinates mouseCoords = hexCalculator.HexFromPosition(hit.point);
+        HexCoordinates mouseCoords = hexCalculator.HexFromPosition(hit.point);*/
         //Debug.Log(mouseCoords);
 
         /*if (cells[mouseCoords])
@@ -76,18 +78,8 @@ public class Grid : NetworkBehaviour
             selectedPermanent = null;
         }*/
 
-        if (Input.GetKeyDown(KeyCode.S) && cells[mouseCoords] != null)
-        {
-            if (!cells[mouseCoords].hasPermanent())
-            {
-                createPermanentServerRpc(mouseCoords);
-            }
-            else
-            {
-                NetworkLog.LogInfoServer("Already has permanent!");
-            }
-        }
-
+        
+        /*
         if (Input.GetKeyDown(KeyCode.Mouse0) && cells[mouseCoords] != null)
         {
             
@@ -114,7 +106,7 @@ public class Grid : NetworkBehaviour
                     }
                 }
             }
-        }
+        }*/
 
 
         if (Input.GetKeyDown(KeyCode.Mouse1)){
@@ -143,18 +135,27 @@ public class Grid : NetworkBehaviour
                     }
                 }
             }*/
+    }
+
+    private bool isCellOktoSpawn(HexCoordinates cellCoordinates)
+    {
+        if (cells[cellCoordinates] && !cells[cellCoordinates].hasPermanent())
+        {
+            return true;
         }
 
-    [ServerRpc(RequireOwnership =false)]
-    void createPermanentServerRpc(HexCoordinates cell)
+        return false;
+    }
+
+    public void createPermanentOnCell(HexCoordinates cell, GameObject prefab, ulong ownerId)
     {
-        if (cells[cell] && !cells[cell].hasPermanent())
+        if (isCellOktoSpawn(cell))
         {
-            Debug.Log("luke: " + NetworkManager.Singleton.LocalClientId);
+            Debug.Log("spawning...");
             /*Vector3 position = hexCalculator.HexToPosition(cell);
             GameObject go = Instantiate(myPrefab, position, Quaternion.identity);
             go.GetComponent<NetworkObject>().Spawn();*/
-            cells[cell].spawnObject(myPrefab,Quaternion.identity);
+            cells[cell].spawnObject(myPrefab, Quaternion.identity, ownerId);
 
             //updateCellPermanentClientRpc(cell, go.GetComponent<NetworkObject>());
         }
@@ -163,6 +164,43 @@ public class Grid : NetworkBehaviour
             Debug.Log("already ahs perm");
         }
     }
+
+    public List<HexCoordinates> findPath(HexCoordinates start, HexCoordinates end)
+    {
+        List<HexCoordinates> foundPath;
+        bool didFindPath = pathFinder.FindPath(start, end, out foundPath);
+        //Debug.Log(didFindPath + " " + foundPath.Count);
+        if (didFindPath)
+        {
+            return foundPath;
+        }
+
+        return null;
+    }
+
+    public List<Vector3> findPathVector3(HexCoordinates start, HexCoordinates end)
+    {
+        List<HexCoordinates> foundPath = findPath(start, end);
+        if (foundPath != null)
+        {
+            List<Vector3> returnObj = new List<Vector3>();
+            foreach(HexCoordinates h in foundPath)
+            {
+                returnObj.Add(hexCalculator.HexToPosition(h));
+            }
+            return returnObj;
+        }
+
+        return null;
+    }
+
+    public HexCoordinates getHexCoordinatesFromPosition(Vector3 position)
+    {
+        return hexCalculator.HexFromPosition(position);
+    }
+
+
+    
 
     /*[ClientRpc]
     void updateCellPermanentClientRpc(HexCoordinates cell, NetworkObjectReference permanent)

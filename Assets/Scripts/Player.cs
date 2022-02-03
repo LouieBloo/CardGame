@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine.Networking;
 using UnityEngine;
+using HexMapTools;
 
 public class Player : NetworkBehaviour
 {
     public GameObject myPrefab;
 
-    public GameObject grid;
-
     private int offset = 0;
+
+    private ObjectSelecting objectSelector;
+    private Grid grid;
 
     public override void OnDestroy()
     {
@@ -29,16 +31,47 @@ public class Player : NetworkBehaviour
         {
             //spawnGridServerRpc();
         }
+
+        Debug.Log("Server: " + IsServer + " owner: " + IsOwner);
+
+        if (IsOwner)
+        {
+            objectSelector = GameObject.FindGameObjectsWithTag("Game")[0].GetComponent<ObjectSelecting>();
+            grid = GameObject.FindGameObjectsWithTag("Grid")[0].GetComponent<Grid>();
+
+            Debug.Log(grid);
+        }
     }
 
 
     void Update()
     {
+        if (!IsOwner) { return; }
+
         //Debug.Log(IsServer);
-        if (IsOwner && Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.P))
         {
             testServerRpc();
         }
+        if (Input.GetKeyDown(KeyCode.S) && objectSelector.isEmptyCellTargeted())
+        {
+            createPermanentServerRpc(objectSelector.getTargetedCell().getHexCoordinates());
+        }
+    }
+
+    [ServerRpc]
+    void createPermanentServerRpc(HexCoordinates cell)
+    {
+        Debug.Log("Inside RPC");
+        if(grid == null)
+        {
+            GameObject.FindGameObjectsWithTag("Grid")[0].GetComponent<Grid>().createPermanentOnCell(cell, myPrefab,GetComponent<NetworkObject>().OwnerClientId);
+        }
+        else
+        {
+            grid.createPermanentOnCell(cell, myPrefab, GetComponent<NetworkObject>().OwnerClientId);
+        }
+        
     }
 
     [ServerRpc]
@@ -47,12 +80,6 @@ public class Player : NetworkBehaviour
         Debug.Log("luke: " + GetComponent<NetworkObject>().OwnerClientId);
     }
 
-    [ServerRpc]
-    void spawnGridServerRpc()
-    {
-        GameObject go = Instantiate(grid, new Vector3(0, 0, 0), grid.transform.rotation);
-        go.GetComponent<NetworkObject>().Spawn();
-    }
 
     [ServerRpc]
     void axeManServerRpc(int offset)
