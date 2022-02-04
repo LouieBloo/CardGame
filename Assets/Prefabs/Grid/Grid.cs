@@ -165,6 +165,11 @@ public class Grid : NetworkBehaviour
         }
     }
 
+    public void permanentMovedToNewCell()
+    {
+
+    }
+
     public List<HexCoordinates> findPath(HexCoordinates start, HexCoordinates end)
     {
         List<HexCoordinates> foundPath;

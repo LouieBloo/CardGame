@@ -59,6 +59,7 @@ public class ObjectSelecting : MonoBehaviour
 
     public bool isEmptyCellTargeted()
     {
+        Debug.Log("cell: " + hitCell);
         return getTargetedCell() && !hitCell.hasPermanent();
     }
 

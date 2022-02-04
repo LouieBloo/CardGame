@@ -16,18 +16,14 @@ public class CreatureSelectable : Selectable
 
     public override void commandIssuedToCell(PermanentCell target,Grid grid)
     {
+        if (!IsOwner) { return; }
         if (target.hasPermanent())
         {
 
         }
         else
         {
-            List<Vector3> path = grid.findPathVector3(grid.getHexCoordinatesFromPosition(transform.position), target.getHexCoordinates());
-
-            if (path != null)
-            {
-                movementScript.moveToPointFromPath(path);
-            }
+            movementScript.moveToPointFromPath(target);
         }
     }
 }
