@@ -165,9 +165,19 @@ public class Grid : NetworkBehaviour
         }
     }
 
-    public void permanentMovedToNewCell()
+    public void permanentMovedToNewCell(Vector3 startingPosition, Vector3 endPosition, NetworkObjectReference permanent)
     {
+        HexCoordinates startingCell = hexCalculator.HexFromPosition(startingPosition);
+        HexCoordinates endCell = hexCalculator.HexFromPosition(endPosition);
+        if (isCellOktoSpawn(endCell))
+        {
+            if (cells[startingCell])
+            {
+                cells[startingCell].unattachPermanent();
+            }
 
+            cells[endCell].attachPermanent(permanent);
+        }
     }
 
     public List<HexCoordinates> findPath(HexCoordinates start, HexCoordinates end)

@@ -64,9 +64,15 @@ public class PermanentCell : NetworkBehaviour
         return go;
     }
 
-    private void attachPermanent(NetworkObjectReference networkObject)
+    public void attachPermanent(NetworkObjectReference networkObject)
     {
         attachedNetworkObject.Value = networkObject;
+    }
+
+    public void unattachPermanent()
+    {
+        attachedNetworkObject.Value = new NetworkObjectReference();
+        deSelect();
     }
 
     public Permanent getAttachedPermanent()

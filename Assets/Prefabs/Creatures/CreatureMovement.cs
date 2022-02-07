@@ -48,7 +48,6 @@ public class CreatureMovement : NetworkBehaviour
         if (path != null)
         {
             StartCoroutine(moveToPoint(path.ToArray()));
-            
         }
     }
 
@@ -81,6 +80,10 @@ public class CreatureMovement : NetworkBehaviour
 
             yield return null;
         }
+
+
+
+        grid.permanentMovedToNewCell(startingPos,route[route.Length - 1], GetComponent<NetworkObject>());
     }
 
     IEnumerator rotateTowardsPoint(Vector3 point)

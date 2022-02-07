@@ -14,6 +14,10 @@ public class ObjectSelecting : MonoBehaviour
 
     private PermanentCell hitCell;
 
+    private PermanentCell attackMovePotentialCellPosition;
+
+    private bool attackCellSelecting = true;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -33,7 +37,7 @@ public class ObjectSelecting : MonoBehaviour
         if (hitCell)
         {
             //hoving logic
-            if(hitCell != hoveringPermanent)
+            if (hitCell != hoveringPermanent)
             {
                 selectHoveringPermanent(hitCell);
             }
@@ -43,6 +47,13 @@ public class ObjectSelecting : MonoBehaviour
             {
                 selectCell(hitCell);
             }
+
+            if (attackCellSelecting)
+            {
+               attackCellSelect(mouseCoords, hit);
+            }
+
+
         }
         else
         {
@@ -52,8 +63,53 @@ public class ObjectSelecting : MonoBehaviour
             }
             deselectHoveringPermanent();
         }
+        
+    }
 
+    PermanentCell attackCellSelect(HexCoordinates mouseCoords,RaycastHit hit)
+    {
+        //arrow direction
+        float xDifference = hitCell.transform.position.x - hit.point.x;
+        float zDifference = hitCell.transform.position.z - hit.point.z;
+        HexDirection direction;
+        if (zDifference > 0.3)
+        {
+            direction = xDifference > 0 ? HexDirection.SW : HexDirection.SE;
+        }
+        else if (zDifference < -0.3)
+        {
+            direction = xDifference > 0 ? HexDirection.NW : HexDirection.NE;
+        }
+        else
+        {
+            direction = xDifference > 0 ? HexDirection.W : HexDirection.E;
+        }
 
+        HexCoordinates attackMoveCoordinates = HexUtility.GetNeighbour(mouseCoords, direction);
+        if (grid.cells[attackMoveCoordinates])
+        {
+            if (!attackMovePotentialCellPosition)
+            {
+                attackMovePotentialCellPosition = grid.cells[attackMoveCoordinates];
+                attackMovePotentialCellPosition.select();
+            }
+            else if (attackMovePotentialCellPosition && attackMovePotentialCellPosition != grid.cells[attackMoveCoordinates])
+            {
+                //when the previous potential attack move cell is equal to the NEW hovering permanent we dont want to deselct the previous attacking cell as its now selected
+                if (attackMovePotentialCellPosition == hoveringPermanent) {
+                }
+                else
+                {
+                    attackMovePotentialCellPosition.deSelect();
+                }
+
+                attackMovePotentialCellPosition = grid.cells[attackMoveCoordinates];
+                attackMovePotentialCellPosition.select();
+            }
+        }
+        
+        return attackMovePotentialCellPosition;
+       //Debug.Log("x: " + xDifference + " z: " + zDifference);
         
     }
 
