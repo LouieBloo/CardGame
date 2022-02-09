@@ -1,23 +1,32 @@
 using HexMapTools;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class Permanent : MonoBehaviour
+public class Permanent : NetworkBehaviour
 {
-
-    
-
-    // Start is called before the first frame update
-    void Start()
+    public enum Type
     {
-        
+        Creature,
+        Chest,
+        Wall
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public Type type = Type.Creature;
 
+
+
+    public void permanentAttacked(NetworkObjectReference attackingPermanent, Type attackingPermanentType)
+    {
+        if (!IsServer){Debug.Log("Permanent not server"); return;}
+
+        if (type == Type.Creature && attackingPermanentType == Type.Creature)
+        {
+            if (attackingPermanent.TryGet(out NetworkObject targetObject))
+            {
+                GetComponent<Creature>().attacked(targetObject.GetComponent<Creature>().creatureObjectReference.GetComponent<DamageDealer>());
+            }
+        }
+    }
 }

@@ -32,14 +32,10 @@ public class Player : NetworkBehaviour
             //spawnGridServerRpc();
         }
 
-        Debug.Log("Server: " + IsServer + " owner: " + IsOwner);
-
         if (IsOwner)
         {
             objectSelector = GameObject.FindGameObjectsWithTag("Game")[0].GetComponent<ObjectSelecting>();
             grid = GameObject.FindGameObjectsWithTag("Grid")[0].GetComponent<Grid>();
-
-            Debug.Log(grid);
         }
     }
 

@@ -42,7 +42,7 @@ public class Selectable : NetworkBehaviour
     }
     
     //if we are selected and the user left clicks on another permanent
-    public virtual void commandIssuedToCell(PermanentCell target,Grid grid)
+    public virtual void commandIssuedToCell(PermanentCell target, PermanentCell attackMoveCell,Grid grid)
     {
         Debug.Log("Issueing command at cell: " + target);
     }

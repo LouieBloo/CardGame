@@ -16,7 +16,6 @@ public class ObjectSelecting : MonoBehaviour
 
     private PermanentCell attackMovePotentialCellPosition;
 
-    private bool attackCellSelecting = true;
 
     // Start is called before the first frame update
     void Start()
@@ -42,18 +41,17 @@ public class ObjectSelecting : MonoBehaviour
                 selectHoveringPermanent(hitCell);
             }
 
+            //attack selecting
+            if (selectedPermanent && hitCell.hasPermanent())
+            {
+                attackCellSelect(mouseCoords, hit);
+            }
+            
             //permanent logic
             if (Input.GetKeyDown(KeyCode.Mouse0))
             {
                 selectCell(hitCell);
             }
-
-            if (attackCellSelecting)
-            {
-               attackCellSelect(mouseCoords, hit);
-            }
-
-
         }
         else
         {
@@ -115,7 +113,6 @@ public class ObjectSelecting : MonoBehaviour
 
     public bool isEmptyCellTargeted()
     {
-        Debug.Log("cell: " + hitCell);
         return getTargetedCell() && !hitCell.hasPermanent();
     }
 
@@ -142,6 +139,10 @@ public class ObjectSelecting : MonoBehaviour
         {
             hoveringPermanent.deSelect();
             hoveringPermanent = null;
+        }
+        if (attackMovePotentialCellPosition) {
+            attackMovePotentialCellPosition.deSelect();
+            attackMovePotentialCellPosition = null;
         }
     }
 
@@ -176,7 +177,7 @@ public class ObjectSelecting : MonoBehaviour
 
         if (issueCommand)
         {
-            selectedPermanent.commandIssuedToCell(cell, grid);
+            selectedPermanent.commandIssuedToCell(cell, attackMovePotentialCellPosition, grid);
         }
         
 
