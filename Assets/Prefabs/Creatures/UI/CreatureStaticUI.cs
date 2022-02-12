@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class CreatureStaticUI : MonoBehaviour
 {
 
+    public TextMeshProUGUI healthText;
     public TextMeshProUGUI amountText;
 
     // Start is called before the first frame update
@@ -15,8 +16,9 @@ public class CreatureStaticUI : MonoBehaviour
         
     }
 
-    public void updateAll(Creature.CreatureStats newStats)
+    public void updateAll(Creature.CreatureInfo newStats)
     {
+        healthText.text = newStats.health + "";
         amountText.text = newStats.amount + "";
     }
 }

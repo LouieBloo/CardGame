@@ -13,24 +13,32 @@ public class DamageTaker : NetworkBehaviour
 
     public ArmorType armorType = ArmorType.Physical;
 
-    [SerializeField] private int baseHealth = 15;
+    [SerializeField] private int baseHealth = 0;
     [SerializeField] private NetworkVariable<int> health = new NetworkVariable<int>();
 
     [SerializeField] private int baseArmor = 0;
 
-    [SerializeField] private NetworkVariable<int> amount = new NetworkVariable<int>(1);
+    [SerializeField] private NetworkVariable<int> amount = new NetworkVariable<int>();
 
     private Permanent permanent;
 
 
-
     private void Start()
     {
-        permanent = transform.parent.GetComponent<Permanent>();
+        permanent = GetComponent<Permanent>();
+    }
 
+    public void setup(CreatureStats creatureStats)
+    {
         if (IsServer)
         {
-            health.Value = baseHealth;
+            health.Value = creatureStats.baseHealth;
+            baseHealth = creatureStats.baseHealth;
+
+            armorType = creatureStats.armorType;
+            baseArmor = creatureStats.baseArmor;
+
+            amount.Value = 3;
         }
     }
 
@@ -38,7 +46,8 @@ public class DamageTaker : NetworkBehaviour
     {
         if(permanent.type == Permanent.Type.Creature)
         {
-            return baseArmor + permanent.GetComponent<Creature>().defensePoints.Value;
+            //return baseArmor + permanent.GetComponent<Creature>().defensePoints.Value;
+            return baseArmor;
         }
 
         return 0;
@@ -51,17 +60,17 @@ public class DamageTaker : NetworkBehaviour
             int healthAfterDamage = health.Value - damage;
             if(healthAfterDamage > 0)
             {
-                //health.Value -= damage;
-                amount.Value -= damage;
+                health.Value -= damage;
             }
             else
             {
-                healthAfterDamage *= -1;
-                Debug.Log("Amount logic here...");
+                float totalHealth = health.Value + (baseHealth * (amount.Value-1));
+                float remainingHealth = totalHealth - damage;
+                amount.Value = Mathf.CeilToInt(remainingHealth / baseHealth);
+                health.Value = (int)(remainingHealth % baseHealth);
             }
         }
     }
-
 
     private void die()
     {
@@ -69,6 +78,11 @@ public class DamageTaker : NetworkBehaviour
         {
             Debug.Log("DIE PERMANET!");
         }
+    }
+
+    public void subscribeToHealthChanges(NetworkVariable<int>.OnValueChangedDelegate callback)
+    {
+        health.OnValueChanged += callback;
     }
 
     public void subscribeToAmountChanges(NetworkVariable<int>.OnValueChangedDelegate callback)

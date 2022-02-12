@@ -1445,8 +1445,7 @@ GameObject:
   - component: {fileID: 4682988835747410629}
   - component: {fileID: -6381309575424665239}
   - component: {fileID: 6954065327863596701}
-  - component: {fileID: -1072028759559173105}
-  - component: {fileID: 4864512384681516463}
+  - component: {fileID: -760823692550217201}
   m_Layer: 0
   m_Name: Swordsman
   m_TagString: Untagged
@@ -1520,7 +1519,7 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &-1072028759559173105
+--- !u!114 &-760823692550217201
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1529,33 +1528,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 4731520841268163385}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fda1fc43a1a790345b42e691ecce6c82, type: 3}
+  m_Script: {fileID: 11500000, guid: 76a8f64ac95935840a073e5dfdb6ef2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   damageType: 0
-  physicalType: 0
-  magicType: 0
-  baseDamage:
-    m_InternalValue: 3
---- !u!114 &4864512384681516463
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4731520841268163385}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 232324e854a9e794ebdd08d03c5467d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  physicalDamageType: 0
+  baseDamage: 4
+  baseHealth: 10
   armorType: 0
-  baseHealth: 15
-  health:
-    m_InternalValue: 0
-  baseArmor: 0
-  amount:
-    m_InternalValue: 1
+  baseArmor: 1
+  baseSpeed: 3
 --- !u!1 &4731527214890039423
 GameObject:
   m_ObjectHideFlags: 0

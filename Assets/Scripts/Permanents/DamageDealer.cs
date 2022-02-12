@@ -27,17 +27,27 @@ public class DamageDealer : NetworkBehaviour
     }
 
     public DamageType damageType = DamageType.Physical;
-    public PhysicalType physicalType = PhysicalType.Normal;
+    public PhysicalType physicalDamageType = PhysicalType.Normal;
     public MagicType magicType = MagicType.Fire;
 
     [SerializeField] private NetworkVariable<int> baseDamage = new NetworkVariable<int>();
 
     private Permanent permanent;
 
-
     private void Start()
     {
-        permanent = transform.parent.GetComponent<Permanent>();
+        permanent = GetComponent<Permanent>();
+    }
+
+    public void setup(CreatureStats creatureStats)
+    {
+        if (IsServer)
+        {
+            damageType = creatureStats.damageType;
+            physicalDamageType = creatureStats.physicalDamageType;
+
+            baseDamage.Value = creatureStats.baseDamage;
+        }
     }
 
     public int getBaseDamage()
@@ -45,7 +55,8 @@ public class DamageDealer : NetworkBehaviour
         //if we are a creature we return our base damage modifed with our player stats
         if(permanent.type == Permanent.Type.Creature)
         {
-            return (transform.parent.GetComponent<Creature>().attackPoints.Value * 2) + baseDamage.Value;
+            //return (transform.parent.GetComponent<Creature>().attackPoints.Value * 2) + baseDamage.Value;
+            return baseDamage.Value;
         }
 
         return 0;

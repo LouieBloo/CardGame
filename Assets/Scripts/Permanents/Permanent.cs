@@ -25,7 +25,7 @@ public class Permanent : NetworkBehaviour
         {
             if (attackingPermanent.TryGet(out NetworkObject targetObject))
             {
-                GetComponent<Creature>().attacked(targetObject.GetComponent<Creature>().creatureObjectReference.GetComponent<DamageDealer>());
+                GetComponent<Creature>().attacked(targetObject.GetComponent<Creature>().GetComponent<DamageDealer>());
             }
         }
     }

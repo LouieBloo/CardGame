@@ -11,17 +11,15 @@ public class Creature : NetworkBehaviour
         Attack, Defend, Move, Interact
     }
 
-    public NetworkVariable<int> attackPoints = new NetworkVariable<int>();
-    public NetworkVariable<int> defensePoints = new NetworkVariable<int>();
-
     public CreatureStaticUI ui;
 
     public GameObject spawnCreaturePrefab;
     public GameObject creatureObjectReference;
 
     private DamageTaker damageTaker;
+    private DamageDealer damageDealer;
 
-    public struct CreatureStats
+    public struct CreatureInfo
     {
         public int health;
         public int amount;
@@ -29,15 +27,23 @@ public class Creature : NetworkBehaviour
 
     private void Start()
     {
+        damageTaker = GetComponent<DamageTaker>();
+        damageTaker.subscribeToAmountChanges(uiNeedsUpdating);
+        damageTaker.subscribeToHealthChanges(uiNeedsUpdating);
+
+        damageDealer = GetComponent<DamageDealer>();
+
         if (IsOwner)
         {
             spawnCreatureObjectServerRpc();
         }
+
+        updateUI();
     }
 
     private void Update()
     {
-        updateUIs();
+        //updateUI();
     }
 
     [ServerRpc]
@@ -48,17 +54,16 @@ public class Creature : NetworkBehaviour
         newObj.transform.SetParent(transform);
         newObj.transform.localRotation = spawnCreaturePrefab.transform.rotation;
         creatureObjectReference = newObj;
-
-        damageTaker = creatureObjectReference.GetComponent<DamageTaker>();
-        damageTaker.subscribeToAmountChanges(uiNeedsUpdating);
-        updateUIs();
+        
+        damageTaker.setup(creatureObjectReference.GetComponent<CreatureStats>());
+        damageDealer.setup(creatureObjectReference.GetComponent<CreatureStats>());
     }
 
     public void attacked(DamageDealer damageDealer)
     {
         if (IsServer)
         {
-            DamageCalculator.calculateDamage(damageDealer, damageTaker);
+            DamageCalculator.calculateDamage(damageDealer, this.damageTaker);
         }
         else
         {
@@ -68,12 +73,13 @@ public class Creature : NetworkBehaviour
 
     public void uiNeedsUpdating(int old, int newd)
     {
-        updateUIs();
+        updateUI();
     }
 
-    void updateUIs()
+
+    void updateUI()
     {
-        CreatureStats parms = new CreatureStats();
+        CreatureInfo parms = new CreatureInfo();
         parms.amount = damageTaker.getAmount();
         parms.health = damageTaker.getHealth();
         ui.updateAll(parms);
