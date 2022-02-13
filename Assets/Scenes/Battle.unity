@@ -656,6 +656,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grid: {fileID: 590745688}
+  westAttackTexture: {fileID: 2800000, guid: 21e8ace0bc88f7a4d9712adb456f86f1, type: 3}
+  northWestAttackTexture: {fileID: 2800000, guid: b3568fee38a055749bdb7ca17dcfcb79,
+    type: 3}
+  northEastAttackTexture: {fileID: 2800000, guid: d29106582d3316247aee555c0450ec83,
+    type: 3}
+  eastAttackTexture: {fileID: 2800000, guid: 6bc7b16f704645b418663d5055b21684, type: 3}
+  southEastAttackTexture: {fileID: 2800000, guid: 67f132530b2c124498bb3971fb8a564c,
+    type: 3}
+  southWestAttackTexture: {fileID: 2800000, guid: d1e2c25450eb7c44993c6a407c48b295,
+    type: 3}
 --- !u!114 &1552141778
 MonoBehaviour:
   m_ObjectHideFlags: 0

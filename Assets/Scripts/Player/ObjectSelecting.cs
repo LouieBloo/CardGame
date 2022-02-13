@@ -16,10 +16,25 @@ public class ObjectSelecting : MonoBehaviour
 
     private PermanentCell attackMovePotentialCellPosition;
 
+    public Texture2D westAttackTexture;
+    public Texture2D northWestAttackTexture;
+    public Texture2D northEastAttackTexture;
+    public Texture2D eastAttackTexture;
+    public Texture2D southEastAttackTexture;
+    public Texture2D southWestAttackTexture;
+    private Texture2D currentTexture;
+
+    private Hashtable mouseTextureDirectionMapping = new Hashtable();
 
     // Start is called before the first frame update
     void Start()
     {
+        mouseTextureDirectionMapping.Add(HexDirection.W, westAttackTexture);
+        mouseTextureDirectionMapping.Add(HexDirection.NW, northWestAttackTexture);
+        mouseTextureDirectionMapping.Add(HexDirection.NE, northEastAttackTexture);
+        mouseTextureDirectionMapping.Add(HexDirection.E, eastAttackTexture);
+        mouseTextureDirectionMapping.Add(HexDirection.SE, southEastAttackTexture);
+        mouseTextureDirectionMapping.Add(HexDirection.SW, southWestAttackTexture);
     }
 
     // Update is called once per frame
@@ -83,6 +98,16 @@ public class ObjectSelecting : MonoBehaviour
             direction = xDifference > 0 ? HexDirection.W : HexDirection.E;
         }
 
+        //set the texture of the mouse to the right direction of attack arrow
+        if(!currentTexture || currentTexture != (Texture2D)mouseTextureDirectionMapping[direction])
+        {
+            Debug.Log(direction);
+            Debug.Log(mouseTextureDirectionMapping[direction]);
+            currentTexture = (Texture2D)mouseTextureDirectionMapping[direction];
+            Cursor.SetCursor(currentTexture, new Vector2(64,64), CursorMode.Auto);
+        }
+        
+        //check if the neighbor in this direction exists, and do stuff on it sometimes
         HexCoordinates attackMoveCoordinates = HexUtility.GetNeighbour(mouseCoords, direction);
         if (grid.cells[attackMoveCoordinates])
         {
@@ -124,10 +149,12 @@ public class ObjectSelecting : MonoBehaviour
 
     void selectHoveringPermanent(PermanentCell newPermanent)
     {
-        if (hoveringPermanent)
+        /*if (hoveringPermanent)
         {
             hoveringPermanent.deSelect();
-        }
+            resetMouseTexture();
+        }*/
+        deselectHoveringPermanent();
 
         newPermanent.select();
         hoveringPermanent = newPermanent;
@@ -144,6 +171,13 @@ public class ObjectSelecting : MonoBehaviour
             attackMovePotentialCellPosition.deSelect();
             attackMovePotentialCellPosition = null;
         }
+        resetMouseTexture();
+    }
+
+    void resetMouseTexture()
+    {
+        currentTexture = null;
+        Cursor.SetCursor(currentTexture, Vector2.zero, CursorMode.Auto);
     }
 
     void selectCell(PermanentCell cell)
@@ -190,5 +224,7 @@ public class ObjectSelecting : MonoBehaviour
             selectedPermanent.deselect();
             selectedPermanent = null;
         }
+
+        resetMouseTexture();
     }
 }
