@@ -5,7 +5,7 @@ using UnityEngine;
 namespace HexMapTools
 {
 
-    public enum HexDirection { NE, E, SE, SW, W, NW };
+    public enum HexDirection { NE, E, SE, SW, W, NW, NONE };
 
     public static class HexUtility {
 

@@ -15,6 +15,7 @@ public class CreatureMovement : NetworkBehaviour
     IEnumerator doingCommand;
 
     public NetworkVariable<FixedString64Bytes> facingOrientation = new NetworkVariable<FixedString64Bytes>();
+    public NetworkVariable<FixedString64Bytes> hexSpaceType = new NetworkVariable<FixedString64Bytes>();
 
     public void setup(HexDirection startingOrientation)
     {
@@ -31,6 +32,12 @@ public class CreatureMovement : NetworkBehaviour
     public HexDirection getOrientation()
     {
         return CellHelper.getDirectionFromString(facingOrientation.Value.ToString());
+    }
+
+    public CreatureStats.CreatureHexSpaces getHexSpaceType()
+    {
+        CreatureStats.CreatureHexSpaces.TryParse(hexSpaceType.Value.ToString(), out CreatureStats.CreatureHexSpaces result);
+        return result;
     }
 
     public void moveToCell(PermanentCell target,HexDirection orientation)

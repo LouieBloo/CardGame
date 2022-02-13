@@ -91,6 +91,9 @@ public class Creature : NetworkBehaviour
         
         damageTaker.setup(creatureObjectReference.GetComponent<CreatureStats>());
         damageDealer.setup(creatureObjectReference.GetComponent<CreatureStats>());
+
+        //setup creature movement
+        GetComponent<CreatureMovement>().hexSpaceType.Value = creatureObjectReference.GetComponent<CreatureStats>().hexSpaces.ToString();
     }
 
     public void attacked(DamageDealer damageDealer)
