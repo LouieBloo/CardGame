@@ -1,3 +1,4 @@
+using HexMapTools;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -9,10 +10,12 @@ public class Selectable : NetworkBehaviour
     [SerializeField] protected GameObject selectedIndicatorPrefab;
     private GameObject selectedIndicator;
 
+    private CreatureMovement creatureMovement;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        creatureMovement = GetComponent<CreatureMovement>();
     }
 
     // Update is called once per frame
@@ -40,9 +43,14 @@ public class Selectable : NetworkBehaviour
             selectedIndicator = null;
         }
     }
-    
+
+    public CreatureMovement CreatureMovement
+    {
+        get { return this.creatureMovement; }
+    }
+
     //if we are selected and the user left clicks on another permanent
-    public virtual void commandIssuedToCell(PermanentCell target, PermanentCell attackMoveCell,Grid grid)
+    public virtual void commandIssuedToCell(PermanentCell target, PermanentCell attackMoveCell,Grid grid,HexDirection orientation)
     {
         Debug.Log("Issueing command at cell: " + target);
     }

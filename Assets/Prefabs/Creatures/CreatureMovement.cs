@@ -18,55 +18,40 @@ public class CreatureMovement : NetworkBehaviour
 
     public void setup(HexDirection startingOrientation)
     {
-        Debug.Log(startingOrientation);
         facingOrientation.Value = startingOrientation.ToString();
         rotateToOrientation(facingOrientation.Value.ToString());
     }
 
     private void rotateToOrientation(string orientation)
     {
-        switch (orientation)
-        {
-            case "W":
-                transform.Rotate(0, -90, 0);
-                break;
-            case "NW":
-                transform.Rotate(0, -45, 0);
-                break;
-            case "NE":
-                transform.Rotate(0, 45, 0);
-                break;
-            case "E":
-                transform.Rotate(0, 90, 0);
-                break;
-            case "SE":
-                transform.Rotate(0, 135, 0);
-                break;
-            case "SW":
-                transform.Rotate(0, 225, 0);
-                break;
-        }
+        transform.eulerAngles = new Vector3(transform.rotation.x, 0, transform.rotation.z);
+        transform.Rotate(0, CellHelper.rotateAmountFromDirection(orientation), 0);
     }
 
-    public void moveToCell(PermanentCell target)
+    public HexDirection getOrientation()
+    {
+        return CellHelper.getDirectionFromString(facingOrientation.Value.ToString());
+    }
+
+    public void moveToCell(PermanentCell target,HexDirection orientation)
     {
         if (IsOwner)
         {
-            moveAndExecuteActionServerRpc(target.transform.position,Vector3.zero,Creature.CreatureActions.Move);
+            moveAndExecuteActionServerRpc(target.transform.position,Vector3.zero,Creature.CreatureActions.Move, orientation.ToString());
         }
     }
 
-    public void moveToCellAndAttack(PermanentCell attackTarget, PermanentCell targetCell)
+    public void moveToCellAndAttack(PermanentCell attackTarget, PermanentCell targetCell, HexDirection orientation)
     {
         if (IsOwner)
         {
-            moveAndExecuteActionServerRpc(targetCell.transform.position, attackTarget.transform.position, Creature.CreatureActions.Attack);
+            moveAndExecuteActionServerRpc(targetCell.transform.position, attackTarget.transform.position, Creature.CreatureActions.Attack, orientation.ToString());
         }
     }
 
 
     [ServerRpc]
-    void moveAndExecuteActionServerRpc(Vector3 targetMovePosition, Vector3 targetActionPosition, Creature.CreatureActions action)
+    void moveAndExecuteActionServerRpc(Vector3 targetMovePosition, Vector3 targetActionPosition, Creature.CreatureActions action, string finalOrientation)
     {
         if (doingCommand != null) { Debug.Log("Already doing a command...");return; }
 
@@ -85,18 +70,18 @@ public class CreatureMovement : NetworkBehaviour
         {
             if (!targetActionCell) {  Debug.Log("Invalid attack, cant find cell"); return; }
             if (!targetActionCell.hasPermanent()) { Debug.Log("Invalid attack, target doesnt have permanent"); return; }
-            if(targetActionCell.getAttachedPermanent().GetComponent<NetworkObject>().OwnerClientId == OwnerClientId) { Debug.Log("Invalid attack, target is same team as us!"); return; }
+            //if(targetActionCell.getAttachedPermanent().GetComponent<NetworkObject>().OwnerClientId == OwnerClientId) { Debug.Log("Invalid attack, target is same team as us!"); return; }
         }
 
         List<Vector3> path = grid.findPathVector3(grid.getHexCoordinatesFromPosition(transform.position), targetMoveCell.getHexCoordinates());
         if (path != null)
         {
-            doingCommand = moveToPointThenExecuteAction(path.ToArray(), targetActionCell, action);
+            doingCommand = moveToPointThenExecuteAction(path.ToArray(), targetActionCell, action,finalOrientation);
             StartCoroutine(doingCommand);
         }
     }
 
-    IEnumerator moveToPointThenExecuteAction(Vector3[] route, PermanentCell targetActionCell, Creature.CreatureActions action)
+    IEnumerator moveToPointThenExecuteAction(Vector3[] route, PermanentCell targetActionCell, Creature.CreatureActions action, string finalOrientation)
     {
         Animator animator = GetComponent<Creature>().creatureObjectReference.GetComponent<Animator>();
         if(route.Length > 0)
@@ -141,6 +126,15 @@ public class CreatureMovement : NetworkBehaviour
             //rotate towards action target
             yield return StartCoroutine(rotateTowardsPoint(targetActionCell.transform.position));
         }
+        else
+        {
+            //rotate towards final orientation
+            HexCoordinates neighbor = HexUtility.GetNeighbour(grid.getHexCoordinatesFromPosition(transform.position), CellHelper.getDirectionFromString(finalOrientation));
+            yield return StartCoroutine(rotateTowardsPoint(grid.getPositionFromHexCoordinates(neighbor)));
+        }
+
+        //set final orientation of our object 
+        facingOrientation.Value = finalOrientation;
 
         handleAction(targetActionCell, action);
 

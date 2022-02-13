@@ -10,6 +10,8 @@ public class ObjectSelecting : MonoBehaviour
     public Grid grid;
 
     private Selectable selectedPermanent;
+    private HexDirection selectedPermanentTargetOrientation;
+    private HexDirection attackOrientation;
     private PermanentCell hoveringPermanent;
 
     private PermanentCell hitCell;
@@ -22,9 +24,18 @@ public class ObjectSelecting : MonoBehaviour
     public Texture2D eastAttackTexture;
     public Texture2D southEastAttackTexture;
     public Texture2D southWestAttackTexture;
+
+    public Texture2D westMoveTexture;
+    public Texture2D northWestMoveTexture;
+    public Texture2D northEastMoveTexture;
+    public Texture2D eastMoveTexture;
+    public Texture2D southEastMoveTexture;
+    public Texture2D southWestMoveTexture;
+
     private Texture2D currentTexture;
 
     private Dictionary<HexDirection, Texture2D> mouseTextureDirectionMapping = new Dictionary<HexDirection, Texture2D>();
+    private Dictionary<HexDirection, Texture2D> mouseTextureMoveDirectionMapping = new Dictionary<HexDirection, Texture2D>();
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +46,13 @@ public class ObjectSelecting : MonoBehaviour
         mouseTextureDirectionMapping.Add(HexDirection.E, eastAttackTexture);
         mouseTextureDirectionMapping.Add(HexDirection.SE, southEastAttackTexture);
         mouseTextureDirectionMapping.Add(HexDirection.SW, southWestAttackTexture);
+
+        mouseTextureMoveDirectionMapping.Add(HexDirection.W, westMoveTexture);
+        mouseTextureMoveDirectionMapping.Add(HexDirection.NW, northWestMoveTexture);
+        mouseTextureMoveDirectionMapping.Add(HexDirection.NE, northEastMoveTexture);
+        mouseTextureMoveDirectionMapping.Add(HexDirection.E, eastMoveTexture);
+        mouseTextureMoveDirectionMapping.Add(HexDirection.SE, southEastMoveTexture);
+        mouseTextureMoveDirectionMapping.Add(HexDirection.SW, southWestMoveTexture);
     }
 
     // Update is called once per frame
@@ -66,6 +84,11 @@ public class ObjectSelecting : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Mouse0))
             {
                 selectCell(hitCell);
+            }
+
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                rotateTargetOrientation();
             }
         }
         else
@@ -103,6 +126,7 @@ public class ObjectSelecting : MonoBehaviour
         {
             currentTexture = mouseTextureDirectionMapping[direction];
             Cursor.SetCursor(currentTexture, new Vector2(64,64), CursorMode.Auto);
+            attackOrientation = direction;
         }
         
         //check if the neighbor in this direction exists, and do stuff on it sometimes
@@ -156,6 +180,12 @@ public class ObjectSelecting : MonoBehaviour
 
         newPermanent.select();
         hoveringPermanent = newPermanent;
+
+        if(selectedPermanent && selectedPermanent.CreatureMovement)
+        {
+            selectedPermanentTargetOrientation = selectedPermanent.CreatureMovement.getOrientation();
+            setMouseTexture(mouseTextureMoveDirectionMapping[selectedPermanentTargetOrientation], new Vector2(64, 64));
+        }
     }
 
     void deselectHoveringPermanent()
@@ -176,6 +206,21 @@ public class ObjectSelecting : MonoBehaviour
     {
         currentTexture = null;
         Cursor.SetCursor(currentTexture, Vector2.zero, CursorMode.Auto);
+    }
+
+    void setMouseTexture(Texture2D texture, Vector2 offset)
+    {
+        currentTexture = texture;
+        Cursor.SetCursor(currentTexture, offset, CursorMode.Auto);
+    }
+
+    void rotateTargetOrientation()
+    {
+        if (selectedPermanent && selectedPermanent.CreatureMovement)
+        {
+            selectedPermanentTargetOrientation = CellHelper.nextDirectionWhenRotated(selectedPermanentTargetOrientation);
+            setMouseTexture(mouseTextureMoveDirectionMapping[selectedPermanentTargetOrientation], new Vector2(64, 64));
+        }
     }
 
     void selectCell(PermanentCell cell)
@@ -209,10 +254,8 @@ public class ObjectSelecting : MonoBehaviour
 
         if (issueCommand)
         {
-            selectedPermanent.commandIssuedToCell(cell, attackMovePotentialCellPosition, grid);
+            selectedPermanent.commandIssuedToCell(cell, attackMovePotentialCellPosition, grid, attackMovePotentialCellPosition == null ? selectedPermanentTargetOrientation : CellHelper.getOppositeOfDirection(attackOrientation));
         }
-        
-
     }
 
     void deselectPermanent()

@@ -14,18 +14,18 @@ public class CreatureSelectable : Selectable
     }
 
 
-    public override void commandIssuedToCell(PermanentCell target, PermanentCell attackMoveCell, Grid grid)
+    public override void commandIssuedToCell(PermanentCell target, PermanentCell attackMoveCell, Grid grid, HexDirection orientation)
     {
         //if(doIHaveTurnPriority)
 
         if (!IsOwner) { return; }
         if (target.hasPermanent() && attackMoveCell)
         {
-            movementScript.moveToCellAndAttack(target, attackMoveCell);
+            movementScript.moveToCellAndAttack(target, attackMoveCell, orientation);
         }
         else
         {
-            movementScript.moveToCell(target);
+            movementScript.moveToCell(target,orientation);
         }
     }
 }

@@ -211,8 +211,13 @@ public class Grid : NetworkBehaviour
         return hexCalculator.HexFromPosition(position);
     }
 
+    public Vector3 getPositionFromHexCoordinates(HexCoordinates coordinates)
+    {
+        return hexCalculator.HexToPosition(coordinates);
+    }
 
-    
+
+
 
     /*[ClientRpc]
     void updateCellPermanentClientRpc(HexCoordinates cell, NetworkObjectReference permanent)

@@ -666,6 +666,16 @@ MonoBehaviour:
     type: 3}
   southWestAttackTexture: {fileID: 2800000, guid: d1e2c25450eb7c44993c6a407c48b295,
     type: 3}
+  westMoveTexture: {fileID: 2800000, guid: 94cf4d6495e4ac7498952b1691627970, type: 3}
+  northWestMoveTexture: {fileID: 2800000, guid: 7df81990ff2ee8a44bcc54335a3bdfce,
+    type: 3}
+  northEastMoveTexture: {fileID: 2800000, guid: 2e8d831349fc43545ba2634480b76c52,
+    type: 3}
+  eastMoveTexture: {fileID: 2800000, guid: fcad99de496ceca479b6b433da2e3f1a, type: 3}
+  southEastMoveTexture: {fileID: 2800000, guid: abe4452e645d4b44398bafd4c6bb1463,
+    type: 3}
+  southWestMoveTexture: {fileID: 2800000, guid: 38ced33580b075a47aa14ae7839f1954,
+    type: 3}
 --- !u!114 &1552141778
 MonoBehaviour:
   m_ObjectHideFlags: 0
