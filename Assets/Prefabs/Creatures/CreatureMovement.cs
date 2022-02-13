@@ -1,6 +1,7 @@
 using HexMapTools;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -12,6 +13,40 @@ public class CreatureMovement : NetworkBehaviour
     private Grid grid;
 
     IEnumerator doingCommand;
+
+    public NetworkVariable<FixedString64Bytes> facingOrientation = new NetworkVariable<FixedString64Bytes>();
+
+    public void setup(HexDirection startingOrientation)
+    {
+        Debug.Log(startingOrientation);
+        facingOrientation.Value = startingOrientation.ToString();
+        rotateToOrientation(facingOrientation.Value.ToString());
+    }
+
+    private void rotateToOrientation(string orientation)
+    {
+        switch (orientation)
+        {
+            case "W":
+                transform.Rotate(0, -90, 0);
+                break;
+            case "NW":
+                transform.Rotate(0, -45, 0);
+                break;
+            case "NE":
+                transform.Rotate(0, 45, 0);
+                break;
+            case "E":
+                transform.Rotate(0, 90, 0);
+                break;
+            case "SE":
+                transform.Rotate(0, 135, 0);
+                break;
+            case "SW":
+                transform.Rotate(0, 225, 0);
+                break;
+        }
+    }
 
     public void moveToCell(PermanentCell target)
     {
@@ -79,7 +114,7 @@ public class CreatureMovement : NetworkBehaviour
                 // Check if the position of the cube and sphere are approximately equal.
                 if (Vector3.Distance(transform.position, targetPoint) < 0.001f)
                 {
-                    transform.position = targetPoint;
+                    transform.position = new Vector3(targetPoint.x,transform.position.y,targetPoint.z);
                     targetPointIndex++;
                     if (targetPointIndex != route.Length)
                     {

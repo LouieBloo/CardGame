@@ -708,11 +708,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Grid
       objectReference: {fileID: 0}
-    - target: {fileID: 373961697663329237, guid: d3f43de3a91b86345a2609a7bf6c1c55,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 373961697663329241, guid: d3f43de3a91b86345a2609a7bf6c1c55,
         type: 3}
       propertyPath: GlobalObjectIdHash
@@ -852,7 +847,7 @@ MonoBehaviour:
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
-      Prefab: {fileID: 5037977379858631648, guid: 2bc6db7d920b27742853245aef8bbf8b,
+      Prefab: {fileID: 5932788995159726474, guid: 9a2c217c9a9bc3446a64a8387726aff3,
         type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0

@@ -11,6 +11,8 @@ public class PermanentCell : NetworkBehaviour
     public GameObject objectToSpawnOnStartup;
     public Quaternion objectSpawnRotation;
 
+    public GameObject creaturePrefab;
+
     private HexCoordinates hexCoordinates;
 
     //NetworkVariable<ulong> attachedPermanentId = new NetworkVariable<ulong>();
@@ -47,19 +49,23 @@ public class PermanentCell : NetworkBehaviour
 
     public GameObject spawnStartingObject()
     {
+        return null;
         if (!objectToSpawnOnStartup) { return null; }
-        return spawnObject(objectToSpawnOnStartup, objectSpawnRotation,0);
+        //return spawnCreature(objectToSpawnOnStartup, objectSpawnRotation,0,"PPPP");
     }
 
-    public GameObject spawnObject(GameObject prefab,Quaternion rotation, ulong ownerId)
+    public GameObject spawnCreature(Quaternion rotation, ulong ownerId,string creatureName)
     {
-        GameObject go = Instantiate(prefab, transform.position, rotation);
+        GameObject go = Instantiate(creaturePrefab, transform.position, rotation);
         go.GetComponent<NetworkObject>().Spawn();
-        if(ownerId > 0)
+        if (ownerId > 0)
         {
             go.GetComponent<NetworkObject>().ChangeOwnership(ownerId);
         }
-        
+
+
+        go.GetComponent<Creature>().setSpawnParameters(creatureName,HexDirection.SW);
+
         attachPermanent(go.GetComponent<NetworkObject>());
         return go;
     }

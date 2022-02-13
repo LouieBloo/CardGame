@@ -99,6 +99,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectToSpawnOnStartup: {fileID: 0}
   objectSpawnRotation: {x: 0, y: 0, z: 0, w: 0}
+  creaturePrefab: {fileID: 6689913824549537717, guid: 1af54562b895b044999bb2bee9428136,
+    type: 3}
 --- !u!1 &190983383061585417
 GameObject:
   m_ObjectHideFlags: 0

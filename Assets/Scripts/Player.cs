@@ -7,8 +7,6 @@ using HexMapTools;
 
 public class Player : NetworkBehaviour
 {
-    public GameObject myPrefab;
-
     private int offset = 0;
 
     private ObjectSelecting objectSelector;
@@ -49,23 +47,31 @@ public class Player : NetworkBehaviour
         {
             testServerRpc();
         }
-        if (Input.GetKeyDown(KeyCode.S) && objectSelector.isEmptyCellTargeted())
+
+        if (objectSelector.isEmptyCellTargeted())
         {
-            createPermanentServerRpc(objectSelector.getTargetedCell().getHexCoordinates());
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                createCreatureServerRpc(objectSelector.getTargetedCell().getHexCoordinates(), "THIN_DRAGON");
+            }
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                createCreatureServerRpc(objectSelector.getTargetedCell().getHexCoordinates(), "SWORDSMAN");
+            }
         }
+        
     }
 
     [ServerRpc]
-    void createPermanentServerRpc(HexCoordinates cell)
+    void createCreatureServerRpc(HexCoordinates cell,string creatureName)
     {
-        Debug.Log("Inside RPC");
         if(grid == null)
         {
-            GameObject.FindGameObjectsWithTag("Grid")[0].GetComponent<Grid>().createPermanentOnCell(cell, myPrefab,GetComponent<NetworkObject>().OwnerClientId);
+            GameObject.FindGameObjectsWithTag("Grid")[0].GetComponent<Grid>().createCreatureOnCell(cell, GetComponent<NetworkObject>().OwnerClientId, creatureName);
         }
         else
         {
-            grid.createPermanentOnCell(cell, myPrefab, GetComponent<NetworkObject>().OwnerClientId);
+            grid.createCreatureOnCell(cell, GetComponent<NetworkObject>().OwnerClientId, creatureName);
         }
         
     }
@@ -77,10 +83,5 @@ public class Player : NetworkBehaviour
     }
 
 
-    [ServerRpc]
-    void axeManServerRpc(int offset)
-    {
-        GameObject go = Instantiate(myPrefab, new Vector3(offset,0,0), Quaternion.identity);
-        go.GetComponent<NetworkObject>().Spawn();
-    }
+ 
 }

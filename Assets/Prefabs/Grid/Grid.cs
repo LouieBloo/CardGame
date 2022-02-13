@@ -18,8 +18,6 @@ public class Grid : NetworkBehaviour
     private HexPathFinder pathFinder;
     
 
-    public GameObject myPrefab;
-
     private void Start()
     {
         HexGrid hexGrid = GetComponent<HexGrid>();
@@ -147,15 +145,14 @@ public class Grid : NetworkBehaviour
         return false;
     }
 
-    public void createPermanentOnCell(HexCoordinates cell, GameObject prefab, ulong ownerId)
+    public void createCreatureOnCell(HexCoordinates cell, ulong ownerId,string creatureName)
     {
         if (isCellOktoSpawn(cell))
         {
-            Debug.Log("spawning...");
             /*Vector3 position = hexCalculator.HexToPosition(cell);
             GameObject go = Instantiate(myPrefab, position, Quaternion.identity);
             go.GetComponent<NetworkObject>().Spawn();*/
-            cells[cell].spawnObject(myPrefab, Quaternion.identity, ownerId);
+            cells[cell].spawnCreature(Quaternion.identity, ownerId,creatureName);
 
             //updateCellPermanentClientRpc(cell, go.GetComponent<NetworkObject>());
         }

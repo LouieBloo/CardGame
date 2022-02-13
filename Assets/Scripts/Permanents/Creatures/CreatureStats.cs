@@ -14,4 +14,11 @@ public class CreatureStats : MonoBehaviour
 
     public int baseSpeed;
 
+    public enum CreatureHexSpaces
+    {
+        Normal,
+        Line
+    }
+
+    public CreatureHexSpaces hexSpaces = CreatureHexSpaces.Normal;
 }

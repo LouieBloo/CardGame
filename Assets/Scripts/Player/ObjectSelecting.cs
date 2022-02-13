@@ -24,7 +24,7 @@ public class ObjectSelecting : MonoBehaviour
     public Texture2D southWestAttackTexture;
     private Texture2D currentTexture;
 
-    private Hashtable mouseTextureDirectionMapping = new Hashtable();
+    private Dictionary<HexDirection, Texture2D> mouseTextureDirectionMapping = new Dictionary<HexDirection, Texture2D>();
 
     // Start is called before the first frame update
     void Start()
@@ -99,11 +99,9 @@ public class ObjectSelecting : MonoBehaviour
         }
 
         //set the texture of the mouse to the right direction of attack arrow
-        if(!currentTexture || currentTexture != (Texture2D)mouseTextureDirectionMapping[direction])
+        if(!currentTexture || currentTexture != mouseTextureDirectionMapping[direction])
         {
-            Debug.Log(direction);
-            Debug.Log(mouseTextureDirectionMapping[direction]);
-            currentTexture = (Texture2D)mouseTextureDirectionMapping[direction];
+            currentTexture = mouseTextureDirectionMapping[direction];
             Cursor.SetCursor(currentTexture, new Vector2(64,64), CursorMode.Auto);
         }
         
