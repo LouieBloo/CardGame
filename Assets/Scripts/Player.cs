@@ -65,13 +65,20 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     void createCreatureServerRpc(HexCoordinates cell,string creatureName)
     {
+        HexCoordinates[] cellsToSpawnOn = new HexCoordinates[creatureName == "THIN_DRAGON" ? 2 : 1];
+        cellsToSpawnOn[0] = cell;
+        if(cellsToSpawnOn.Length > 1)
+        {
+            cellsToSpawnOn[1] = HexUtility.GetNeighbour(cell, HexDirection.W);
+        }
+
         if(grid == null)
         {
-            GameObject.FindGameObjectsWithTag("Grid")[0].GetComponent<Grid>().createCreatureOnCell(cell, GetComponent<NetworkObject>().OwnerClientId, creatureName);
+            GameObject.FindGameObjectsWithTag("Grid")[0].GetComponent<Grid>().createCreatureOnCell(cellsToSpawnOn, GetComponent<NetworkObject>().OwnerClientId, creatureName);
         }
         else
         {
-            grid.createCreatureOnCell(cell, GetComponent<NetworkObject>().OwnerClientId, creatureName);
+            grid.createCreatureOnCell(cellsToSpawnOn, GetComponent<NetworkObject>().OwnerClientId, creatureName);
         }
         
     }

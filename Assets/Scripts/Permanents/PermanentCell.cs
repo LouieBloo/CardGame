@@ -54,8 +54,9 @@ public class PermanentCell : NetworkBehaviour
         //return spawnCreature(objectToSpawnOnStartup, objectSpawnRotation,0,"PPPP");
     }
 
-    public GameObject spawnCreature(Quaternion rotation, ulong ownerId,string creatureName)
+    public NetworkObjectReference spawnCreature(Quaternion rotation, ulong ownerId,string creatureName, Vector3[] spawnCells)
     {
+        //instantiate the object and set ownership
         GameObject go = Instantiate(creaturePrefab, transform.position, rotation);
         go.GetComponent<NetworkObject>().Spawn();
         if (ownerId > 0)
@@ -63,11 +64,15 @@ public class PermanentCell : NetworkBehaviour
             go.GetComponent<NetworkObject>().ChangeOwnership(ownerId);
         }
 
+        //tell the creature what kind they are and orientation
+        go.GetComponent<Creature>().setSpawnParameters(creatureName,HexDirection.E);
 
-        go.GetComponent<Creature>().setSpawnParameters(creatureName,HexDirection.SW);
-
+        //tell creature what cells they occupy
+        go.GetComponent<Permanent>().setOccupiedCellsServerRpc(spawnCells);
+        
+        //attach to ourself
         attachPermanent(go.GetComponent<NetworkObject>());
-        return go;
+        return go.GetComponent<NetworkObject>();
     }
 
     public void attachPermanent(NetworkObjectReference networkObject)

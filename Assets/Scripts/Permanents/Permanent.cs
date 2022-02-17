@@ -15,7 +15,12 @@ public class Permanent : NetworkBehaviour
 
     public Type type = Type.Creature;
 
+    private NetworkList<Vector3> cellsOccupied;
 
+    private void Awake()
+    {
+        cellsOccupied = new NetworkList<Vector3>();
+    }
 
     public void permanentAttacked(NetworkObjectReference attackingPermanent, Type attackingPermanentType)
     {
@@ -28,5 +33,20 @@ public class Permanent : NetworkBehaviour
                 GetComponent<Creature>().attacked(targetObject.GetComponent<Creature>().GetComponent<DamageDealer>());
             }
         }
+    }
+
+    [ServerRpc (RequireOwnership =false)]
+    public void setOccupiedCellsServerRpc(Vector3[] positions)
+    {
+        cellsOccupied.Clear();
+        foreach(Vector3 p in positions)
+        {
+            cellsOccupied.Add(p);
+        }
+    }
+
+    public NetworkList<Vector3> getCellsOccupied()
+    {
+        return cellsOccupied;
     }
 }

@@ -70,7 +70,21 @@ public class CreatureMovement : NetworkBehaviour
         //grab target move cell
         PermanentCell targetMoveCell = grid.cells[grid.getHexCoordinatesFromPosition(targetMovePosition)];
         //make sure there is nothing in this cell
-        if (!targetMoveCell || (targetMoveCell.hasPermanent() && targetMoveCell.getAttachedPermanent().OwnerClientId != OwnerClientId)) { Debug.Log("Invalid attack, either no target or target has a permanent"); return; }
+        if (!targetMoveCell || (targetMoveCell.hasPermanent() && targetMoveCell.getAttachedPermanent() != GetComponent<Permanent>())) { Debug.Log("Invalid attack, either no target or target has a permanent"); return; }
+
+        //same checks for extra cells
+        Vector3[] extraSpaces = null;
+        if(getHexSpaceType() == CreatureStats.CreatureHexSpaces.Line)
+        {
+            HexCoordinates neighbor = HexUtility.GetNeighbour(grid.getHexCoordinatesFromPosition(targetMovePosition), CellHelper.getOppositeOfDirection(CellHelper.getDirectionFromString(finalOrientation)));
+            PermanentCell extraLineMoveCell = grid.cells[neighbor];
+            if (!extraLineMoveCell) { Debug.Log("Line cell extra not real!"); return; }
+            if (extraLineMoveCell.hasPermanent() && extraLineMoveCell.getAttachedPermanent() != GetComponent<Permanent>()) { Debug.Log("Line cell extra has permanent!"); return; }
+            extraSpaces = new Vector3[1];
+            extraSpaces[0] = grid.getPositionFromHexCoordinates(neighbor);
+        }
+
+
         //if we are attacking, make sure its a valid attack
         PermanentCell targetActionCell = grid.cells[grid.getHexCoordinatesFromPosition(targetActionPosition)];
         if (action == Creature.CreatureActions.Attack)
@@ -83,12 +97,12 @@ public class CreatureMovement : NetworkBehaviour
         List<Vector3> path = grid.findPathVector3(grid.getHexCoordinatesFromPosition(transform.position), targetMoveCell.getHexCoordinates());
         if (path != null)
         {
-            doingCommand = moveToPointThenExecuteAction(path.ToArray(), targetActionCell, action,finalOrientation);
+            doingCommand = moveToPointThenExecuteAction(path.ToArray(), targetActionCell, action,finalOrientation, extraSpaces);
             StartCoroutine(doingCommand);
         }
     }
 
-    IEnumerator moveToPointThenExecuteAction(Vector3[] route, PermanentCell targetActionCell, Creature.CreatureActions action, string finalOrientation)
+    IEnumerator moveToPointThenExecuteAction(Vector3[] route, PermanentCell targetActionCell, Creature.CreatureActions action, string finalOrientation, Vector3[] extraSpaces)
     {
         Animator animator = GetComponent<Creature>().creatureObjectReference.GetComponent<Animator>();
         if(route.Length > 0)
@@ -122,7 +136,7 @@ public class CreatureMovement : NetworkBehaviour
                 yield return null;
             }
 
-            grid.permanentMovedToNewCell(startingPos, route[route.Length - 1], GetComponent<NetworkObject>());
+            grid.permanentMovedToNewCell(GetComponent<NetworkObject>(), route[route.Length - 1],finalOrientation,extraSpaces);
         }
 
         animator.SetBool("Running", false);

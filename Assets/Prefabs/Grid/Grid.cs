@@ -145,35 +145,71 @@ public class Grid : NetworkBehaviour
         return false;
     }
 
-    public void createCreatureOnCell(HexCoordinates cell, ulong ownerId,string creatureName)
+    public void createCreatureOnCell(HexCoordinates[] spawnCells, ulong ownerId,string creatureName)
     {
-        if (isCellOktoSpawn(cell))
+        //verify there is nothing else on these cells
+        bool okToSpawn = true;
+        foreach (HexCoordinates h in spawnCells)
         {
-            /*Vector3 position = hexCalculator.HexToPosition(cell);
-            GameObject go = Instantiate(myPrefab, position, Quaternion.identity);
-            go.GetComponent<NetworkObject>().Spawn();*/
-            cells[cell].spawnCreature(Quaternion.identity, ownerId,creatureName);
-
-            //updateCellPermanentClientRpc(cell, go.GetComponent<NetworkObject>());
+            if (!isCellOktoSpawn(h))
+            {
+                Debug.Log("Cant spawn object, already a permanent");
+                okToSpawn = false;
+            }
         }
-        else
+
+        if (okToSpawn)
         {
-            Debug.Log("already ahs perm");
+            //transform our hex coordinates into vector 3 for the permanent
+            Vector3[] creatureCellPositions = new Vector3[spawnCells.Length];
+            for(int x = 0; x < spawnCells.Length; x++)
+            {
+                creatureCellPositions[x] = getPositionFromHexCoordinates(spawnCells[x]);
+            }
+            NetworkObjectReference spawnedCreatureReference = cells[spawnCells[0]].spawnCreature(Quaternion.identity, ownerId, creatureName, creatureCellPositions);
+            //tell all the other cells that will be occupied that they are occupied
+            for(int x = 1; x < spawnCells.Length; x++)
+            {
+                cells[spawnCells[x]].attachPermanent(spawnedCreatureReference);
+            }
         }
     }
 
-    public void permanentMovedToNewCell(Vector3 startingPosition, Vector3 endPosition, NetworkObjectReference permanent)
+    //we assume all security testing was done before this call
+    public void permanentMovedToNewCell(NetworkObjectReference permanent, Vector3 endPosition, string finalOrientation, Vector3[] extraSpaces)
     {
-        HexCoordinates startingCell = hexCalculator.HexFromPosition(startingPosition);
         HexCoordinates endCell = hexCalculator.HexFromPosition(endPosition);
-        if (isCellOktoSpawn(endCell))
+
+        if (permanent.TryGet(out NetworkObject targetObject))
         {
-            if (cells[startingCell])
+            //first we unattach the cells that this permanent occupies
+            Permanent targetPermanent = targetObject.GetComponent<Permanent>();
+            foreach(Vector3 cellVector in targetPermanent.getCellsOccupied())
             {
-                cells[startingCell].unattachPermanent();
+                HexCoordinates cellCoords = hexCalculator.HexFromPosition(cellVector);
+                cells[cellCoords].unattachPermanent();
             }
 
+            //we must now tell our new cells that they have a permanent and tell the permanent all the positions it occupies
+            int totalSpacesTaken = 1;
+            if(extraSpaces != null && extraSpaces.Length > 0)
+            {
+                totalSpacesTaken += extraSpaces.Length;
+            }
+            Vector3[] positionsOfSpaces = new Vector3[totalSpacesTaken];
+            //main cell is a special case
             cells[endCell].attachPermanent(permanent);
+            positionsOfSpaces[0] = hexCalculator.HexToPosition(endCell);
+            for(int x = 1; x < positionsOfSpaces.Length; x++)
+            {
+                cells[hexCalculator.HexFromPosition(extraSpaces[x - 1])].attachPermanent(permanent);
+                positionsOfSpaces[x] = extraSpaces[x - 1];
+            }
+            targetPermanent.setOccupiedCellsServerRpc(positionsOfSpaces);
+        }
+        else
+        {
+            Debug.Log("HOW DID THIS HAPPEN?");
         }
     }
 
