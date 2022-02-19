@@ -69,6 +69,11 @@ public class DamageTaker : NetworkBehaviour
                 amount.Value = Mathf.CeilToInt(remainingHealth / baseHealth);
                 health.Value = (int)(remainingHealth % baseHealth);
             }
+
+            if(amount.Value <= 0)
+            {
+                die();
+            }
         }
     }
 
@@ -76,7 +81,7 @@ public class DamageTaker : NetworkBehaviour
     {
         if(IsServer && amount.Value <= 0)
         {
-            Debug.Log("DIE PERMANET!");
+            GetComponent<Creature>().killed();
         }
     }
 

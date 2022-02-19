@@ -1009,6 +1009,7 @@ MonoBehaviour:
   baseArmor: 2
   baseSpeed: 6
   hexSpaces: 1
+  hexSpaceDistance: 1
 --- !u!1 &5972391637143400841
 GameObject:
   m_ObjectHideFlags: 0

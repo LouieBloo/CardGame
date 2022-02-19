@@ -11,49 +11,18 @@ public class ObjectSelecting : MonoBehaviour
 
     private Selectable selectedPermanent;
     private HexDirection selectedPermanentTargetOrientation = HexDirection.NONE;
-    private HexDirection attackOrientation;
+    private HexDirection mouseOrientation;
     private PermanentCell hoveringPermanent;
-    private PermanentCell hoveringPermanentExtra;
+    private List<PermanentCell> extraHoveringPermanents = new List<PermanentCell>();
 
     private PermanentCell hitCell;
 
-    private PermanentCell attackMovePotentialCellPosition;
-
-    public Texture2D westAttackTexture;
-    public Texture2D northWestAttackTexture;
-    public Texture2D northEastAttackTexture;
-    public Texture2D eastAttackTexture;
-    public Texture2D southEastAttackTexture;
-    public Texture2D southWestAttackTexture;
-
-    public Texture2D westMoveTexture;
-    public Texture2D northWestMoveTexture;
-    public Texture2D northEastMoveTexture;
-    public Texture2D eastMoveTexture;
-    public Texture2D southEastMoveTexture;
-    public Texture2D southWestMoveTexture;
-
     private Texture2D currentTexture;
-
-    private Dictionary<HexDirection, Texture2D> mouseTextureDirectionMapping = new Dictionary<HexDirection, Texture2D>();
-    private Dictionary<HexDirection, Texture2D> mouseTextureMoveDirectionMapping = new Dictionary<HexDirection, Texture2D>();
 
     // Start is called before the first frame update
     void Start()
     {
-        mouseTextureDirectionMapping.Add(HexDirection.W, westAttackTexture);
-        mouseTextureDirectionMapping.Add(HexDirection.NW, northWestAttackTexture);
-        mouseTextureDirectionMapping.Add(HexDirection.NE, northEastAttackTexture);
-        mouseTextureDirectionMapping.Add(HexDirection.E, eastAttackTexture);
-        mouseTextureDirectionMapping.Add(HexDirection.SE, southEastAttackTexture);
-        mouseTextureDirectionMapping.Add(HexDirection.SW, southWestAttackTexture);
-
-        mouseTextureMoveDirectionMapping.Add(HexDirection.W, westMoveTexture);
-        mouseTextureMoveDirectionMapping.Add(HexDirection.NW, northWestMoveTexture);
-        mouseTextureMoveDirectionMapping.Add(HexDirection.NE, northEastMoveTexture);
-        mouseTextureMoveDirectionMapping.Add(HexDirection.E, eastMoveTexture);
-        mouseTextureMoveDirectionMapping.Add(HexDirection.SE, southEastMoveTexture);
-        mouseTextureMoveDirectionMapping.Add(HexDirection.SW, southWestMoveTexture);
+        
     }
 
     // Update is called once per frame
@@ -69,27 +38,20 @@ public class ObjectSelecting : MonoBehaviour
 
         if (hitCell)
         {
-            //hoving logic
-            if (hitCell != hoveringPermanent)
-            {
-                selectHoveringPermanent(hitCell);
-            }
-
-            //attack selecting
-            if (selectedPermanent && hitCell.hasPermanent())
-            {
-                attackCellSelect(mouseCoords, hit);
-            }
-            
             //permanent logic
             if (Input.GetKeyDown(KeyCode.Mouse0))
             {
                 selectCell(hitCell);
             }
-
-            if (Input.GetKeyDown(KeyCode.R))
+            else
             {
-                rotateTargetOrientation();
+                //hoving logic
+                if (hitCell != hoveringPermanent)
+                {
+                    selectHoveringPermanent(hitCell);
+                }
+
+                handleAdditionalHovering(mouseCoords, hit);
             }
         }
         else
@@ -100,74 +62,60 @@ public class ObjectSelecting : MonoBehaviour
             }
             deselectHoveringPermanent();
         }
-        
+
+        //right click wipes everything
+        if (Input.GetKeyDown(KeyCode.Mouse1))
+        {
+            deselectPermanent();
+            deselectHoveringPermanent();
+        }
     }
 
-    PermanentCell attackCellSelect(HexCoordinates mouseCoords,RaycastHit hit)
+    void handleAdditionalHovering(HexCoordinates mouseCoords,RaycastHit hit)
     {
         //arrow direction
         float xDifference = hitCell.transform.position.x - hit.point.x;
         float zDifference = hitCell.transform.position.z - hit.point.z;
-        HexDirection direction;
         if (zDifference > 0.3)
         {
-            direction = xDifference > 0 ? HexDirection.SW : HexDirection.SE;
+            mouseOrientation = xDifference > 0 ? HexDirection.SW : HexDirection.SE;
         }
         else if (zDifference < -0.3)
         {
-            direction = xDifference > 0 ? HexDirection.NW : HexDirection.NE;
+            mouseOrientation = xDifference > 0 ? HexDirection.NW : HexDirection.NE;
         }
         else
         {
-            direction = xDifference > 0 ? HexDirection.W : HexDirection.E;
+            mouseOrientation = xDifference > 0 ? HexDirection.W : HexDirection.E;
         }
 
-        //set the texture of the mouse to the right direction of attack arrow
-        if(!currentTexture || currentTexture != mouseTextureDirectionMapping[direction])
+
+        if (selectedPermanent)
         {
-            currentTexture = mouseTextureDirectionMapping[direction];
-            Cursor.SetCursor(currentTexture, new Vector2(64,64), CursorMode.Auto);
-            attackOrientation = direction;
-        }
-
-        
-        //check if the neighbor in this direction exists, and do stuff on it sometimes
-        HexCoordinates attackMoveCoordinates = HexUtility.GetNeighbour(mouseCoords, direction);
-        if (grid.cells[attackMoveCoordinates])
-        {
-            if (!attackMovePotentialCellPosition)
+            if (Input.GetKeyDown(KeyCode.R))
             {
-                attackMovePotentialCellPosition = grid.cells[attackMoveCoordinates];
-                attackMovePotentialCellPosition.select();
+                rotateTargetOrientation();
             }
-            else if (attackMovePotentialCellPosition && attackMovePotentialCellPosition != grid.cells[attackMoveCoordinates])
+
+            selectedPermanentTargetOrientation = selectedPermanentTargetOrientation != HexDirection.NONE ? selectedPermanentTargetOrientation : selectedPermanent.getOrientation();
+            Selectable targetSelectable = hoveringPermanent.hasPermanent() ? hoveringPermanent.getAttachedPermanent().GetComponent<Selectable>() : hoveringPermanent;
+            Selectable.OnHoverOverSelectableResponse selectedPermanentHoverResponse = selectedPermanent.onMouseHoverEnter(targetSelectable, selectedPermanentTargetOrientation, mouseOrientation);
+            if (selectedPermanentHoverResponse != null)
             {
-                //when the previous potential attack move cell is equal to the NEW hovering permanent we dont want to deselct the previous attacking cell as its now selected
-                if (attackMovePotentialCellPosition == hoveringPermanent) {
-                }
-                else
-                {
-                    attackMovePotentialCellPosition.deSelect();
-                }
+                //set mouse texture for movement orientation
+                setMouseTexture(selectedPermanentHoverResponse.texture, new Vector2(64, 64));
 
-                attackMovePotentialCellPosition = grid.cells[attackMoveCoordinates];
-                attackMovePotentialCellPosition.select();
+                //select any extra cells such as big creatures with 2 spaces
+                selectHoveringPermanentExtra(selectedPermanentHoverResponse.selectableArea);
             }
+
         }
-
-        //extra hovering
-        selectHoveringPermanentExtra(attackMovePotentialCellPosition,CellHelper.getOppositeOfDirection(direction));
-
-        return attackMovePotentialCellPosition;
-       //Debug.Log("x: " + xDifference + " z: " + zDifference);
-        
     }
 
     public bool isEmptyCellTargeted()
     {
         return getTargetedCell() && !hitCell.hasPermanent();
     }
-
 
     public PermanentCell getTargetedCell()
     {
@@ -176,66 +124,53 @@ public class ObjectSelecting : MonoBehaviour
 
     void selectHoveringPermanent(PermanentCell newPermanent)
     {
-        /*if (hoveringPermanent)
-        {
-            hoveringPermanent.deSelect();
-            resetMouseTexture();
-        }*/
         deselectHoveringPermanent();
 
-        newPermanent.select();
+        newPermanent.hover();
         hoveringPermanent = newPermanent;
-
-        if(selectedPermanent && selectedPermanent.CreatureMovement)
-        {
-            //set mouse texture for movement orientation
-            selectedPermanentTargetOrientation = selectedPermanentTargetOrientation != HexDirection.NONE ? selectedPermanentTargetOrientation : selectedPermanent.CreatureMovement.getOrientation();
-            setMouseTexture(mouseTextureMoveDirectionMapping[selectedPermanentTargetOrientation], new Vector2(64, 64));
-
-            //select any extra cells such as big creatures with 2 spaces
-            selectHoveringPermanentExtra(hoveringPermanent,selectedPermanentTargetOrientation);
-        }
     }
 
     void deselectHoveringPermanent()
     {
         if (hoveringPermanent)
         {
-            hoveringPermanent.deSelect();
+            hoveringPermanent.deHover();
             hoveringPermanent = null;
         }
         deselectselectHoveringPermanentExtra();
-
-        if (attackMovePotentialCellPosition) {
-            attackMovePotentialCellPosition.deSelect();
-            attackMovePotentialCellPosition = null;
-        }
         resetMouseTexture();
     }
 
     //target being whatever cell we will be adding this extra too. when attacking its the move location, not the attacking target
-    void selectHoveringPermanentExtra(PermanentCell target, HexDirection direction)
+    void selectHoveringPermanentExtra(Selectable.SelectableHexArea area)
     {
         deselectselectHoveringPermanentExtra();
 
-        //select any extra cells such as big creatures with 2 spaces
-        if (target && selectedPermanent.CreatureMovement.getHexSpaceType() == CreatureStats.CreatureHexSpaces.Line)
+        if(area.type == Selectable.SelectableHexAreaType.Line)
         {
-            HexCoordinates neighbor = HexUtility.GetNeighbour(grid.getHexCoordinatesFromPosition(target.transform.position), CellHelper.getOppositeOfDirection(direction));
-            if (grid.cells[neighbor])
+            Vector3 targetPosition = hoveringPermanent.transform.position;
+            for(int x = 0; x < area.distance; x++)
             {
-                hoveringPermanentExtra = grid.cells[neighbor];
-                hoveringPermanentExtra.select();
+                HexCoordinates neighbor = HexUtility.GetNeighbour(grid.getHexCoordinatesFromPosition(targetPosition), CellHelper.getOppositeOfDirection(area.orientation));
+                if (grid.cells[neighbor])
+                {
+                    extraHoveringPermanents.Add(grid.cells[neighbor]);
+                    grid.cells[neighbor].hover();
+                    targetPosition = grid.cells[neighbor].transform.position;
+                }
             }
         }
     }
 
     void deselectselectHoveringPermanentExtra()
     {
-        if (hoveringPermanentExtra)
+        if (extraHoveringPermanents.Count > 0)
         {
-            hoveringPermanentExtra.deSelect();
-            hoveringPermanentExtra = null;
+            foreach(PermanentCell p in extraHoveringPermanents)
+            {
+                p.deHover();
+            }
+            extraHoveringPermanents.Clear();
         }
     }
 
@@ -253,13 +188,7 @@ public class ObjectSelecting : MonoBehaviour
 
     void rotateTargetOrientation()
     {
-        if (selectedPermanent && selectedPermanent.CreatureMovement && !attackMovePotentialCellPosition)
-        {
-            selectedPermanentTargetOrientation = CellHelper.nextDirectionWhenRotated(selectedPermanentTargetOrientation);
-            setMouseTexture(mouseTextureMoveDirectionMapping[selectedPermanentTargetOrientation], new Vector2(64, 64));
-
-            selectHoveringPermanentExtra(hoveringPermanent,selectedPermanentTargetOrientation);
-        }
+        selectedPermanentTargetOrientation = CellHelper.nextDirectionWhenRotated(selectedPermanentTargetOrientation);
     }
 
     void selectCell(PermanentCell cell)
@@ -293,7 +222,7 @@ public class ObjectSelecting : MonoBehaviour
 
         if (issueCommand)
         {
-            selectedPermanent.commandIssuedToCell(cell, attackMovePotentialCellPosition, grid, attackMovePotentialCellPosition == null ? selectedPermanentTargetOrientation : CellHelper.getOppositeOfDirection(attackOrientation));
+            selectedPermanent.commandIssuedToCell(cell, extraHoveringPermanents, selectedPermanentTargetOrientation,mouseOrientation);
         }
     }
 

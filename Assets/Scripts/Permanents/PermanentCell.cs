@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class PermanentCell : NetworkBehaviour
+public class PermanentCell : Selectable
 {
     private SpriteRenderer spriteRenderer;
 
@@ -22,6 +22,7 @@ public class PermanentCell : NetworkBehaviour
     void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        type = SelectableType.HexCell;
     }
 
     void OnDrawGizmos()
@@ -32,10 +33,6 @@ public class PermanentCell : NetworkBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-    }
 
     public void setHexCoordinates(HexCoordinates coordinates)
     {
@@ -83,7 +80,6 @@ public class PermanentCell : NetworkBehaviour
     public void unattachPermanent()
     {
         attachedNetworkObject.Value = new NetworkObjectReference();
-        deSelect();
     }
 
     public Permanent getAttachedPermanent()
@@ -106,16 +102,15 @@ public class PermanentCell : NetworkBehaviour
         //return attachedNetworkObject && attachedNetworkObject.Value != null;
     }
 
-    public void select()
+    public void hover()
     {
         spriteRenderer.color = Color.black;
     }
 
-    public void deSelect()
+    public void deHover()
     {
         spriteRenderer.color = Color.white;
     }
-
 
 
     static public void drawString(string text, Vector3 worldPosition, Color textColor, Vector2 anchor, float textSize = 15f)

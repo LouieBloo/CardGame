@@ -426,6 +426,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectedIndicatorPrefab: {fileID: 2854190863585195421, guid: 6a4d883f2719bd14ead569ca1989c976,
     type: 3}
+  westMoveTexture: {fileID: 2800000, guid: 94cf4d6495e4ac7498952b1691627970, type: 3}
+  northWestMoveTexture: {fileID: 2800000, guid: 7df81990ff2ee8a44bcc54335a3bdfce,
+    type: 3}
+  northEastMoveTexture: {fileID: 2800000, guid: 2e8d831349fc43545ba2634480b76c52,
+    type: 3}
+  eastMoveTexture: {fileID: 2800000, guid: fcad99de496ceca479b6b433da2e3f1a, type: 3}
+  southEastMoveTexture: {fileID: 2800000, guid: abe4452e645d4b44398bafd4c6bb1463,
+    type: 3}
+  southWestMoveTexture: {fileID: 2800000, guid: 38ced33580b075a47aa14ae7839f1954,
+    type: 3}
+  westAttackTexture: {fileID: 2800000, guid: 21e8ace0bc88f7a4d9712adb456f86f1, type: 3}
+  northWestAttackTexture: {fileID: 2800000, guid: b3568fee38a055749bdb7ca17dcfcb79,
+    type: 3}
+  northEastAttackTexture: {fileID: 2800000, guid: d29106582d3316247aee555c0450ec83,
+    type: 3}
+  eastAttackTexture: {fileID: 2800000, guid: 6bc7b16f704645b418663d5055b21684, type: 3}
+  southEastAttackTexture: {fileID: 2800000, guid: 67f132530b2c124498bb3971fb8a564c,
+    type: 3}
+  southWestAttackTexture: {fileID: 2800000, guid: d1e2c25450eb7c44993c6a407c48b295,
+    type: 3}
 --- !u!114 &2301321734742404553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -440,6 +460,144 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementSpeed: 4
   rotationSpeed: 360
+  facingOrientation:
+    m_InternalValue:
+      utf8LengthInBytes: 0
+      bytes:
+        offset0000:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        offset0016:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        offset0032:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        byte0048: 0
+        byte0049: 0
+        byte0050: 0
+        byte0051: 0
+        byte0052: 0
+        byte0053: 0
+        byte0054: 0
+        byte0055: 0
+        byte0056: 0
+        byte0057: 0
+        byte0058: 0
+        byte0059: 0
+        byte0060: 0
+        byte0061: 0
+  hexSpaceType:
+    m_InternalValue:
+      utf8LengthInBytes: 0
+      bytes:
+        offset0000:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        offset0016:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        offset0032:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        byte0048: 0
+        byte0049: 0
+        byte0050: 0
+        byte0051: 0
+        byte0052: 0
+        byte0053: 0
+        byte0054: 0
+        byte0055: 0
+        byte0056: 0
+        byte0057: 0
+        byte0058: 0
+        byte0059: 0
+        byte0060: 0
+        byte0061: 0
 --- !u!114 &2128330016230743486
 MonoBehaviour:
   m_ObjectHideFlags: 0

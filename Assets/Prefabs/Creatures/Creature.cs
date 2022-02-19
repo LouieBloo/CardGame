@@ -31,7 +31,6 @@ public class Creature : NetworkBehaviour
     private Dictionary<string, GameObject> creaturePrefabMapping = new Dictionary<string, GameObject>();
 
     private string creatureName;
-
     
 
     public struct CreatureInfo
@@ -94,6 +93,7 @@ public class Creature : NetworkBehaviour
 
         //setup creature movement
         GetComponent<CreatureMovement>().hexSpaceType.Value = creatureObjectReference.GetComponent<CreatureStats>().hexSpaces.ToString();
+        GetComponent<CreatureMovement>().hexSpaceDistance.Value = creatureObjectReference.GetComponent<CreatureStats>().hexSpaceDistance;
     }
 
     public void attacked(DamageDealer damageDealer)
@@ -106,6 +106,12 @@ public class Creature : NetworkBehaviour
         {
             Debug.Log("Cant apply damange as this isnt the server");
         }
+    }
+
+    public void killed()
+    {
+        creatureObjectReference.GetComponent<NetworkObject>().Despawn(true);
+        GetComponent<NetworkObject>().Despawn(true);
     }
 
     public void uiNeedsUpdating(int old, int newd)

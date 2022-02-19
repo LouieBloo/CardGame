@@ -12,6 +12,52 @@ public class Selectable : NetworkBehaviour
 
     private CreatureMovement creatureMovement;
 
+    public enum SelectableType
+    {
+        Creature,
+        HexCell,
+        Spell
+    }
+
+    public enum SelectableHexAreaType
+    {
+        Point,
+        Line,
+        None
+    }
+
+    public class SelectableHexArea
+    {
+        public SelectableHexArea(SelectableHexAreaType type, int distance, HexDirection orientation)
+        {
+            this.type = type;
+            this.distance = distance;
+            this.orientation = orientation;
+        }
+        public SelectableHexAreaType type;
+        public int distance;
+        public HexDirection orientation;
+    }
+
+    public class OnHoverOverSelectableResponse
+    {
+        public OnHoverOverSelectableResponse(Texture2D texture, SelectableHexArea selectableArea)
+        {
+            this.texture = texture;
+            this.selectableArea = selectableArea;
+            
+        }
+        public Texture2D texture;
+        public SelectableHexArea selectableArea;
+    }
+
+    protected SelectableType type;
+
+    public SelectableType Type
+    {
+        get { return this.type; }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -44,14 +90,27 @@ public class Selectable : NetworkBehaviour
         }
     }
 
-    public CreatureMovement CreatureMovement
+
+    //When we are selected and the mouse is hovering over another selectable
+    public virtual OnHoverOverSelectableResponse onMouseHoverEnter(Selectable selectableMouseIsHoveringOn, HexDirection targetOrientation, HexDirection mouseOrientation)
     {
-        get { return this.creatureMovement; }
+        return null;
     }
 
+    public virtual HexDirection getOrientation()
+    {
+        return HexDirection.NONE;
+    }
+
+   /* public CreatureMovement CreatureMovement
+    {
+        get { return this.creatureMovement; }
+    }*/
+
     //if we are selected and the user left clicks on another permanent
-    public virtual void commandIssuedToCell(PermanentCell target, PermanentCell attackMoveCell,Grid grid,HexDirection orientation)
+    public virtual bool commandIssuedToCell(PermanentCell target, List<PermanentCell> extraHoveringCells, HexDirection orientation, HexDirection mouseOrientation)
     {
         Debug.Log("Issueing command at cell: " + target);
+        return false;
     }
 }

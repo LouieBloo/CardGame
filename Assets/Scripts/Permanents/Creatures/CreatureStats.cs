@@ -16,9 +16,10 @@ public class CreatureStats : MonoBehaviour
 
     public enum CreatureHexSpaces
     {
-        Normal,
+        Point,
         Line
     }
 
-    public CreatureHexSpaces hexSpaces = CreatureHexSpaces.Normal;
+    public CreatureHexSpaces hexSpaces = CreatureHexSpaces.Point;
+    public int hexSpaceDistance = 0;
 }

@@ -110,7 +110,7 @@ public class Grid : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse1)){
             foreach (PermanentCell c in cells.GetCells())
             {
-                c.deSelect();
+                c.deHover();
             }
         }
 
