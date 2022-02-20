@@ -446,6 +446,8 @@ MonoBehaviour:
     type: 3}
   southWestAttackTexture: {fileID: 2800000, guid: d1e2c25450eb7c44993c6a407c48b295,
     type: 3}
+  statsUIPrefab: {fileID: 547918047721802203, guid: 1855d64bf326f6744bba520ffc6b0218,
+    type: 3}
 --- !u!114 &2301321734742404553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -598,6 +600,8 @@ MonoBehaviour:
         byte0059: 0
         byte0060: 0
         byte0061: 0
+  hexSpaceDistance:
+    m_InternalValue: 0
 --- !u!114 &2128330016230743486
 MonoBehaviour:
   m_ObjectHideFlags: 0

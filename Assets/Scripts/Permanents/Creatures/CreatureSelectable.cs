@@ -24,6 +24,9 @@ public class CreatureSelectable : Selectable
     public Texture2D southWestAttackTexture;
     private Dictionary<HexDirection, Texture2D> mouseTextureDirectionMapping = new Dictionary<HexDirection, Texture2D>();
 
+    public GameObject statsUIPrefab;
+    private GameObject activeStatsUI;
+
     private void Awake()
     {
         movementScript = this.GetComponent<CreatureMovement>();
@@ -99,5 +102,25 @@ public class CreatureSelectable : Selectable
     public override HexDirection getOrientation()
     {
         return movementScript.getOrientation();
+    }
+
+    public override void onAltClick(Vector3 mousePosition)
+    {
+        CreatureStats statsForUI = new CreatureStats();
+        activeStatsUI = Instantiate(statsUIPrefab, Vector3.zero, Quaternion.identity);
+        activeStatsUI.GetComponent<CreatureStatsUI>().setup(GetComponent<Creature>().getCurrentStats());
+        if (RectTransformUtility.ScreenPointToWorldPointInRectangle(activeStatsUI.GetComponent<RectTransform>(), mousePosition, null, out Vector3 worldPosition))
+        {
+            activeStatsUI.transform.GetChild(0).position = new Vector3(worldPosition.x + 200, worldPosition.y + 112, worldPosition.z);
+        }
+    }
+
+    public override void onAltClickRelease()
+    {
+        if(activeStatsUI != null)
+        {
+            Destroy(activeStatsUI);
+            activeStatsUI = null;
+        }
     }
 }

@@ -113,4 +113,14 @@ public class Selectable : NetworkBehaviour
         Debug.Log("Issueing command at cell: " + target);
         return false;
     }
+
+    public virtual void onAltClick(Vector3 mousePosition)
+    {
+
+    }
+
+    public virtual void onAltClickRelease()
+    {
+
+    }
 }

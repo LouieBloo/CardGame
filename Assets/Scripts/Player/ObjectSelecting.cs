@@ -14,6 +14,7 @@ public class ObjectSelecting : MonoBehaviour
     private HexDirection mouseOrientation;
     private PermanentCell hoveringPermanent;
     private List<PermanentCell> extraHoveringPermanents = new List<PermanentCell>();
+    private PermanentCell altClickHoveringPermanent;
 
     private PermanentCell hitCell;
 
@@ -66,8 +67,18 @@ public class ObjectSelecting : MonoBehaviour
         //right click wipes everything
         if (Input.GetKeyDown(KeyCode.Mouse1))
         {
-            deselectPermanent();
-            deselectHoveringPermanent();
+            if(hoveringPermanent != null && hoveringPermanent.hasPermanent())
+            {
+                altClickHoveringPermanentSelected();
+            }
+            else
+            {
+                deselectPermanent();
+                deselectHoveringPermanent();
+            }
+        }else if (Input.GetKeyUp(KeyCode.Mouse1))
+        {
+            releaseAltClickHoveringPermanent();
         }
     }
 
@@ -139,6 +150,23 @@ public class ObjectSelecting : MonoBehaviour
         }
         deselectselectHoveringPermanentExtra();
         resetMouseTexture();
+    }
+
+    void altClickHoveringPermanentSelected()
+    {
+        releaseAltClickHoveringPermanent();
+        altClickHoveringPermanent = hoveringPermanent;
+        altClickHoveringPermanent.getAttachedPermanent().GetComponent<Selectable>().onAltClick(Input.mousePosition);
+    }
+
+    void releaseAltClickHoveringPermanent()
+    {
+        if (altClickHoveringPermanent != null && altClickHoveringPermanent.hasPermanent())
+        {
+            altClickHoveringPermanent.getAttachedPermanent().GetComponent<Selectable>().onAltClickRelease();
+        }
+
+        altClickHoveringPermanent = null;
     }
 
     //target being whatever cell we will be adding this extra too. when attacking its the move location, not the attacking target

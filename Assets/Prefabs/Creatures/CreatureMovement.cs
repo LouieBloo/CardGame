@@ -17,6 +17,7 @@ public class CreatureMovement : NetworkBehaviour
     public NetworkVariable<FixedString64Bytes> facingOrientation = new NetworkVariable<FixedString64Bytes>();
     public NetworkVariable<FixedString64Bytes> hexSpaceType = new NetworkVariable<FixedString64Bytes>();
     public NetworkVariable<int> hexSpaceDistance = new NetworkVariable<int>();
+    public NetworkVariable<int> speed = new NetworkVariable<int>();
 
     public void setup(HexDirection startingOrientation)
     {

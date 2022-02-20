@@ -16,7 +16,7 @@ public class DamageTaker : NetworkBehaviour
     [SerializeField] private int baseHealth = 0;
     [SerializeField] private NetworkVariable<int> health = new NetworkVariable<int>();
 
-    [SerializeField] private int baseArmor = 0;
+    [SerializeField] private NetworkVariable<int> baseArmor = new NetworkVariable<int>();
 
     [SerializeField] private NetworkVariable<int> amount = new NetworkVariable<int>();
 
@@ -36,7 +36,7 @@ public class DamageTaker : NetworkBehaviour
             baseHealth = creatureStats.baseHealth;
 
             armorType = creatureStats.armorType;
-            baseArmor = creatureStats.baseArmor;
+            baseArmor.Value = creatureStats.baseArmor;
 
             amount.Value = 3;
         }
@@ -47,7 +47,7 @@ public class DamageTaker : NetworkBehaviour
         if(permanent.type == Permanent.Type.Creature)
         {
             //return baseArmor + permanent.GetComponent<Creature>().defensePoints.Value;
-            return baseArmor;
+            return baseArmor.Value;
         }
 
         return 0;

@@ -1562,11 +1562,17 @@ MonoBehaviour:
   damageType: 0
   physicalDamageType: 0
   baseDamage: 4
+  currentDamage: 0
   baseHealth: 10
+  currentHealth: 0
   armorType: 0
   baseArmor: 1
+  currentArmor: 0
   baseSpeed: 3
+  currentSpeed: 0
+  name: Swordsman
   hexSpaces: 0
+  hexSpaceDistance: 0
 --- !u!1 &4731527214890039423
 GameObject:
   m_ObjectHideFlags: 0

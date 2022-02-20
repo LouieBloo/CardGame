@@ -19,6 +19,7 @@ public class Creature : NetworkBehaviour
 
     private DamageTaker damageTaker;
     private DamageDealer damageDealer;
+    private CreatureMovement creatureMovement;
 
     [System.Serializable]
     public class CreaturePrefab
@@ -41,6 +42,8 @@ public class Creature : NetworkBehaviour
 
     private void Start()
     {
+        creatureMovement = GetComponent<CreatureMovement>();
+
         if (IsServer)
         {
            //setup the creature prefab mapping for performance reasons
@@ -49,7 +52,6 @@ public class Creature : NetworkBehaviour
                 creaturePrefabMapping.Add(p.name, p.prefab);
            } 
         }
-
 
         damageTaker = GetComponent<DamageTaker>();
         damageTaker.subscribeToAmountChanges(uiNeedsUpdating);
@@ -92,8 +94,9 @@ public class Creature : NetworkBehaviour
         damageDealer.setup(creatureObjectReference.GetComponent<CreatureStats>());
 
         //setup creature movement
-        GetComponent<CreatureMovement>().hexSpaceType.Value = creatureObjectReference.GetComponent<CreatureStats>().hexSpaces.ToString();
-        GetComponent<CreatureMovement>().hexSpaceDistance.Value = creatureObjectReference.GetComponent<CreatureStats>().hexSpaceDistance;
+        creatureMovement.hexSpaceType.Value = creatureObjectReference.GetComponent<CreatureStats>().hexSpaces.ToString();
+        creatureMovement.hexSpaceDistance.Value = creatureObjectReference.GetComponent<CreatureStats>().hexSpaceDistance;
+        creatureMovement.speed.Value = creatureObjectReference.GetComponent<CreatureStats>().baseSpeed;
     }
 
     public void attacked(DamageDealer damageDealer)
@@ -112,6 +115,24 @@ public class Creature : NetworkBehaviour
     {
         creatureObjectReference.GetComponent<NetworkObject>().Despawn(true);
         GetComponent<NetworkObject>().Despawn(true);
+    }
+
+    public CreatureStats getCurrentStats()
+    {
+        if (creatureObjectReference == null)
+        {
+            creatureObjectReference = transform.GetChild(1).gameObject;
+        }
+        CreatureStats stats = new CreatureStats();
+        CreatureStats baseStats = creatureObjectReference.GetComponent<CreatureStats>();
+
+        stats.currentDamage = damageDealer.getBaseDamage();
+        stats.baseHealth = baseStats.baseHealth;
+        stats.currentArmor = damageTaker.getArmor();
+        stats.currentSpeed = creatureMovement.speed.Value;
+        stats.name = baseStats.name;
+
+        return stats;
     }
 
     public void uiNeedsUpdating(int old, int newd)
