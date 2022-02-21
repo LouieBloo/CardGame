@@ -1,3 +1,4 @@
+using DamageNumbersPro;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -22,7 +23,7 @@ public class DamageTaker : NetworkBehaviour
 
     private Permanent permanent;
 
-
+    public GameObject damageFloatingTextPrefab;
     private void Start()
     {
         permanent = GetComponent<Permanent>();
@@ -70,11 +71,19 @@ public class DamageTaker : NetworkBehaviour
                 health.Value = (int)(remainingHealth % baseHealth);
             }
 
+            spawnDamageFloatingTextClientRpc(damage);
+
             if(amount.Value <= 0)
             {
                 die();
             }
         }
+    }
+
+    [ClientRpc]
+    void spawnDamageFloatingTextClientRpc(int damage)
+    {
+        damageFloatingTextPrefab.GetComponent<DamageNumber>().Spawn(new Vector3(transform.position.x, transform.position.y + 1, transform.position.z), damage);
     }
 
     private void die()

@@ -92,7 +92,7 @@ public class Selectable : NetworkBehaviour
 
 
     //When we are selected and the mouse is hovering over another selectable
-    public virtual OnHoverOverSelectableResponse onMouseHoverEnter(Selectable selectableMouseIsHoveringOn, HexDirection targetOrientation, HexDirection mouseOrientation)
+    public virtual OnHoverOverSelectableResponse onMouseHoverEnter(PermanentCell cell,Selectable selectableMouseIsHoveringOn, HexDirection targetOrientation, HexDirection mouseOrientation)
     {
         return null;
     }

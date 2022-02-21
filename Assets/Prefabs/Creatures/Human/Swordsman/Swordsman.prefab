@@ -1561,6 +1561,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageType: 0
   physicalDamageType: 0
+  attackType: 0
+  baseRange: 1
   baseDamage: 4
   currentDamage: 0
   baseHealth: 10

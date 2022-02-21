@@ -1,12 +1,14 @@
 using HexMapTools;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class CreatureSelectable : Selectable
 {
 
     private CreatureMovement movementScript;
+    private Attacker attacker;
 
     public Texture2D westMoveTexture;
     public Texture2D northWestMoveTexture;
@@ -16,20 +18,13 @@ public class CreatureSelectable : Selectable
     public Texture2D southWestMoveTexture;
     private Dictionary<HexDirection, Texture2D> mouseTextureMoveDirectionMapping = new Dictionary<HexDirection, Texture2D>();
 
-    public Texture2D westAttackTexture;
-    public Texture2D northWestAttackTexture;
-    public Texture2D northEastAttackTexture;
-    public Texture2D eastAttackTexture;
-    public Texture2D southEastAttackTexture;
-    public Texture2D southWestAttackTexture;
-    private Dictionary<HexDirection, Texture2D> mouseTextureDirectionMapping = new Dictionary<HexDirection, Texture2D>();
-
     public GameObject statsUIPrefab;
     private GameObject activeStatsUI;
 
     private void Awake()
     {
         movementScript = this.GetComponent<CreatureMovement>();
+        attacker = GetComponent<Attacker>();
         type = SelectableType.Creature;
     }
 
@@ -41,39 +36,30 @@ public class CreatureSelectable : Selectable
         mouseTextureMoveDirectionMapping.Add(HexDirection.E, eastMoveTexture);
         mouseTextureMoveDirectionMapping.Add(HexDirection.SE, southEastMoveTexture);
         mouseTextureMoveDirectionMapping.Add(HexDirection.SW, southWestMoveTexture);
-
-        mouseTextureDirectionMapping.Add(HexDirection.W, westAttackTexture);
-        mouseTextureDirectionMapping.Add(HexDirection.NW, northWestAttackTexture);
-        mouseTextureDirectionMapping.Add(HexDirection.NE, northEastAttackTexture);
-        mouseTextureDirectionMapping.Add(HexDirection.E, eastAttackTexture);
-        mouseTextureDirectionMapping.Add(HexDirection.SE, southEastAttackTexture);
-        mouseTextureDirectionMapping.Add(HexDirection.SW, southWestAttackTexture);
     }
 
     public override bool commandIssuedToCell(PermanentCell target, List<PermanentCell> extraHoveringCells, HexDirection orientation, HexDirection mouseOrientation)
     {
         //if(doIHaveTurnPriority)
-
         if (!IsOwner) { return false; }
-        if (target.hasPermanent() && extraHoveringCells.Count > 0)
+
+        //convert permanet cell to vector 3 for network serialization
+        Vector3[] extraMovePositions = new Vector3[extraHoveringCells.Count];
+        for (int x = 0; x < extraHoveringCells.Count; x++)
         {
-            Debug.Log("SHOULD ATTACK");
-            movementScript.moveToCellAndAttack(target, extraHoveringCells, orientation, mouseOrientation);
-        }
-        else
-        {
-            movementScript.moveToCell(target, extraHoveringCells, orientation);
+            extraMovePositions[x] = extraHoveringCells[x].transform.position;
         }
 
-        return false;
+        attacker.commandIssuedToCellServerRpc(target.transform.position, extraMovePositions, orientation, mouseOrientation);
+        return true;
     }
 
 
     //When we are selected and the mouse is hovering over another selectable
-    public override OnHoverOverSelectableResponse onMouseHoverEnter(Selectable selectableMouseIsHoveringOn, HexDirection orientation, HexDirection mouseOrientation)
+    public override OnHoverOverSelectableResponse onMouseHoverEnter(PermanentCell cell, Selectable selectableMouseIsHoveringOn, HexDirection orientation, HexDirection mouseOrientation)
     {
         //check for valid move if we are hovering over a cell
-        if(selectableMouseIsHoveringOn.Type == SelectableType.HexCell && !selectableMouseIsHoveringOn.GetComponent<PermanentCell>().hasPermanent())
+        if(selectableMouseIsHoveringOn.Type == SelectableType.HexCell && !cell.hasPermanent())
         {
             if (movementScript.getHexSpaceType() == CreatureStats.CreatureHexSpaces.Point)
             {
@@ -86,14 +72,18 @@ public class CreatureSelectable : Selectable
         }
         else if (selectableMouseIsHoveringOn.Type == SelectableType.Creature)
         {
-            if(movementScript.getHexSpaceType() == CreatureStats.CreatureHexSpaces.Point)
+            if (attacker.isValidTarget(cell.getHexCoordinates(), selectableMouseIsHoveringOn.GetComponent<NetworkObject>().OwnerClientId)){
+                return attacker.mouseAttackHover(mouseOrientation);
+            }
+
+            /*if(movementScript.getHexSpaceType() == CreatureStats.CreatureHexSpaces.Point)
             {
                 return new OnHoverOverSelectableResponse(mouseTextureDirectionMapping[mouseOrientation], new SelectableHexArea(SelectableHexAreaType.Line, 1,CellHelper.getOppositeOfDirection(mouseOrientation)));
             }else if (movementScript.getHexSpaceType() == CreatureStats.CreatureHexSpaces.Line)
             {
                 //note the +1 to distance since we start counting from the target, not the move position
                 return new OnHoverOverSelectableResponse(mouseTextureDirectionMapping[mouseOrientation], new SelectableHexArea(SelectableHexAreaType.Line, movementScript.hexSpaceDistance.Value+1, CellHelper.getOppositeOfDirection(mouseOrientation)));
-            }
+            }*/
         }
 
         return null;
@@ -111,7 +101,26 @@ public class CreatureSelectable : Selectable
         activeStatsUI.GetComponent<CreatureStatsUI>().setup(GetComponent<Creature>().getCurrentStats());
         if (RectTransformUtility.ScreenPointToWorldPointInRectangle(activeStatsUI.GetComponent<RectTransform>(), mousePosition, null, out Vector3 worldPosition))
         {
-            activeStatsUI.transform.GetChild(0).position = new Vector3(worldPosition.x + 200, worldPosition.y + 112, worldPosition.z);
+            //we put the ui at the mouse position but we also need to check if it will go off the screen
+            Rect uiRect = activeStatsUI.transform.GetChild(0).GetComponent<RectTransform>().rect;
+
+            float xOffset = 0;
+            float yOffset = (uiRect.height/2);
+            if(mousePosition.x <= (uiRect.width/2))
+            {
+                xOffset = (uiRect.width / 2) - mousePosition.x;
+            }else if(Screen.width - (uiRect.width / 2) < mousePosition.x)
+            {
+                xOffset = (uiRect.width / 2) - (Screen.width - mousePosition.x);
+                xOffset *= -1;
+            }
+
+            if (Screen.height - uiRect.height < mousePosition.y)
+            {
+                yOffset = (uiRect.height / 2) - (Screen.height - mousePosition.y);
+                yOffset *= -1;
+            }
+            activeStatsUI.transform.GetChild(0).position = new Vector3(worldPosition.x + xOffset, worldPosition.y + yOffset, worldPosition.z);
         }
     }
 

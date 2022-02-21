@@ -16,7 +16,6 @@ public class Grid : NetworkBehaviour
     private HexCoordinates selectedCoordinates;
 
     private HexPathFinder pathFinder;
-    
 
     private void Start()
     {
@@ -176,7 +175,7 @@ public class Grid : NetworkBehaviour
     }
 
     //we assume all security testing was done before this call
-    public void permanentMovedToNewCell(NetworkObjectReference permanent, Vector3 endPosition, string finalOrientation, Vector3[] extraSpaces)
+    public void permanentMovedToNewCell(NetworkObjectReference permanent, Vector3 endPosition, string finalOrientation, List<PermanentCell> extraSpaces)
     {
         HexCoordinates endCell = hexCalculator.HexFromPosition(endPosition);
 
@@ -192,9 +191,9 @@ public class Grid : NetworkBehaviour
 
             //we must now tell our new cells that they have a permanent and tell the permanent all the positions it occupies
             int totalSpacesTaken = 1;
-            if(extraSpaces != null && extraSpaces.Length > 0)
+            if(extraSpaces != null && extraSpaces.Count > 0)
             {
-                totalSpacesTaken += extraSpaces.Length;
+                totalSpacesTaken += extraSpaces.Count;
             }
             Vector3[] positionsOfSpaces = new Vector3[totalSpacesTaken];
             //main cell is a special case
@@ -202,8 +201,8 @@ public class Grid : NetworkBehaviour
             positionsOfSpaces[0] = hexCalculator.HexToPosition(endCell);
             for(int x = 1; x < positionsOfSpaces.Length; x++)
             {
-                cells[hexCalculator.HexFromPosition(extraSpaces[x - 1])].attachPermanent(permanent);
-                positionsOfSpaces[x] = extraSpaces[x - 1];
+                cells[extraSpaces[x - 1].getHexCoordinates()].attachPermanent(permanent);
+                positionsOfSpaces[x] = extraSpaces[x - 1].transform.position;
             }
             targetPermanent.setOccupiedCellsServerRpc(positionsOfSpaces);
         }

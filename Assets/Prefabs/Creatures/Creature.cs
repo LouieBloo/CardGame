@@ -15,11 +15,14 @@ public class Creature : NetworkBehaviour
 
     public CreatureStaticUI ui;
 
-    public GameObject creatureObjectReference;
+    //public GameObject creatureObjectReference;
+    NetworkVariable<NetworkObjectReference> creatureObjectReference = new NetworkVariable<NetworkObjectReference>();
 
+    private CreatureStats creatureStats;
     private DamageTaker damageTaker;
     private DamageDealer damageDealer;
     private CreatureMovement creatureMovement;
+    private Attacker attacker;
 
     [System.Serializable]
     public class CreaturePrefab
@@ -32,7 +35,7 @@ public class Creature : NetworkBehaviour
     private Dictionary<string, GameObject> creaturePrefabMapping = new Dictionary<string, GameObject>();
 
     private string creatureName;
-    
+
 
     public struct CreatureInfo
     {
@@ -46,11 +49,11 @@ public class Creature : NetworkBehaviour
 
         if (IsServer)
         {
-           //setup the creature prefab mapping for performance reasons
-           foreach(CreaturePrefab p in creaturePrefabs)
-           {
+            //setup the creature prefab mapping for performance reasons
+            foreach (CreaturePrefab p in creaturePrefabs)
+            {
                 creaturePrefabMapping.Add(p.name, p.prefab);
-           } 
+            }
         }
 
         damageTaker = GetComponent<DamageTaker>();
@@ -58,6 +61,8 @@ public class Creature : NetworkBehaviour
         damageTaker.subscribeToHealthChanges(uiNeedsUpdating);
 
         damageDealer = GetComponent<DamageDealer>();
+
+        attacker = GetComponent<Attacker>();
 
         if (IsServer)
         {
@@ -79,24 +84,36 @@ public class Creature : NetworkBehaviour
     }
 
     //we require false here as only the server can call this function
-    [ServerRpc(RequireOwnership =false)]
+    [ServerRpc(RequireOwnership = false)]
     void spawnCreatureObjectServerRpc()
     {
         Debug.Log(creatureName);
-        GameObject newObj = Instantiate(creaturePrefabMapping[creatureName], transform.position,Quaternion.identity);
+        GameObject newObj = Instantiate(creaturePrefabMapping[creatureName], transform.position, Quaternion.identity);
         newObj.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
         newObj.transform.SetParent(transform);
         newObj.transform.localRotation = creaturePrefabMapping[creatureName].transform.rotation;
         newObj.transform.localPosition = new Vector3(newObj.transform.localPosition.x, creaturePrefabMapping[creatureName].transform.position.y, newObj.transform.localPosition.z);
-        creatureObjectReference = newObj;
-        
-        damageTaker.setup(creatureObjectReference.GetComponent<CreatureStats>());
-        damageDealer.setup(creatureObjectReference.GetComponent<CreatureStats>());
+        creatureObjectReference.Value = newObj;
+
+        creatureStats = newObj.GetComponent<CreatureStats>();
+        //setup damage taking and giving
+        damageTaker.setup(creatureStats);
+        damageDealer.setup(creatureStats);
+
+        attacker.setup(creatureStats);
 
         //setup creature movement
-        creatureMovement.hexSpaceType.Value = creatureObjectReference.GetComponent<CreatureStats>().hexSpaces.ToString();
-        creatureMovement.hexSpaceDistance.Value = creatureObjectReference.GetComponent<CreatureStats>().hexSpaceDistance;
-        creatureMovement.speed.Value = creatureObjectReference.GetComponent<CreatureStats>().baseSpeed;
+        creatureMovement.hexSpaceType.Value = creatureStats.hexSpaces.ToString();
+        creatureMovement.hexSpaceDistance.Value = creatureStats.hexSpaceDistance;
+        creatureMovement.speed.Value = creatureStats.baseSpeed;
+    }
+
+    public NetworkObject getCreatureObject(){
+        if (creatureObjectReference.Value.TryGet(out NetworkObject targetObject))
+        {
+            return targetObject;
+        }
+        return null;
     }
 
     public void attacked(DamageDealer damageDealer)
@@ -113,18 +130,18 @@ public class Creature : NetworkBehaviour
 
     public void killed()
     {
-        creatureObjectReference.GetComponent<NetworkObject>().Despawn(true);
+        getCreatureObject().Despawn(true);
         GetComponent<NetworkObject>().Despawn(true);
     }
 
     public CreatureStats getCurrentStats()
     {
-        if (creatureObjectReference == null)
+        /*if (creatureObjectReference == null)
         {
             creatureObjectReference = transform.GetChild(1).gameObject;
-        }
+        }*/
         CreatureStats stats = new CreatureStats();
-        CreatureStats baseStats = creatureObjectReference.GetComponent<CreatureStats>();
+        CreatureStats baseStats = getCreatureObject().GetComponent<CreatureStats>();
 
         stats.currentDamage = damageDealer.getBaseDamage();
         stats.baseHealth = baseStats.baseHealth;

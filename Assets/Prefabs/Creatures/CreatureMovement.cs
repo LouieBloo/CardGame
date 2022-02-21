@@ -1,4 +1,5 @@
 using HexMapTools;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
@@ -19,10 +20,23 @@ public class CreatureMovement : NetworkBehaviour
     public NetworkVariable<int> hexSpaceDistance = new NetworkVariable<int>();
     public NetworkVariable<int> speed = new NetworkVariable<int>();
 
+    private void Start()
+    {
+        if (!grid)
+        {
+            grid = GameObject.FindGameObjectsWithTag("Grid")[0].GetComponent<Grid>();
+        }
+    }
+
     public void setup(HexDirection startingOrientation)
     {
         facingOrientation.Value = startingOrientation.ToString();
         rotateToOrientation(facingOrientation.Value.ToString());
+    }
+
+    public HexCoordinates currentCoordinates()
+    {
+        return grid.getHexCoordinatesFromPosition(transform.position);
     }
 
     private void rotateToOrientation(string orientation)
@@ -44,74 +58,48 @@ public class CreatureMovement : NetworkBehaviour
 
     public void moveToCell(PermanentCell target, List<PermanentCell> extraHoveringCells, HexDirection orientation)
     {
-        if (IsOwner)
+        if (IsServer)
         {
-            Vector3[] extraMovePositions = new Vector3[extraHoveringCells.Count];
-            for(int x = 0; x < extraHoveringCells.Count; x++)
-            {
-                extraMovePositions[x] = extraHoveringCells[x].transform.position;
-            }
-            moveAndExecuteActionServerRpc(target.transform.position, extraMovePositions, Vector3.zero,Creature.CreatureActions.Move, orientation.ToString());
+            moveAndExecuteAction(target, extraHoveringCells, null,Creature.CreatureActions.Move, orientation.ToString(),null);
         }
     }
 
-    public void moveToCellAndAttack(PermanentCell target, List<PermanentCell> extraHoveringCells, HexDirection orientation, HexDirection mouseOrientation)
+    public void moveToCellAndAttack(PermanentCell target, List<PermanentCell> extraHoveringCells, HexDirection orientation, HexDirection mouseOrientation, Action<PermanentCell> callbackWhenDone)
     {
-        if (IsOwner)
+        if (IsServer)
         {
-            Vector3[] extraMovePositions = new Vector3[extraHoveringCells.Count];
-            for (int x = 0; x < extraHoveringCells.Count; x++)
-            {
-                extraMovePositions[x] = extraHoveringCells[x].transform.position;
-            }
-            moveAndExecuteActionServerRpc(extraMovePositions[0], extraMovePositions, target.transform.position, Creature.CreatureActions.Attack, orientation.ToString());
+            moveAndExecuteAction(extraHoveringCells[0], extraHoveringCells, target, Creature.CreatureActions.Attack, orientation.ToString(),callbackWhenDone);
         }
     }
 
 
-    [ServerRpc]
-    void moveAndExecuteActionServerRpc(Vector3 targetMovePosition,Vector3[] extraMovePositions, Vector3 targetActionPosition, Creature.CreatureActions action, string finalOrientation)
+    void moveAndExecuteAction(PermanentCell targetMoveCell, List<PermanentCell> extraMovePositions, PermanentCell targetActionCell, Creature.CreatureActions action, string finalOrientation, Action<PermanentCell> callbackWhenDone)
     {
         if (doingCommand != null) { Debug.Log("Already doing a command...");return; }
 
-        if (!grid)
-        {
-            grid = GameObject.FindGameObjectsWithTag("Grid")[0].GetComponent<Grid>();
-        }
 
-        //grab target move cell
-        PermanentCell targetMoveCell = grid.cells[grid.getHexCoordinatesFromPosition(targetMovePosition)];
         //make sure there is nothing in this cell
         if (!targetMoveCell || (targetMoveCell.hasPermanent() && targetMoveCell.getAttachedPermanent() != GetComponent<Permanent>())) { Debug.Log("Invalid attack, either no target or target has a permanent"); return; }
 
         //same checks for extra cells
-        foreach(Vector3 v in extraMovePositions)
+        foreach(PermanentCell cell in extraMovePositions)
         {
-            PermanentCell extraLineMoveCell = grid.cells[grid.getHexCoordinatesFromPosition(targetMovePosition)];
-            if (!extraLineMoveCell) { Debug.Log("Line cell extra not real!"); return; }
-            if (extraLineMoveCell.hasPermanent() && extraLineMoveCell.getAttachedPermanent() != GetComponent<Permanent>()) { Debug.Log("Line cell extra has permanent!"); return; }
+            if (!cell) { Debug.Log("Line cell extra not real!"); return; }
+            if (cell.hasPermanent() && cell.getAttachedPermanent() != GetComponent<Permanent>()) { Debug.Log("Line cell extra has permanent!"); return; }
         }
 
-        //if we are attacking, make sure its a valid attack
-        PermanentCell targetActionCell = grid.cells[grid.getHexCoordinatesFromPosition(targetActionPosition)];
-        if (action == Creature.CreatureActions.Attack)
-        {
-            if (!targetActionCell) {  Debug.Log("Invalid attack, cant find cell"); return; }
-            if (!targetActionCell.hasPermanent()) { Debug.Log("Invalid attack, target doesnt have permanent"); return; }
-            //if(targetActionCell.getAttachedPermanent().GetComponent<NetworkObject>().OwnerClientId == OwnerClientId) { Debug.Log("Invalid attack, target is same team as us!"); return; }
-        }
-
+        //find path
         List<Vector3> path = grid.findPathVector3(grid.getHexCoordinatesFromPosition(transform.position), targetMoveCell.getHexCoordinates());
         if (path != null)
         {
-            doingCommand = moveToPointThenExecuteAction(path.ToArray(), targetActionCell, action,finalOrientation, extraMovePositions);
+            doingCommand = moveToPointThenExecuteAction(path.ToArray(), targetActionCell, action,finalOrientation, extraMovePositions,callbackWhenDone);
             StartCoroutine(doingCommand);
         }
     }
 
-    IEnumerator moveToPointThenExecuteAction(Vector3[] route, PermanentCell targetActionCell, Creature.CreatureActions action, string finalOrientation, Vector3[] extraMovePositions)
+    IEnumerator moveToPointThenExecuteAction(Vector3[] route, PermanentCell targetActionCell, Creature.CreatureActions action, string finalOrientation, List<PermanentCell> extraMoveCells, Action<PermanentCell> callbackWhenDone)
     {
-        Animator animator = GetComponent<Creature>().creatureObjectReference.GetComponent<Animator>();
+        Animator animator = GetComponent<Creature>().getCreatureObject().GetComponent<Animator>();
         if(route.Length > 0)
         {
             Vector3 startingPos = transform.position;
@@ -143,7 +131,7 @@ public class CreatureMovement : NetworkBehaviour
                 yield return null;
             }
 
-            grid.permanentMovedToNewCell(GetComponent<NetworkObject>(), route[route.Length - 1],finalOrientation, extraMovePositions);
+            grid.permanentMovedToNewCell(GetComponent<NetworkObject>(), route[route.Length - 1],finalOrientation, extraMoveCells);
         }
 
         animator.SetBool("Running", false);
@@ -164,7 +152,10 @@ public class CreatureMovement : NetworkBehaviour
         //set final orientation of our object 
         facingOrientation.Value = finalOrientation;
 
-        handleAction(targetActionCell, action);
+        if(callbackWhenDone != null)
+        {
+            callbackWhenDone(targetActionCell);
+        }
 
         doingCommand = null;
     }

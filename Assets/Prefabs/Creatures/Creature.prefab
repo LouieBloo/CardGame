@@ -313,6 +313,7 @@ GameObject:
   - component: {fileID: 8520154280293594936}
   - component: {fileID: -4037839420428402356}
   - component: {fileID: 6467392829200870357}
+  - component: {fileID: -8340882367029181488}
   m_Layer: 0
   m_Name: Creature
   m_TagString: Untagged
@@ -385,6 +386,9 @@ MonoBehaviour:
   - name: THIN_DRAGON
     prefab: {fileID: 5932788995159726474, guid: 9a2c217c9a9bc3446a64a8387726aff3,
       type: 3}
+  - name: ARCHER
+    prefab: {fileID: 6022363812095014427, guid: b03d14f85e4e0be47aa0272e8e8b556c,
+      type: 3}
 --- !u!114 &4301498901831340213
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -435,16 +439,6 @@ MonoBehaviour:
   southEastMoveTexture: {fileID: 2800000, guid: abe4452e645d4b44398bafd4c6bb1463,
     type: 3}
   southWestMoveTexture: {fileID: 2800000, guid: 38ced33580b075a47aa14ae7839f1954,
-    type: 3}
-  westAttackTexture: {fileID: 2800000, guid: 21e8ace0bc88f7a4d9712adb456f86f1, type: 3}
-  northWestAttackTexture: {fileID: 2800000, guid: b3568fee38a055749bdb7ca17dcfcb79,
-    type: 3}
-  northEastAttackTexture: {fileID: 2800000, guid: d29106582d3316247aee555c0450ec83,
-    type: 3}
-  eastAttackTexture: {fileID: 2800000, guid: 6bc7b16f704645b418663d5055b21684, type: 3}
-  southEastAttackTexture: {fileID: 2800000, guid: 67f132530b2c124498bb3971fb8a564c,
-    type: 3}
-  southWestAttackTexture: {fileID: 2800000, guid: d1e2c25450eb7c44993c6a407c48b295,
     type: 3}
   statsUIPrefab: {fileID: 547918047721802203, guid: 1855d64bf326f6744bba520ffc6b0218,
     type: 3}
@@ -602,6 +596,8 @@ MonoBehaviour:
         byte0061: 0
   hexSpaceDistance:
     m_InternalValue: 0
+  speed:
+    m_InternalValue: 0
 --- !u!114 &2128330016230743486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -635,9 +631,12 @@ MonoBehaviour:
   baseHealth: 15
   health:
     m_InternalValue: 0
-  baseArmor: 0
+  baseArmor:
+    m_InternalValue: 0
   amount:
     m_InternalValue: 1
+  damageFloatingTextPrefab: {fileID: 3811703216433348034, guid: a73e55093e9dbeb439bdd6df258ff5fe,
+    type: 3}
 --- !u!114 &-4037839420428402356
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -664,6 +663,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthText: {fileID: 7534240317094778855}
   amountText: {fileID: 303407536829601985}
+--- !u!114 &-8340882367029181488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6689913824549537717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5a10959fa81c1d41b6580eb3544fc4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  westAttackTexture: {fileID: 2800000, guid: 21e8ace0bc88f7a4d9712adb456f86f1, type: 3}
+  northWestAttackTexture: {fileID: 2800000, guid: b3568fee38a055749bdb7ca17dcfcb79,
+    type: 3}
+  northEastAttackTexture: {fileID: 2800000, guid: d29106582d3316247aee555c0450ec83,
+    type: 3}
+  eastAttackTexture: {fileID: 2800000, guid: 6bc7b16f704645b418663d5055b21684, type: 3}
+  southEastAttackTexture: {fileID: 2800000, guid: 67f132530b2c124498bb3971fb8a564c,
+    type: 3}
+  southWestAttackTexture: {fileID: 2800000, guid: d1e2c25450eb7c44993c6a407c48b295,
+    type: 3}
+  rangedAttackTexture: {fileID: 2800000, guid: 9882d35b2a49002439793ec780524d71, type: 3}
 --- !u!1 &8445455529584633618
 GameObject:
   m_ObjectHideFlags: 0

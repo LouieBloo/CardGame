@@ -9,12 +9,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1800976583469701215}
+  - component: {fileID: -5307083424965341965}
   - component: {fileID: 1800976583469701208}
   - component: {fileID: 1800976583469701209}
   - component: {fileID: 1800976583469701210}
   - component: {fileID: 1800976583469701211}
   - component: {fileID: 8005546995691981043}
-  - component: {fileID: -5307083424965341965}
+  - component: {fileID: -4698611565757124795}
+  - component: {fileID: -2321045627222273464}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -36,6 +38,33 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-5307083424965341965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800976583469701204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  InLocalSpace: 0
+  Interpolate: 1
+  CanCommitToTransform: 0
 --- !u!33 &1800976583469701208
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -126,10 +155,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37234be412025f946baecb5f68b2836b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myPrefab: {fileID: 6689913824549537717, guid: 1af54562b895b044999bb2bee9428136,
+  uiPrefab: {fileID: 6211119694687613981, guid: 3f1f164cfec401a47a8de06f8de3712c,
     type: 3}
-  grid: {fileID: 373961697663329237, guid: d3f43de3a91b86345a2609a7bf6c1c55, type: 3}
---- !u!114 &-5307083424965341965
+--- !u!114 &-4698611565757124795
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -138,21 +166,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1800976583469701204}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Script: {fileID: 11500000, guid: 4308728143951154297070d94aa80461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
-  SyncRotAngleX: 1
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  InLocalSpace: 0
-  Interpolate: 1
-  CanCommitToTransform: 0
+  respondingToInput: 1
+--- !u!114 &-2321045627222273464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800976583469701204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b447adea2f62df445a123c26a5769aa4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spellBookPrefab: {fileID: 0}
+  startingMana: 10

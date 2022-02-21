@@ -110,7 +110,7 @@ public class ObjectSelecting : MonoBehaviour
 
             selectedPermanentTargetOrientation = selectedPermanentTargetOrientation != HexDirection.NONE ? selectedPermanentTargetOrientation : selectedPermanent.getOrientation();
             Selectable targetSelectable = hoveringPermanent.hasPermanent() ? hoveringPermanent.getAttachedPermanent().GetComponent<Selectable>() : hoveringPermanent;
-            Selectable.OnHoverOverSelectableResponse selectedPermanentHoverResponse = selectedPermanent.onMouseHoverEnter(targetSelectable, selectedPermanentTargetOrientation, mouseOrientation);
+            Selectable.OnHoverOverSelectableResponse selectedPermanentHoverResponse = selectedPermanent.onMouseHoverEnter(hoveringPermanent,targetSelectable, selectedPermanentTargetOrientation, mouseOrientation);
             if (selectedPermanentHoverResponse != null)
             {
                 //set mouse texture for movement orientation

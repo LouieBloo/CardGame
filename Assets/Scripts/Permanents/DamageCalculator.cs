@@ -14,8 +14,6 @@ public class DamageCalculator
             totalDamage = attacker.getBaseDamage() - victim.getArmor();
         }
 
-        Debug.Log(totalDamage);
-
         if (totalDamage > 0)
         {
             victim.takeDamage(totalDamage);

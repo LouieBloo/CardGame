@@ -7,10 +7,13 @@ using HexMapTools;
 
 public class Player : NetworkBehaviour
 {
-    private int offset = 0;
-
     private ObjectSelecting objectSelector;
     private Grid grid;
+
+    private SpellBook spellBook;
+
+    public GameObject uiPrefab;
+    private GameObject ui;
 
     public override void OnDestroy()
     {
@@ -34,6 +37,8 @@ public class Player : NetworkBehaviour
         {
             objectSelector = GameObject.FindGameObjectsWithTag("Game")[0].GetComponent<ObjectSelecting>();
             grid = GameObject.FindGameObjectsWithTag("Grid")[0].GetComponent<Grid>();
+            ui = Instantiate(uiPrefab, Vector3.zero, Quaternion.identity);
+            ui.GetComponent<PlayerUI>().setup(this);
         }
     }
 
@@ -54,9 +59,13 @@ public class Player : NetworkBehaviour
             {
                 createCreatureServerRpc(objectSelector.getTargetedCell().getHexCoordinates(), "THIN_DRAGON");
             }
-            if (Input.GetKeyDown(KeyCode.S))
+            if (Input.GetKeyDown(KeyCode.M))
             {
                 createCreatureServerRpc(objectSelector.getTargetedCell().getHexCoordinates(), "SWORDSMAN");
+            }
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                createCreatureServerRpc(objectSelector.getTargetedCell().getHexCoordinates(), "ARCHER");
             }
         }
         
