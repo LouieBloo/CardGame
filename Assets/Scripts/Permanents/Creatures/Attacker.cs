@@ -27,6 +27,9 @@ public class Attacker : NetworkBehaviour
 
     private Grid grid;
 
+    private PermanentCell tempTarget;
+    private Animator animator;
+
     public enum RangeType
     {
         Melee,
@@ -51,7 +54,7 @@ public class Attacker : NetworkBehaviour
         mouseTextureDirectionMapping.Add(HexDirection.SW, southWestAttackTexture);
     }
 
-    public void setup(CreatureStats stats)
+    public void setup(CreatureStats stats, Animator animator)
     {
         if (IsServer)
         {
@@ -60,6 +63,8 @@ public class Attacker : NetworkBehaviour
         }
 
         projectilePrefab = stats.projectilePrefab;
+
+        this.animator = animator;
     }
 
     [ServerRpc]
@@ -88,7 +93,7 @@ public class Attacker : NetworkBehaviour
             }
             else if (getAttackType() == RangeType.Ranged && isValidTarget(targetCell.getHexCoordinates(),targetCell.OwnerClientId))
             {
-                targetReadyForAttack(targetCell);
+                StartCoroutine(creatureMovement.rotateTowardTarget(targetCell, targetReadyForAttack));
             }
         }
         else
@@ -158,9 +163,31 @@ public class Attacker : NetworkBehaviour
 
     public void attackTargetRange(PermanentCell target)
     {
-        GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-        projectile.GetComponent<TargetProjectile>().UpdateTarget(target.getAttachedPermanent().transform, Vector3.zero, damageTarget, target);
-        spawnProjectileClientRpc(target.getAttachedPermanent().GetComponent<NetworkObject>());
+        tempTarget = target;
+        animator.GetComponent<CreatureAnimatorHelper>().subscribe(rangePrepAnimationFinished);
+        startRangePrepAnimationClientRpc();
+    }
+
+    [ClientRpc]
+    public void startRangePrepAnimationClientRpc()
+    {
+        if (!animator)
+        {
+            animator = GetComponent<Creature>().getCreatureObject().GetComponent<Animator>();
+        }
+
+        animator.SetTrigger("RangePrep");
+    }
+
+    public void rangePrepAnimationFinished()
+    {
+        if (IsServer)
+        {
+            Transform projectileOffset = animator.GetComponent<CreatureAnimatorHelper>().projectileSpawnPosition;
+            GameObject projectile = Instantiate(projectilePrefab, projectileOffset.position, Quaternion.identity);
+            projectile.GetComponent<TargetProjectile>().UpdateTarget(tempTarget.getAttachedPermanent().transform, Vector3.zero, damageTarget, tempTarget);
+            spawnProjectileClientRpc(tempTarget.getAttachedPermanent().GetComponent<NetworkObject>());
+        }
     }
 
     [ClientRpc]
@@ -175,7 +202,8 @@ public class Attacker : NetworkBehaviour
 
             if (target.TryGet(out NetworkObject targetObject))
             {
-                GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+                Transform projectileOffset = animator.GetComponent<CreatureAnimatorHelper>().projectileSpawnPosition;
+                GameObject projectile = Instantiate(projectilePrefab, projectileOffset.position, Quaternion.identity);
                 projectile.GetComponent<TargetProjectile>().UpdateTarget(targetObject.transform, Vector3.zero);
             }
         }

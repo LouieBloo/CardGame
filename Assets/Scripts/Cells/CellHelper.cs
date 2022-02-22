@@ -80,4 +80,30 @@ public class CellHelper
         HexDirection.TryParse(input, out HexDirection result);
         return result;
     }
+
+    public static HexDirection rotationToHexDirection(float rotation)
+    {
+        if(rotation >= 0 && rotation < 60)
+        {
+            return HexDirection.NE;
+        }
+        else if (rotation >= 60 && rotation < 120)
+        {
+            return HexDirection.E;
+        }
+        else if (rotation >= 120 && rotation < 180)
+        {
+            return HexDirection.SE;
+        }
+        else if (rotation >= 180 && rotation < 240)
+        {
+            return HexDirection.SW;
+        }
+        else if (rotation >= 240 && rotation < 300)
+        {
+            return HexDirection.W;
+        }
+
+        return HexDirection.NW;
+    }
 }

@@ -72,6 +72,15 @@ public class CreatureMovement : NetworkBehaviour
         }
     }
 
+    public IEnumerator rotateTowardTarget(PermanentCell target, Action<PermanentCell> callbackWhenDone)
+    {
+        if (IsServer) {
+            //rotate towards action target
+            yield return StartCoroutine(rotateTowardsPoint(target.transform.position));
+            facingOrientation.Value = CellHelper.rotationToHexDirection(transform.rotation.eulerAngles.y).ToString();
+            callbackWhenDone(target);
+        }
+    }
 
     void moveAndExecuteAction(PermanentCell targetMoveCell, List<PermanentCell> extraMovePositions, PermanentCell targetActionCell, Creature.CreatureActions action, string finalOrientation, Action<PermanentCell> callbackWhenDone)
     {

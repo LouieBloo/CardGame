@@ -100,7 +100,7 @@ public class Creature : NetworkBehaviour
         damageTaker.setup(creatureStats);
         damageDealer.setup(creatureStats);
 
-        attacker.setup(creatureStats);
+        attacker.setup(creatureStats,newObj.GetComponent<Animator>());
 
         //setup creature movement
         creatureMovement.hexSpaceType.Value = creatureStats.hexSpaces.ToString();
