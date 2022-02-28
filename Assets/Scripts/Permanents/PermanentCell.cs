@@ -15,6 +15,12 @@ public class PermanentCell : Selectable
 
     private HexCoordinates hexCoordinates;
 
+    private bool halfSelected = false;
+
+    public Color baseColor;
+    public Color hoverColor;
+    public Color selectedColor;
+
     //NetworkVariable<ulong> attachedPermanentId = new NetworkVariable<ulong>();
     NetworkVariable<NetworkObjectReference> attachedNetworkObject = new NetworkVariable<NetworkObjectReference>();
 
@@ -104,14 +110,32 @@ public class PermanentCell : Selectable
 
     public void hover()
     {
-        spriteRenderer.color = Color.black;
+        spriteRenderer.color = hoverColor;
     }
 
     public void deHover()
     {
-        spriteRenderer.color = Color.white;
+        if (!halfSelected)
+        {
+            spriteRenderer.color = baseColor;
+        }
+        else
+        {
+            spriteRenderer.color = selectedColor;
+        }
     }
 
+    public void halfSelect()
+    {
+        halfSelected = true;
+        spriteRenderer.color = selectedColor;
+    }
+
+    public void deHalfSelect()
+    {
+        halfSelected = false;
+        deHover();
+    }
 
     static public void drawString(string text, Vector3 worldPosition, Color textColor, Vector2 anchor, float textSize = 15f)
     {

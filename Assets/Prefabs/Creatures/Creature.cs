@@ -106,6 +106,7 @@ public class Creature : NetworkBehaviour
         creatureMovement.hexSpaceType.Value = creatureStats.hexSpaces.ToString();
         creatureMovement.hexSpaceDistance.Value = creatureStats.hexSpaceDistance;
         creatureMovement.speed.Value = creatureStats.baseSpeed;
+        creatureMovement.movementRange.Value = creatureStats.baseMovementRange;
     }
 
     public NetworkObject getCreatureObject(){

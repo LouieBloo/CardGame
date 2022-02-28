@@ -97,10 +97,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77a626439adf77245a6855c570864222, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectedIndicatorPrefab: {fileID: 0}
   objectToSpawnOnStartup: {fileID: 0}
   objectSpawnRotation: {x: 0, y: 0, z: 0, w: 0}
   creaturePrefab: {fileID: 6689913824549537717, guid: 1af54562b895b044999bb2bee9428136,
     type: 3}
+  baseColor: {r: 1, g: 1, b: 1, a: 1}
+  hoverColor: {r: 0, g: 0, b: 0, a: 1}
+  selectedColor: {r: 0.2784314, g: 1, b: 0.34509805, a: 1}
 --- !u!1 &190983383061585417
 GameObject:
   m_ObjectHideFlags: 0

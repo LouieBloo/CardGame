@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 1800976583469701211}
   - component: {fileID: 8005546995691981043}
   - component: {fileID: -4698611565757124795}
-  - component: {fileID: -2321045627222273464}
+  - component: {fileID: 8887222452075092150}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -170,7 +170,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   respondingToInput: 1
---- !u!114 &-2321045627222273464
+--- !u!114 &8887222452075092150
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -184,3 +184,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spellBookPrefab: {fileID: 0}
   startingMana: 10
+  Spells:
+  - spellPrefab: {fileID: 8586303123652671312, guid: 7c651fd7abcfa40449d28b4badb8a729,
+      type: 3}
+    name: Frost Shield
+    mana: 5

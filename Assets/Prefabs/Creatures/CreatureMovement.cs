@@ -18,6 +18,7 @@ public class CreatureMovement : NetworkBehaviour
     public NetworkVariable<FixedString64Bytes> facingOrientation = new NetworkVariable<FixedString64Bytes>();
     public NetworkVariable<FixedString64Bytes> hexSpaceType = new NetworkVariable<FixedString64Bytes>();
     public NetworkVariable<int> hexSpaceDistance = new NetworkVariable<int>();
+    public NetworkVariable<int> movementRange = new NetworkVariable<int>();
     public NetworkVariable<int> speed = new NetworkVariable<int>();
 
     private void Start()
@@ -97,13 +98,31 @@ public class CreatureMovement : NetworkBehaviour
             if (cell.hasPermanent() && cell.getAttachedPermanent() != GetComponent<Permanent>()) { Debug.Log("Line cell extra has permanent!"); return; }
         }
 
-        //find path
+        //find
+        //
         List<Vector3> path = grid.findPathVector3(grid.getHexCoordinatesFromPosition(transform.position), targetMoveCell.getHexCoordinates());
         if (path != null)
         {
+            if(path.Count > movementRange.Value)
+            {
+                alertClientRpc("Can't move there, creature doesn't have enough range");
+                return;
+            }
             doingCommand = moveToPointThenExecuteAction(path.ToArray(), targetActionCell, action,finalOrientation, extraMovePositions,callbackWhenDone);
             StartCoroutine(doingCommand);
         }
+        else
+        {
+            Debug.Log("No path found");
+        }
+    }
+
+    [ClientRpc]
+    public void alertClientRpc(string message)
+    {
+        if (!IsOwner) { return; }
+        //Debug.Log("Unit doesnt have enough range");
+        GlobalVars.gv.gameUI.alertMessage(message);
     }
 
     IEnumerator moveToPointThenExecuteAction(Vector3[] route, PermanentCell targetActionCell, Creature.CreatureActions action, string finalOrientation, List<PermanentCell> extraMoveCells, Action<PermanentCell> callbackWhenDone)
@@ -174,6 +193,11 @@ public class CreatureMovement : NetworkBehaviour
         if (!targetActionCell) { return; }
 
         GetComponent<CreatureAction>().handleAction(targetActionCell, action);
+    }
+
+    public Selectable.SelectableHexArea getMovementRange()
+    {
+        return new Selectable.SelectableHexArea(Selectable.SelectableHexAreaType.Line, movementRange.Value, HexDirection.NONE);
     }
 
     IEnumerator rotateTowardsPoint(Vector3 point)

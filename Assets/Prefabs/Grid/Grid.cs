@@ -251,7 +251,10 @@ public class Grid : NetworkBehaviour
         return hexCalculator.HexToPosition(coordinates);
     }
 
-
+    public PermanentCell getPermanentCellAtPosition(Vector3 position)
+    {
+        return cells[getHexCoordinatesFromPosition(position)];
+    }
 
 
     /*[ClientRpc]

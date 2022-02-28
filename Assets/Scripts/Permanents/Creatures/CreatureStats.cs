@@ -17,6 +17,7 @@ public class CreatureStats : MonoBehaviour
     public int baseArmor;
     public int currentArmor;
 
+    public int baseMovementRange;
     public int baseSpeed;
     public int currentSpeed;
 

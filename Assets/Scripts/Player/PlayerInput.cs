@@ -27,6 +27,12 @@ public class PlayerInput : NetworkBehaviour
             {
                 spellBook.iconClicked();
             }
+
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                spellBook.spellActivated(0);
+            }
+
             yield return null;
         }
     }

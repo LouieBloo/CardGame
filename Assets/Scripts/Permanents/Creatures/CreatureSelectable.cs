@@ -38,6 +38,12 @@ public class CreatureSelectable : Selectable
         mouseTextureMoveDirectionMapping.Add(HexDirection.SW, southWestMoveTexture);
     }
 
+    public override SelectableHexArea select()
+    {
+        base.select();
+        return movementScript.getMovementRange();
+    }
+
     public override bool commandIssuedToCell(PermanentCell target, List<PermanentCell> extraHoveringCells, HexDirection orientation, HexDirection mouseOrientation)
     {
         //if(doIHaveTurnPriority)

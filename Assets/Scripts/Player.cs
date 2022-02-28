@@ -67,6 +67,8 @@ public class Player : NetworkBehaviour
             {
                 createCreatureServerRpc(objectSelector.getTargetedCell().getHexCoordinates(), "ARCHER");
             }
+
+            
         }
         
     }

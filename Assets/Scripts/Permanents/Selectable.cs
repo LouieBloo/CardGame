@@ -23,6 +23,7 @@ public class Selectable : NetworkBehaviour
     {
         Point,
         Line,
+        Path,
         None
     }
 
@@ -73,12 +74,14 @@ public class Selectable : NetworkBehaviour
         }
     }
 
-    public void select()
+    public virtual SelectableHexArea select()
     {
         if (!selectedIndicator)
         {
             selectedIndicator = Instantiate(selectedIndicatorPrefab, new Vector3(transform.position.x, transform.position.y + 3f, transform.position.z), selectedIndicatorPrefab.transform.rotation);
         }
+
+        return null;
     }
 
     public void deselect()

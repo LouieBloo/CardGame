@@ -10,15 +10,19 @@ public class ObjectSelecting : MonoBehaviour
     public Grid grid;
 
     private Selectable selectedPermanent;
+    private Selectable savedSelectedPermanent;
     private HexDirection selectedPermanentTargetOrientation = HexDirection.NONE;
     private HexDirection mouseOrientation;
     private PermanentCell hoveringPermanent;
     private List<PermanentCell> extraHoveringPermanents = new List<PermanentCell>();
+    private List<PermanentCell> selectedHalfHoverPermanents = new List<PermanentCell>();
     private PermanentCell altClickHoveringPermanent;
 
     private PermanentCell hitCell;
 
     private Texture2D currentTexture;
+
+    private Action<PermanentCell,List<PermanentCell> ,HexDirection , HexDirection > findTargetCallback;
 
     // Start is called before the first frame update
     void Start()
@@ -46,7 +50,7 @@ public class ObjectSelecting : MonoBehaviour
             }
             else
             {
-                //hoving logic
+                //hovering logic
                 if (hitCell != hoveringPermanent)
                 {
                     selectHoveringPermanent(hitCell);
@@ -80,6 +84,21 @@ public class ObjectSelecting : MonoBehaviour
         {
             releaseAltClickHoveringPermanent();
         }
+    }
+
+    public void findTarget(Action<PermanentCell,List<PermanentCell> ,HexDirection , HexDirection > callback, Selectable selectable)
+    {
+        findTargetCallback = callback;
+
+        if (selectedPermanent)
+        {
+            savedSelectedPermanent = selectedPermanent;
+            deselectPermanent();
+            deselectHoveringPermanent();
+        }
+
+        selectedPermanent = selectable;
+        selectedPermanent.select();
     }
 
     void handleAdditionalHovering(HexCoordinates mouseCoords,RaycastHit hit)
@@ -241,7 +260,7 @@ public class ObjectSelecting : MonoBehaviour
             else
             {
                 selectedPermanent = cell.getAttachedPermanent().GetComponent<Selectable>();
-                selectedPermanent.select();
+                selectHalfHoverPermanents(selectedPermanent.select());
             }
         }
         else if (selectedPermanent){
@@ -250,7 +269,14 @@ public class ObjectSelecting : MonoBehaviour
 
         if (issueCommand)
         {
-            selectedPermanent.commandIssuedToCell(cell, extraHoveringPermanents, selectedPermanentTargetOrientation,mouseOrientation);
+            if(findTargetCallback != null)
+            {
+                findTargetCallback(cell, extraHoveringPermanents, selectedPermanentTargetOrientation, mouseOrientation);
+            }
+            else
+            {
+                selectedPermanent.commandIssuedToCell(cell, extraHoveringPermanents, selectedPermanentTargetOrientation, mouseOrientation);
+            }
         }
     }
 
@@ -260,9 +286,46 @@ public class ObjectSelecting : MonoBehaviour
         {
             selectedPermanent.deselect();
             selectedPermanent = null;
+            
         }
 
         selectedPermanentTargetOrientation = HexDirection.NONE;
         resetMouseTexture();
+        resetSelectedHalfHoverPermanents();
+    }
+
+    void selectHalfHoverPermanents(Selectable.SelectableHexArea area)
+    {
+        resetSelectedHalfHoverPermanents();
+
+        if (selectedPermanent != null && area != null)
+        {
+            for (int x = 0; x < area.distance; x++)
+            {
+                List<HexCoordinates> ringHexs = HexUtility.GetRing(grid.getHexCoordinatesFromPosition(selectedPermanent.transform.position), x+1);
+
+                foreach(HexCoordinates hex in ringHexs)
+                {
+                    if (grid.cells[hex])
+                    {
+                        List<Vector3> path = grid.findPathVector3(grid.getHexCoordinatesFromPosition(selectedPermanent.transform.position), hex);
+                        if (path != null && path.Count <= area.distance)
+                        {
+                            grid.cells[hex].halfSelect();
+                            selectedHalfHoverPermanents.Add(grid.cells[hex]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    void resetSelectedHalfHoverPermanents()
+    {
+        foreach(PermanentCell c in selectedHalfHoverPermanents)
+        {
+            c.deHalfSelect();
+        }
+        selectedHalfHoverPermanents.Clear();
     }
 }

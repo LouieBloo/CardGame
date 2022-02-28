@@ -1003,16 +1003,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageType: 0
   physicalDamageType: 0
+  attackType: 0
   baseDamage: 30
   currentDamage: 0
+  baseRange: 0
   baseHealth: 100
   currentHealth: 0
   armorType: 0
   baseArmor: 2
   currentArmor: 0
+  baseMovementRange: 20
   baseSpeed: 6
   currentSpeed: 0
   name: Thin Dragon
+  projectilePrefab: {fileID: 0}
   hexSpaces: 1
   hexSpaceDistance: 1
 --- !u!1 &5972391637143400841

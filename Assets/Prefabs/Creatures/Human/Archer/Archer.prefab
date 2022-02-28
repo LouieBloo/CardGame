@@ -5072,6 +5072,7 @@ MonoBehaviour:
   armorType: 0
   baseArmor: 1
   currentArmor: 0
+  baseMovementRange: 5
   baseSpeed: 3
   currentSpeed: 0
   name: Archer
