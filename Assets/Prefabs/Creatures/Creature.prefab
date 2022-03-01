@@ -314,6 +314,7 @@ GameObject:
   - component: {fileID: -4037839420428402356}
   - component: {fileID: 6467392829200870357}
   - component: {fileID: -8340882367029181488}
+  - component: {fileID: -1834797790087333518}
   m_Layer: 0
   m_Name: Creature
   m_TagString: Untagged
@@ -378,7 +379,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ui: {fileID: 6467392829200870357}
-  creatureObjectReference: {fileID: 0}
   creaturePrefabs:
   - name: SWORDSMAN
     prefab: {fileID: 4731520841268163385, guid: aa067a67a478ad94dac9c3046cf7af6d,
@@ -596,6 +596,8 @@ MonoBehaviour:
         byte0061: 0
   hexSpaceDistance:
     m_InternalValue: 0
+  movementRange:
+    m_InternalValue: 0
   speed:
     m_InternalValue: 0
 --- !u!114 &2128330016230743486
@@ -686,6 +688,18 @@ MonoBehaviour:
   southWestAttackTexture: {fileID: 2800000, guid: d1e2c25450eb7c44993c6a407c48b295,
     type: 3}
   rangedAttackTexture: {fileID: 2800000, guid: 9882d35b2a49002439793ec780524d71, type: 3}
+--- !u!114 &-1834797790087333518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6689913824549537717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3fceb37d7fe4d046b5328fcc1e0565a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8445455529584633618
 GameObject:
   m_ObjectHideFlags: 0

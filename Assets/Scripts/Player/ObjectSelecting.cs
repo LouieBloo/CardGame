@@ -282,11 +282,12 @@ public class ObjectSelecting : MonoBehaviour
 
     void deselectPermanent()
     {
+        findTargetCallback = null;
+
         if (selectedPermanent)
         {
             selectedPermanent.deselect();
             selectedPermanent = null;
-            
         }
 
         selectedPermanentTargetOrientation = HexDirection.NONE;
@@ -327,5 +328,10 @@ public class ObjectSelecting : MonoBehaviour
             c.deHalfSelect();
         }
         selectedHalfHoverPermanents.Clear();
+    }
+
+    public void commandSuccessFullReset()
+    {
+        deselectPermanent();
     }
 }

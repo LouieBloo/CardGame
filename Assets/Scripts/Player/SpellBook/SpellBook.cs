@@ -75,9 +75,11 @@ public class SpellBook : NetworkBehaviour
         if (spellsInSpellbook.Contains(spellId) && mana.Value >= Spells[spellId].mana)
         {
             GameObject spellGameobject = Instantiate(Spells[spellId].spellPrefab, target, Quaternion.identity);
+            spellGameobject.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
+            spellGameobject.transform.SetParent(transform);
             spellGameobject.GetComponent<SpellGameObject>().setup(grid.getPermanentCellAtPosition(target), null);
 
-            castSpellClientRpc(spellId, target);
+            wipeObjectSelectorClientRpc();
         }
         else
         {
@@ -86,13 +88,24 @@ public class SpellBook : NetworkBehaviour
     }
 
     [ClientRpc]
-    void castSpellClientRpc(int spellId, Vector3 target)
+    void wipeObjectSelectorClientRpc()
     {
-        if (!IsServer)
+        if (IsOwner)
         {
-            GameObject spellGameobject = Instantiate(Spells[spellId].spellPrefab, target, Quaternion.identity);
-            spellGameobject.GetComponent<SpellGameObject>().setup(grid.getPermanentCellAtPosition(target), null);
+            objectSelector.commandSuccessFullReset();
         }
+    }
+
+    public CreatureModification getModification(string name)
+    {
+        foreach(SpellBookEntry se in Spells)
+        {
+            if(se.name == name)
+            {
+                return se.spellPrefab.GetComponent<CreatureModification>();
+            }
+        }
+        return null;
     }
 
     public void iconClicked()

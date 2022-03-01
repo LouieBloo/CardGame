@@ -15,13 +15,6 @@ public class SpellSelectable : Selectable
         
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-
     public override SelectableHexArea select()
     {
         return null;
@@ -36,21 +29,7 @@ public class SpellSelectable : Selectable
         }
         else if (selectableMouseIsHoveringOn.Type == SelectableType.Creature)
         {
-            /*if (attacker.isValidTarget(cell.getHexCoordinates(), selectableMouseIsHoveringOn.GetComponent<NetworkObject>().OwnerClientId))
-            {
-                return attacker.mouseAttackHover(mouseOrientation);
-            }*/
-
             return new OnHoverOverSelectableResponse(spellCursorTexture, new SelectableHexArea(SelectableHexAreaType.Point, 0,HexDirection.NONE));
-
-            /*if(movementScript.getHexSpaceType() == CreatureStats.CreatureHexSpaces.Point)
-            {
-                return new OnHoverOverSelectableResponse(mouseTextureDirectionMapping[mouseOrientation], new SelectableHexArea(SelectableHexAreaType.Line, 1,CellHelper.getOppositeOfDirection(mouseOrientation)));
-            }else if (movementScript.getHexSpaceType() == CreatureStats.CreatureHexSpaces.Line)
-            {
-                //note the +1 to distance since we start counting from the target, not the move position
-                return new OnHoverOverSelectableResponse(mouseTextureDirectionMapping[mouseOrientation], new SelectableHexArea(SelectableHexAreaType.Line, movementScript.hexSpaceDistance.Value+1, CellHelper.getOppositeOfDirection(mouseOrientation)));
-            }*/
         }
 
         return null;

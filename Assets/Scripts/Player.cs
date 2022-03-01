@@ -10,8 +10,6 @@ public class Player : NetworkBehaviour
     private ObjectSelecting objectSelector;
     private Grid grid;
 
-    private SpellBook spellBook;
-
     public GameObject uiPrefab;
     private GameObject ui;
 
@@ -39,6 +37,8 @@ public class Player : NetworkBehaviour
             grid = GameObject.FindGameObjectsWithTag("Grid")[0].GetComponent<Grid>();
             ui = Instantiate(uiPrefab, Vector3.zero, Quaternion.identity);
             ui.GetComponent<PlayerUI>().setup(this);
+
+            GlobalVars.gv.player = this;
         }
     }
 

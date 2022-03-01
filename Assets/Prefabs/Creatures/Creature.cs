@@ -17,12 +17,15 @@ public class Creature : NetworkBehaviour
 
     //public GameObject creatureObjectReference;
     NetworkVariable<NetworkObjectReference> creatureObjectReference = new NetworkVariable<NetworkObjectReference>();
+    //List<CreatureModification> modifications = new List<CreatureModification>();
+    
 
     private CreatureStats creatureStats;
     private DamageTaker damageTaker;
     private DamageDealer damageDealer;
     private CreatureMovement creatureMovement;
     private Attacker attacker;
+    
 
     [System.Serializable]
     public class CreaturePrefab
@@ -61,7 +64,6 @@ public class Creature : NetworkBehaviour
         damageTaker.subscribeToHealthChanges(uiNeedsUpdating);
 
         damageDealer = GetComponent<DamageDealer>();
-
         attacker = GetComponent<Attacker>();
 
         if (IsServer)
@@ -70,11 +72,6 @@ public class Creature : NetworkBehaviour
         }
 
         updateUI();
-    }
-
-    private void Update()
-    {
-        //updateUI();
     }
 
     public void setSpawnParameters(string creatureName, HexDirection orientation)

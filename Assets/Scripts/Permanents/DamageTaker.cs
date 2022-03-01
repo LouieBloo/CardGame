@@ -22,11 +22,14 @@ public class DamageTaker : NetworkBehaviour
     [SerializeField] private NetworkVariable<int> amount = new NetworkVariable<int>();
 
     private Permanent permanent;
+    private Modifiable modifiable;
 
     public GameObject damageFloatingTextPrefab;
+
     private void Start()
     {
         permanent = GetComponent<Permanent>();
+        modifiable = GetComponent<Modifiable>();
     }
 
     public void setup(CreatureStats creatureStats)
@@ -48,7 +51,7 @@ public class DamageTaker : NetworkBehaviour
         if(permanent.type == Permanent.Type.Creature)
         {
             //return baseArmor + permanent.GetComponent<Creature>().defensePoints.Value;
-            return baseArmor.Value;
+            return baseArmor.Value + modifiable.getArmorModification();
         }
 
         return 0;
@@ -58,19 +61,27 @@ public class DamageTaker : NetworkBehaviour
     {
         if (IsServer)
         {
-            int healthAfterDamage = health.Value - damage;
-            if(healthAfterDamage > 0)
+            if(damage > 0)
             {
-                health.Value -= damage;
+                int healthAfterDamage = health.Value - damage;
+                if (healthAfterDamage > 0)
+                {
+                    health.Value -= damage;
+                }
+                else
+                {
+                    float totalHealth = health.Value + (baseHealth * (amount.Value - 1));
+                    float remainingHealth = totalHealth - damage;
+                    amount.Value = Mathf.CeilToInt(remainingHealth / baseHealth);
+                    health.Value = (int)(remainingHealth % baseHealth);
+                }
             }
             else
             {
-                float totalHealth = health.Value + (baseHealth * (amount.Value-1));
-                float remainingHealth = totalHealth - damage;
-                amount.Value = Mathf.CeilToInt(remainingHealth / baseHealth);
-                health.Value = (int)(remainingHealth % baseHealth);
+                //so the user doesnt see negative numbers
+                damage = 0;
             }
-
+            
             spawnDamageFloatingTextClientRpc(damage);
 
             if(amount.Value <= 0)

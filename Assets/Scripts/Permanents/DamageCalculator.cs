@@ -14,10 +14,7 @@ public class DamageCalculator
             totalDamage = attacker.getBaseDamage() - victim.getArmor();
         }
 
-        if (totalDamage > 0)
-        {
-            victim.takeDamage(totalDamage);
-        }
+        victim.takeDamage(totalDamage);
 
         return totalDamage;
     }

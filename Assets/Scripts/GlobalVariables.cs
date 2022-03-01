@@ -5,4 +5,5 @@ using UnityEngine;
 public class GlobalVariables : MonoBehaviour
 {
     public GameUI gameUI;
+    public Player player;
 }

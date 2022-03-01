@@ -185,7 +185,7 @@ MonoBehaviour:
   spellBookPrefab: {fileID: 0}
   startingMana: 10
   Spells:
-  - spellPrefab: {fileID: 8586303123652671312, guid: 7c651fd7abcfa40449d28b4badb8a729,
+  - spellPrefab: {fileID: 4760018694462865891, guid: 559d8e9f1694fcd46ad4c60431c314f7,
       type: 3}
     name: Frost Shield
     mana: 5

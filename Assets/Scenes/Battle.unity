@@ -701,6 +701,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameUI: {fileID: 1578073269}
+  player: {fileID: 0}
 --- !u!114 &1552141780
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1016,6 +1017,12 @@ MonoBehaviour:
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
       Prefab: {fileID: 6022363812095014427, guid: b03d14f85e4e0be47aa0272e8e8b556c,
+        type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 4760018694462865891, guid: 559d8e9f1694fcd46ad4c60431c314f7,
         type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
