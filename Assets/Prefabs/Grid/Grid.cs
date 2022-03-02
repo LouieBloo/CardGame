@@ -106,20 +106,14 @@ public class Grid : NetworkBehaviour
         }*/
 
 
-        if (Input.GetKeyDown(KeyCode.Mouse1)){
+        /*if (Input.GetKeyDown(KeyCode.Mouse1)){
             foreach (PermanentCell c in cells.GetCells())
             {
                 c.deHover();
             }
-        }
+        }*/
 
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            foreach (PermanentCell c in cells.GetCells())
-            {
-                c.select();
-            }
-        }
+        
 
             /*if (Input.GetKeyDown(KeyCode.Mouse0) && cells[mouseCoords] != null)
             {

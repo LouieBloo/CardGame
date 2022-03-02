@@ -55,15 +55,15 @@ public class Player : NetworkBehaviour
 
         if (objectSelector.isEmptyCellTargeted())
         {
-            if (Input.GetKeyDown(KeyCode.D))
+            if (Input.GetKeyDown(KeyCode.J))
             {
                 createCreatureServerRpc(objectSelector.getTargetedCell().getHexCoordinates(), "THIN_DRAGON");
             }
-            if (Input.GetKeyDown(KeyCode.M))
+            if (Input.GetKeyDown(KeyCode.K))
             {
                 createCreatureServerRpc(objectSelector.getTargetedCell().getHexCoordinates(), "SWORDSMAN");
             }
-            if (Input.GetKeyDown(KeyCode.A))
+            if (Input.GetKeyDown(KeyCode.L))
             {
                 createCreatureServerRpc(objectSelector.getTargetedCell().getHexCoordinates(), "ARCHER");
             }

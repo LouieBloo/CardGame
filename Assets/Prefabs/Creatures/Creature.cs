@@ -84,7 +84,7 @@ public class Creature : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     void spawnCreatureObjectServerRpc()
     {
-        Debug.Log(creatureName);
+        Debug.Log(creatureName);    
         GameObject newObj = Instantiate(creaturePrefabMapping[creatureName], transform.position, Quaternion.identity);
         newObj.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
         newObj.transform.SetParent(transform);

@@ -8,6 +8,7 @@ using UnityEngine;
 public class ObjectSelecting : MonoBehaviour
 {
     public Grid grid;
+    public CameraTracker cameraTracker;
 
     private Selectable selectedPermanent;
     private Selectable savedSelectedPermanent;
@@ -261,6 +262,8 @@ public class ObjectSelecting : MonoBehaviour
             {
                 selectedPermanent = cell.getAttachedPermanent().GetComponent<Selectable>();
                 selectHalfHoverPermanents(selectedPermanent.select());
+                cameraTracker.trackTarget(selectedPermanent.transform);
+
             }
         }
         else if (selectedPermanent){
@@ -293,6 +296,7 @@ public class ObjectSelecting : MonoBehaviour
         selectedPermanentTargetOrientation = HexDirection.NONE;
         resetMouseTexture();
         resetSelectedHalfHoverPermanents();
+        cameraTracker.stopTargeting();
     }
 
     void selectHalfHoverPermanents(Selectable.SelectableHexArea area)
