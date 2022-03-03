@@ -593,8 +593,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackedObject: {fileID: 0}
   trackSpeed: 7
+  zoomSpeed: 0.75
   trackingOffset: {x: 0, y: 0, z: 0}
-  playerInputMoveSpeed: 7
+  playerInputMoveSpeed: 10
 --- !u!1 &1552141773
 GameObject:
   m_ObjectHideFlags: 0

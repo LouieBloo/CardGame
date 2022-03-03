@@ -182,10 +182,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b447adea2f62df445a123c26a5769aa4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spellBookPrefab: {fileID: 0}
   startingMana: 10
   Spells:
   - spellPrefab: {fileID: 4760018694462865891, guid: 559d8e9f1694fcd46ad4c60431c314f7,
       type: 3}
     name: Frost Shield
     mana: 5
+    spellBookImage: {fileID: 21300000, guid: 153fe7612ee198948a82f117659b2e75, type: 3}
+  spellBookUIPrefab: {fileID: 1785991269721173456, guid: 314f4d165a19eb24bace41c865c0d9da,
+    type: 3}

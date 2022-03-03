@@ -67,9 +67,11 @@ public class CameraTracker : MonoBehaviour
     {
         float delta = amount * zoomSpeed;
         trackingOffset.y += delta;
+        float zDelta = -delta;
+        trackingOffset.z += zDelta * 2f;
         if (!trackedObject)
         {
-            transform.position = new Vector3(transform.position.x, trackingOffset.y, transform.position.z);
+            transform.position = new Vector3(transform.position.x, trackingOffset.y, transform.position.z + zDelta);
         }
         //transform.position
     }

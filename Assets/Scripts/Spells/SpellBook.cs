@@ -4,14 +4,16 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SpellBook : NetworkBehaviour
 {
-    public GameObject spellBookPrefab;
     public int startingMana = 10;
 
     public SpellBookEntry[] Spells;
 
+    public GameObject spellBookUIPrefab;
+    private GameObject activeSpellBook;
 
     private NetworkList<int> spellsInSpellbook;
     private NetworkVariable<int> mana = new NetworkVariable<int>();
@@ -26,6 +28,7 @@ public class SpellBook : NetworkBehaviour
         public GameObject spellPrefab;
         public string name;
         public int mana;
+        public Sprite spellBookImage;
     }
 
     // Start is called before the first frame update
@@ -96,7 +99,7 @@ public class SpellBook : NetworkBehaviour
         }
     }
 
-    public CreatureModification getModification(string name)
+    /*public CreatureModification getModification(string name)
     {
         foreach(SpellBookEntry se in Spells)
         {
@@ -106,10 +109,24 @@ public class SpellBook : NetworkBehaviour
             }
         }
         return null;
+    }*/
+
+    private void openSpellBook()
+    {
+        if(activeSpellBook == null)
+        {
+            activeSpellBook = Instantiate(spellBookUIPrefab, Vector3.zero, Quaternion.identity);
+            activeSpellBook.GetComponent<SpellBookUI>().setup(spellsInSpellbook, Spells);
+        }
+        else
+        {
+            Destroy(activeSpellBook);
+            activeSpellBook = null;
+        }
     }
 
     public void iconClicked()
     {
-        Debug.Log("Spell book clicked...");
+        openSpellBook();
     }
 }
