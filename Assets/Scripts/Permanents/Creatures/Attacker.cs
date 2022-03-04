@@ -102,6 +102,15 @@ public class Attacker : NetworkBehaviour
         }
     }
 
+    [ClientRpc]
+    void wipeObjectSelectorClientRpc()
+    {
+        if (IsOwner)
+        {
+            GetComponent<CreatureSelectable>().commandFinished();
+        }
+    }
+
     public void targetReadyForAttack(PermanentCell target)
     {
         switch (getAttackType())
@@ -113,6 +122,8 @@ public class Attacker : NetworkBehaviour
                 attackTargetRange(target);
                 break;
         }
+
+        wipeObjectSelectorClientRpc();
     }
 
     public bool isValidTarget(HexCoordinates coords,ulong ownerId)

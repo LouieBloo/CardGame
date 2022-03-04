@@ -2,6 +2,7 @@ using HexMapTools;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,15 +12,16 @@ public class SpellBook : NetworkBehaviour
     public int startingMana = 10;
 
     public SpellBookEntry[] Spells;
+    private Dictionary<string, SpellBookEntry> allGameSpells = new Dictionary<string, SpellBookEntry>();
 
     public GameObject spellBookUIPrefab;
     private GameObject activeSpellBook;
 
-    private NetworkList<int> spellsInSpellbook;
+    private NetworkList<FixedString64Bytes> spellsInSpellbook;
     private NetworkVariable<int> mana = new NetworkVariable<int>();
     private ObjectSelecting objectSelector;
 
-    private int currentlyCastingSpellId;
+    private string currentlyCastingSpellId;
     private Grid grid;
 
     [System.Serializable]
@@ -31,32 +33,38 @@ public class SpellBook : NetworkBehaviour
         public Sprite spellBookImage;
     }
 
+    private void Awake()
+    {
+        if (IsServer)
+        {
+            spellsInSpellbook = new NetworkList<FixedString64Bytes>();
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
+        foreach(SpellBookEntry s in Spells)
+        {
+            allGameSpells.Add(s.name, s);
+        }
+
         if (IsServer)
         {
             mana.Value = startingMana;
 
-            spellsInSpellbook.Add(0);
+            spellsInSpellbook.Add("Frost Shield");
         }
 
         objectSelector = GameObject.FindGameObjectsWithTag("Game")[0].GetComponent<ObjectSelecting>();
         grid = GameObject.FindGameObjectsWithTag("Grid")[0].GetComponent<Grid>();
     }
 
-    private void Awake()
+    private void spellActivated(SpellBookEntry spell)
     {
-        if (IsServer)
-        {
-            spellsInSpellbook = new NetworkList<int>();
-        }
-    }
-
-    public void spellActivated(int spellId)
-    {
-        currentlyCastingSpellId = spellId;
-        objectSelector.findTarget(targetFound, Spells[spellId].spellPrefab.GetComponent<Selectable>());
+        currentlyCastingSpellId = spell.name;
+        objectSelector.findTarget(targetFound, allGameSpells[spell.name].spellPrefab.GetComponent<Selectable>());
+        toggleSpellBook();//close the book
     }
 
     public void targetFound(PermanentCell target, List<PermanentCell> extraHoveringCells, HexDirection orientation, HexDirection mouseOrientation)
@@ -73,11 +81,11 @@ public class SpellBook : NetworkBehaviour
     }
 
     [ServerRpc]
-    public void castSpellServerRpc(int spellId,Vector3 target)
+    public void castSpellServerRpc(string spellId,Vector3 target)
     {
-        if (spellsInSpellbook.Contains(spellId) && mana.Value >= Spells[spellId].mana)
+        if (spellsInSpellbook.Contains(spellId) && mana.Value >= allGameSpells[spellId].mana)
         {
-            GameObject spellGameobject = Instantiate(Spells[spellId].spellPrefab, target, Quaternion.identity);
+            GameObject spellGameobject = Instantiate(allGameSpells[spellId].spellPrefab, target, Quaternion.identity);
             spellGameobject.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
             spellGameobject.transform.SetParent(transform);
             spellGameobject.GetComponent<SpellGameObject>().setup(grid.getPermanentCellAtPosition(target), null);
@@ -111,15 +119,17 @@ public class SpellBook : NetworkBehaviour
         return null;
     }*/
 
-    private void openSpellBook()
+    private void toggleSpellBook()
     {
         if(activeSpellBook == null)
         {
+            objectSelector.stopPolling();
             activeSpellBook = Instantiate(spellBookUIPrefab, Vector3.zero, Quaternion.identity);
-            activeSpellBook.GetComponent<SpellBookUI>().setup(spellsInSpellbook, Spells);
+            activeSpellBook.GetComponent<SpellBookUI>().setup(spellsInSpellbook, allGameSpells, spellActivated);
         }
         else
         {
+            objectSelector.startPolling();
             Destroy(activeSpellBook);
             activeSpellBook = null;
         }
@@ -127,6 +137,6 @@ public class SpellBook : NetworkBehaviour
 
     public void iconClicked()
     {
-        openSpellBook();
+        toggleSpellBook();
     }
 }

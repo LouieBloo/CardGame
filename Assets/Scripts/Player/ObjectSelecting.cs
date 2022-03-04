@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class ObjectSelecting : MonoBehaviour
 {
@@ -25,65 +26,103 @@ public class ObjectSelecting : MonoBehaviour
 
     private Action<PermanentCell,List<PermanentCell> ,HexDirection , HexDirection > findTargetCallback;
 
+    Coroutine pollingRoutine;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        startPolling();
+    }
+
+    public void startPolling()
+    {
+        if(pollingRoutine == null)
+        {
+            pollingRoutine = StartCoroutine(pollingForInput());
+        }
+    }
+
+    public void stopPolling()
+    {
+        if(pollingRoutine != null)
+        {
+            StopCoroutine(pollingRoutine);
+            pollingRoutine = null;
+        }
+
+        deselectPermanent();
     }
 
     // Update is called once per frame
-    void Update()
+    IEnumerator pollingForInput()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        // Casts the ray and get the first game object hit
-        Physics.Raycast(ray, out hit);
-        //Debug.Log("This hit at " + hit.point);
-        HexCoordinates mouseCoords = grid.getHexCoordinatesFromPosition(hit.point);
-        hitCell = grid.cells[mouseCoords];
-
-        if (hitCell)
+        while (true)
         {
-            //permanent logic
-            if (Input.GetKeyDown(KeyCode.Mouse0))
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            // Casts the ray and get the first game object hit
+            Physics.Raycast(ray, out hit);
+
+            //dont do our logic if we are hovering over UI elements
+            if(EventSystem.current.currentSelectedGameObject != null)
             {
-                selectCell(hitCell);
+                //Debug.Log("Pause!");
             }
             else
             {
-                //hovering logic
-                if (hitCell != hoveringPermanent)
+                HexCoordinates mouseCoords = grid.getHexCoordinatesFromPosition(hit.point);
+                hitCell = grid.cells[mouseCoords];
+
+                if (hitCell)
                 {
-                    selectHoveringPermanent(hitCell);
+                    //permanent logic
+                    if (Input.GetKeyDown(KeyCode.Mouse0))
+                    {
+                        selectCell(hitCell);
+                    }
+                    else
+                    {
+                        //hovering logic
+                        if (hitCell != hoveringPermanent)
+                        {
+                            selectHoveringPermanent(hitCell);
+                        }
+
+                        handleAdditionalHovering(mouseCoords, hit);
+                    }
+                }
+                else
+                {
+                    if (Input.GetKeyDown(KeyCode.Mouse0))
+                    {
+                        deselectPermanent();
+                    }
+                    deselectHoveringPermanent();
                 }
 
-                handleAdditionalHovering(mouseCoords, hit);
+                //right click wipes everything
+                if (Input.GetKeyDown(KeyCode.Mouse1))
+                {
+                    if (hoveringPermanent != null && hoveringPermanent.hasPermanent())
+                    {
+                        altClickHoveringPermanentSelected();
+                    }
+                    else
+                    {
+                        deselectPermanent();
+                        deselectHoveringPermanent();
+                    }
+                }
+                else if (Input.GetKeyUp(KeyCode.Mouse1))
+                {
+                    releaseAltClickHoveringPermanent();
+                }
             }
-        }
-        else
-        {
-            if (Input.GetKeyDown(KeyCode.Mouse0))
-            {
-                deselectPermanent();
-            }
-            deselectHoveringPermanent();
-        }
+            
+            
+           
 
-        //right click wipes everything
-        if (Input.GetKeyDown(KeyCode.Mouse1))
-        {
-            if(hoveringPermanent != null && hoveringPermanent.hasPermanent())
-            {
-                altClickHoveringPermanentSelected();
-            }
-            else
-            {
-                deselectPermanent();
-                deselectHoveringPermanent();
-            }
-        }else if (Input.GetKeyUp(KeyCode.Mouse1))
-        {
-            releaseAltClickHoveringPermanent();
+            yield return null;
         }
     }
 
@@ -100,6 +139,8 @@ public class ObjectSelecting : MonoBehaviour
 
         selectedPermanent = selectable;
         selectedPermanent.select();
+
+        startPolling();
     }
 
     void handleAdditionalHovering(HexCoordinates mouseCoords,RaycastHit hit)
@@ -278,7 +319,7 @@ public class ObjectSelecting : MonoBehaviour
             }
             else
             {
-                selectedPermanent.commandIssuedToCell(cell, extraHoveringPermanents, selectedPermanentTargetOrientation, mouseOrientation);
+                selectedPermanent.commandIssuedToCell(cell, extraHoveringPermanents, selectedPermanentTargetOrientation, mouseOrientation, commandSuccessFullReset);
             }
         }
     }
@@ -296,7 +337,7 @@ public class ObjectSelecting : MonoBehaviour
         selectedPermanentTargetOrientation = HexDirection.NONE;
         resetMouseTexture();
         resetSelectedHalfHoverPermanents();
-        cameraTracker.stopTargeting();
+        //cameraTracker.stopTargeting();
     }
 
     void selectHalfHoverPermanents(Selectable.SelectableHexArea area)

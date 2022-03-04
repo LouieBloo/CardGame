@@ -1,4 +1,5 @@
 using HexMapTools;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -111,7 +112,7 @@ public class Selectable : NetworkBehaviour
     }*/
 
     //if we are selected and the user left clicks on another permanent
-    public virtual bool commandIssuedToCell(PermanentCell target, List<PermanentCell> extraHoveringCells, HexDirection orientation, HexDirection mouseOrientation)
+    public virtual bool commandIssuedToCell(PermanentCell target, List<PermanentCell> extraHoveringCells, HexDirection orientation, HexDirection mouseOrientation, Action commandFinishedCallback)
     {
         Debug.Log("Issueing command at cell: " + target);
         return false;

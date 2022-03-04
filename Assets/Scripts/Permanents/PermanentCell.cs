@@ -28,6 +28,7 @@ public class PermanentCell : Selectable
     void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        baseColor = spriteRenderer.color;   
         type = SelectableType.HexCell;
     }
 
@@ -100,11 +101,20 @@ public class PermanentCell : Selectable
 
     public bool hasPermanent()
     {
-        if (attachedNetworkObject.Value.TryGet(out NetworkObject targetObject))
+        //wrapping this in case its the first thing clicked when the player loads
+        try
         {
-            return true;
+            if (attachedNetworkObject.Value.TryGet(out NetworkObject targetObject))
+            {
+                return true;
+            }
+            return false;
         }
-        return false;
+        catch (System.Exception)
+        {
+            return false;
+        }
+        
         //return attachedNetworkObject && attachedNetworkObject.Value != null;
     }
 

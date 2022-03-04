@@ -34,7 +34,7 @@ public class PlayerInput : NetworkBehaviour
 
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                spellBook.spellActivated(0);
+                //spellBook.spellActivated(0);
             }
 
             if (Input.GetKey(KeyCode.A))

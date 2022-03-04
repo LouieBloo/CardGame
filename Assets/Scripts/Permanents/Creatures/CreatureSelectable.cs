@@ -1,4 +1,5 @@
 using HexMapTools;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -20,6 +21,8 @@ public class CreatureSelectable : Selectable
 
     public GameObject statsUIPrefab;
     private GameObject activeStatsUI;
+
+    private Action commandFinishedCallback;
 
     private void Awake()
     {
@@ -44,10 +47,12 @@ public class CreatureSelectable : Selectable
         return movementScript.getMovementRange();
     }
 
-    public override bool commandIssuedToCell(PermanentCell target, List<PermanentCell> extraHoveringCells, HexDirection orientation, HexDirection mouseOrientation)
+    public override bool commandIssuedToCell(PermanentCell target, List<PermanentCell> extraHoveringCells, HexDirection orientation, HexDirection mouseOrientation, Action commandFinishedCallback)
     {
         //if(doIHaveTurnPriority)
         if (!IsOwner) { return false; }
+
+        this.commandFinishedCallback = commandFinishedCallback;
 
         //convert permanet cell to vector 3 for network serialization
         Vector3[] extraMovePositions = new Vector3[extraHoveringCells.Count];
@@ -58,6 +63,14 @@ public class CreatureSelectable : Selectable
 
         attacker.commandIssuedToCellServerRpc(target.transform.position, extraMovePositions, orientation, mouseOrientation);
         return true;
+    }
+
+    public void commandFinished()
+    {
+        if (commandFinishedCallback != null)
+        {
+            commandFinishedCallback();
+        }
     }
 
 

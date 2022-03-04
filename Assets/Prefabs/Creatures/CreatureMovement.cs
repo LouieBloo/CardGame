@@ -110,10 +110,21 @@ public class CreatureMovement : NetworkBehaviour
             }
             doingCommand = moveToPointThenExecuteAction(path.ToArray(), targetActionCell, action,finalOrientation, extraMovePositions,callbackWhenDone);
             StartCoroutine(doingCommand);
+
+            wipeObjectSelectorClientRpc();
         }
         else
         {
             Debug.Log("No path found");
+        }
+    }
+
+    [ClientRpc]
+    void wipeObjectSelectorClientRpc()
+    {
+        if (IsOwner)
+        {
+            GetComponent<CreatureSelectable>().commandFinished();
         }
     }
 
