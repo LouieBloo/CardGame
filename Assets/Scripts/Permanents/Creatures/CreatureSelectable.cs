@@ -77,6 +77,7 @@ public class CreatureSelectable : Selectable
     //When we are selected and the mouse is hovering over another selectable
     public override OnHoverOverSelectableResponse onMouseHoverEnter(PermanentCell cell, Selectable selectableMouseIsHoveringOn, HexDirection orientation, HexDirection mouseOrientation)
     {
+        Debug.Log("oms");
         //check for valid move if we are hovering over a cell
         if(selectableMouseIsHoveringOn.Type == SelectableType.HexCell && !cell.hasPermanent())
         {

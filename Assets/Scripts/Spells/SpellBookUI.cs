@@ -21,6 +21,7 @@ public class SpellBookUI : MonoBehaviour
     //spellsInSpellbook, Spells, spellBookSpellClicked
     public void setup(NetworkList<FixedString64Bytes> spellsInSpellbook, Dictionary<string, SpellBookEntry> allGameSpells, Action<SpellBookEntry> callback)
     {
+        Debug.Log("setup ui");
         this.spells = spells;
         this.spellCastCallback = callback;
 

@@ -148,6 +148,7 @@ public class Attacker : NetworkBehaviour
 
     public OnHoverOverSelectableResponse mouseAttackHover(HexDirection mouseOrientation)
     {
+        Debug.Log("MAH");
         if(getAttackType() == RangeType.Melee)
         {
             if (creatureMovement.getHexSpaceType() == CreatureStats.CreatureHexSpaces.Point)
