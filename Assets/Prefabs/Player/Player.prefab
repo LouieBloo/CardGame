@@ -189,5 +189,10 @@ MonoBehaviour:
     name: Frost Shield
     mana: 5
     spellBookImage: {fileID: 21300000, guid: 153fe7612ee198948a82f117659b2e75, type: 3}
+  - spellPrefab: {fileID: 582773682064909776, guid: c76f00d5ebbe63443b8a0b0e73c27de3,
+      type: 3}
+    name: Lightning Bolt
+    mana: 10
+    spellBookImage: {fileID: 21300000, guid: 504f47b8d2ee35c4b9a0d42a46fb61a1, type: 3}
   spellBookUIPrefab: {fileID: 1785991269721173456, guid: 314f4d165a19eb24bace41c865c0d9da,
     type: 3}

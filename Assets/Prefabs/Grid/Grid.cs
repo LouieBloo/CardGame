@@ -39,10 +39,10 @@ public class Grid : NetworkBehaviour
 
     private void Singleton_OnServerStarted()
     {
-        if (IsServer)
+        /*if (IsServer)
         {
             initializeGridPermanentsServerRpc();
-        }
+        }*/
     }
 
     private void Update()

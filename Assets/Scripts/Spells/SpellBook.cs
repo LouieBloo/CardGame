@@ -54,6 +54,7 @@ public class SpellBook : NetworkBehaviour
             mana.Value = startingMana;
 
             spellsInSpellbook.Add("Frost Shield");
+            spellsInSpellbook.Add("Lightning Bolt");
         }
 
         objectSelector = GameObject.FindGameObjectsWithTag("Game")[0].GetComponent<ObjectSelecting>();
@@ -86,7 +87,15 @@ public class SpellBook : NetworkBehaviour
         if (spellsInSpellbook.Contains(spellId) && mana.Value >= allGameSpells[spellId].mana)
         {
             GameObject spellGameobject = Instantiate(allGameSpells[spellId].spellPrefab, target, Quaternion.identity);
-            spellGameobject.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
+            if(spellGameobject.GetComponent<NetworkObject>() != null)
+            {
+                spellGameobject.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
+            }
+            else
+            {
+                spawnSpellClientRpc(spellId, target);
+            }
+            
             spellGameobject.transform.SetParent(transform);
             spellGameobject.GetComponent<SpellGameObject>().setup(grid.getPermanentCellAtPosition(target), null);
 
@@ -96,6 +105,18 @@ public class SpellBook : NetworkBehaviour
         {
             GlobalVars.gv.gameUI.alertMessage("You dont have this spell");
         }
+    }
+
+
+    //some spells we need to network track such as buffs, others we dont such as damage dealers. The client just needs to render the animation + sound
+    [ClientRpc]
+    void spawnSpellClientRpc(string spellId, Vector3 target)
+    {
+        if (IsServer) { return; }
+
+        GameObject spellGameobject = Instantiate(allGameSpells[spellId].spellPrefab, target, Quaternion.identity);
+        spellGameobject.transform.SetParent(transform);
+        spellGameobject.GetComponent<SpellGameObject>().setup(grid.getPermanentCellAtPosition(target), null);
     }
 
     [ClientRpc]

@@ -12,6 +12,9 @@ public class DamageCalculator
         if (attacker.damageType == DamageDealer.DamageType.Physical && victim.armorType == DamageTaker.ArmorType.Physical)
         {
             totalDamage = attacker.getBaseDamage() - victim.getArmor();
+        }else if (attacker.damageType == DamageDealer.DamageType.Magical)
+        {
+            totalDamage = attacker.getBaseDamage();
         }
 
         victim.takeDamage(totalDamage);

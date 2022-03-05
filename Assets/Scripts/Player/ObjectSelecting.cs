@@ -56,6 +56,8 @@ public class ObjectSelecting : MonoBehaviour
     // Update is called once per frame
     IEnumerator pollingForInput()
     {
+        //yield first so our grid is loaded
+        yield return null;
         while (true)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -296,15 +298,14 @@ public class ObjectSelecting : MonoBehaviour
                 else
                 {
                     //we clicked on ourselves, deselect
-                    deselectPermanent();
+                    cameraTracker.trackTarget(selectedPermanent.transform);
+                    //deselectPermanent();
                 }
             }
             else
             {
                 selectedPermanent = cell.getAttachedPermanent().GetComponent<Selectable>();
                 selectHalfHoverPermanents(selectedPermanent.select());
-                cameraTracker.trackTarget(selectedPermanent.transform);
-
             }
         }
         else if (selectedPermanent){

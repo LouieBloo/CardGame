@@ -53,9 +53,13 @@ public class DamageDealer : NetworkBehaviour
     public int getBaseDamage()
     {
         //if we are a creature we return our base damage modifed with our player stats
-        if(permanent.type == Permanent.Type.Creature)
+        if(permanent != null && permanent.type == Permanent.Type.Creature)
         {
             //return (transform.parent.GetComponent<Creature>().attackPoints.Value * 2) + baseDamage.Value;
+            return baseDamage.Value;
+        }
+        else
+        {
             return baseDamage.Value;
         }
 

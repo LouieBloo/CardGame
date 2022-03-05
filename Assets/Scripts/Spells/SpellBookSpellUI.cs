@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class SpellBookSpellUI : MonoBehaviour
 {
-    public Sprite image;
+    public Image image;
     SpellBook.SpellBookEntry spell;
 
     Action<SpellBook.SpellBookEntry> clickCallback;
@@ -27,7 +27,7 @@ public class SpellBookSpellUI : MonoBehaviour
     public void setup(SpellBook.SpellBookEntry spell, Action<SpellBook.SpellBookEntry> clickCallback)
     {
         this.spell = spell;
-        this.image = spell.spellBookImage;
+        this.image.sprite = spell.spellBookImage;
         this.clickCallback = clickCallback;
     }
 }

@@ -11,6 +11,7 @@ public class SpellGameObject : NetworkBehaviour
     public CreatureModification creatureModification;
     public float delayBeforeApplyingModification;
     public float delayBeforeStoppingAnimation;
+    public bool destroyAfterAnimation;
     private AudioSource audioSource;
     private DamageDealer damageDealer;
 
@@ -55,9 +56,15 @@ public class SpellGameObject : NetworkBehaviour
         if (IsServer)
         {
             Debug.Log("Apply spell");
-            target.getAttachedPermanent().GetComponent<Modifiable>().applyModification(GetComponent<NetworkObject>());
+            if(creatureModification != null)
+            {
+                target.getAttachedPermanent().GetComponent<Modifiable>().applyModification(GetComponent<NetworkObject>());
+            }
+            if(damageDealer != null)
+            {
+                target.getAttachedPermanent().GetComponent<Creature>().attacked(damageDealer);
+            }
             //callback(creatureModification);
-            //GetComponent<NetworkObject>().Despawn(true);
         }
     }
 
@@ -66,6 +73,14 @@ public class SpellGameObject : NetworkBehaviour
         if (objectToDisableWhenAnimationDone != null)
         {
             objectToDisableWhenAnimationDone.SetActive(false);
+        }
+
+        if (IsServer && destroyAfterAnimation && GetComponent<NetworkObject>() != null)
+        {
+            GetComponent<NetworkObject>().Despawn(true);
+        }else if (destroyAfterAnimation)
+        {
+            Destroy(this.gameObject);
         }
     }
 
