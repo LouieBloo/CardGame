@@ -62,6 +62,7 @@ public class SpellBook : NetworkBehaviour
 
     private void spellActivated(SpellBookEntry spell)
     {
+        Debug.Log("Spell activated");
         currentlyCastingSpellId = spell.name;
         objectSelector.findTarget(targetFound, allGameSpells[spell.name].spellPrefab.GetComponent<Selectable>());
         toggleSpellBook();//close the book
@@ -83,6 +84,7 @@ public class SpellBook : NetworkBehaviour
     [ServerRpc]
     public void castSpellServerRpc(string spellId,Vector3 target)
     {
+        Debug.Log("Spell activated222");
         if (spellsInSpellbook.Contains(spellId) && mana.Value >= allGameSpells[spellId].mana)
         {
             GameObject spellGameobject = Instantiate(allGameSpells[spellId].spellPrefab, target, Quaternion.identity);
@@ -121,7 +123,8 @@ public class SpellBook : NetworkBehaviour
 
     private void toggleSpellBook()
     {
-        if(activeSpellBook == null)
+        Debug.Log("toggle activated");
+        if (activeSpellBook == null)
         {
             objectSelector.stopPolling();
             activeSpellBook = Instantiate(spellBookUIPrefab, Vector3.zero, Quaternion.identity);
