@@ -30,10 +30,4 @@ public class PlayerSpawn : NetworkBehaviour
             }
         }
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

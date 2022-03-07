@@ -6,7 +6,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-public class CreatureMovement : NetworkBehaviour
+public class CreatureMovement : PlayerOwnedNetworkObject
 {
     public float movementSpeed;
     public float rotationSpeed;
@@ -105,7 +105,7 @@ public class CreatureMovement : NetworkBehaviour
         {
             if(path.Count > movementRange.Value)
             {
-                alertClientRpc("Can't move there, creature doesn't have enough range");
+                sendPlayerErrorClientRpc("Can't move there, creature doesn't have enough range");
                 return;
             }
             doingCommand = moveToPointThenExecuteAction(path.ToArray(), targetActionCell, action,finalOrientation, extraMovePositions,callbackWhenDone);
@@ -126,14 +126,6 @@ public class CreatureMovement : NetworkBehaviour
         {
             GetComponent<CreatureSelectable>().commandFinished();
         }
-    }
-
-    [ClientRpc]
-    public void alertClientRpc(string message)
-    {
-        if (!IsOwner) { return; }
-        //Debug.Log("Unit doesnt have enough range");
-        GlobalVars.gv.gameUI.alertMessage(message);
     }
 
     IEnumerator moveToPointThenExecuteAction(Vector3[] route, PermanentCell targetActionCell, Creature.CreatureActions action, string finalOrientation, List<PermanentCell> extraMoveCells, Action<PermanentCell> callbackWhenDone)

@@ -5,13 +5,18 @@ using UnityEngine.Networking;
 using UnityEngine;
 using HexMapTools;
 
-public class Player : NetworkBehaviour
+public class Player : PlayerOwnedNetworkObject
 {
     private ObjectSelecting objectSelector;
     private Grid grid;
 
     public GameObject uiPrefab;
     private GameObject ui;
+
+    public NetworkVariable<Color> playerColor = new NetworkVariable<Color>();
+
+    public GameObject playerDefaultsPrefab;
+    private GameObject playerDefaultsGameObject;
 
     public override void OnDestroy()
     {
@@ -31,6 +36,11 @@ public class Player : NetworkBehaviour
             //spawnGridServerRpc();
         }
 
+        if (IsServer)
+        {
+            
+        }
+
         if (IsOwner)
         {
             objectSelector = GameObject.FindGameObjectsWithTag("Game")[0].GetComponent<ObjectSelecting>();
@@ -38,10 +48,38 @@ public class Player : NetworkBehaviour
             ui = Instantiate(uiPrefab, Vector3.zero, Quaternion.identity);
             ui.GetComponent<PlayerUI>().setup(this);
 
+            playerDefaultsGameObject = Instantiate(playerDefaultsPrefab, Vector3.zero, Quaternion.identity);
+            playerDefaultsGameObject.GetComponent<PlayerDefaults>().setup(setColorServerRpc);
+            //setColorServerRpc(objectSelector.GetComponent<PlayerDefaults>().getPlayerColor());
+
             GlobalVars.gv.player = this;
         }
     }
 
+    [ServerRpc]
+    void setColorServerRpc(Color c) {
+        foreach(NetworkClient n in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            if(n.PlayerObject.GetComponent<Player>().playerColor.Value == c)
+            {
+                sendPlayerErrorClientRpc("That color has already been taken!");
+                return;
+            }
+        }
+
+        Debug.Log("Server got color: " + c);
+        playerColor.Value = c;
+        destroyDefaultsClientRpc();
+    }
+
+    [ClientRpc]
+    void destroyDefaultsClientRpc()
+    {
+        if (IsOwner)
+        {
+            Destroy(playerDefaultsGameObject);
+        }
+    }
 
     void Update()
     {

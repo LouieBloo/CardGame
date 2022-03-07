@@ -157,6 +157,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiPrefab: {fileID: 6211119694687613981, guid: 3f1f164cfec401a47a8de06f8de3712c,
     type: 3}
+  playerColor:
+    m_InternalValue: {r: 0, g: 0, b: 0, a: 0}
+  playerDefaultsPrefab: {fileID: 7181993999541545653, guid: c28a8c017aad26742a912b8a99f0e084,
+    type: 3}
 --- !u!114 &-4698611565757124795
 MonoBehaviour:
   m_ObjectHideFlags: 0

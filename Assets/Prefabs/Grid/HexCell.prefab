@@ -102,6 +102,7 @@ MonoBehaviour:
   objectSpawnRotation: {x: 0, y: 0, z: 0, w: 0}
   creaturePrefab: {fileID: 6689913824549537717, guid: 1af54562b895b044999bb2bee9428136,
     type: 3}
+  permanentColorSprite: {fileID: 22720902612314029}
   baseColor: {r: 1, g: 1, b: 1, a: 1}
   hoverColor: {r: 0, g: 0, b: 0, a: 1}
   selectedColor: {r: 0.2784314, g: 1, b: 0.34509805, a: 0.50980395}
@@ -121,7 +122,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &194279066079050385
 Transform:
   m_ObjectHideFlags: 0
@@ -198,7 +199,7 @@ GameObject:
   - component: {fileID: 192595825354375057}
   - component: {fileID: 22720902612314029}
   m_Layer: 0
-  m_Name: Outline
+  m_Name: PermanentColor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -213,7 +214,7 @@ Transform:
   m_GameObject: {fileID: 191024191010832813}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.25, y: 1.25, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 194249838293526985}
   m_RootOrder: 0
@@ -259,7 +260,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: 948aa36e3c8e53748946fdea468fdbf7, type: 3}
-  m_Color: {r: 0.5588235, g: 0.5588235, b: 0.5588235, a: 0}
+  m_Color: {r: 1, g: 0, b: 0, a: 0.5372549}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

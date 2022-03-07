@@ -13,6 +13,8 @@ public class PermanentCell : Selectable
 
     public GameObject creaturePrefab;
 
+    public SpriteRenderer permanentColorSprite; 
+
     private HexCoordinates hexCoordinates;
 
     private bool halfSelected = false;
@@ -82,11 +84,27 @@ public class PermanentCell : Selectable
     public void attachPermanent(NetworkObjectReference networkObject)
     {
         attachedNetworkObject.Value = networkObject;
+        setPermanentHoverColorClientRpc(NetworkManager.Singleton.ConnectedClients[PlayerNetworkHelper.getPlayerIdFromNetworkReference(networkObject)].PlayerObject.GetComponent<Player>().playerColor.Value);
     }
 
     public void unattachPermanent()
     {
         attachedNetworkObject.Value = new NetworkObjectReference();
+        resetPermanentHoverColorClientRpc();
+    }
+
+    [ClientRpc]
+    private void setPermanentHoverColorClientRpc(Color color)
+    {
+        permanentColorSprite.enabled = true;
+        color.a = 0.5f;
+        permanentColorSprite.color = color;
+    }
+
+    [ClientRpc]
+    private void resetPermanentHoverColorClientRpc()
+    {
+        permanentColorSprite.enabled = false;
     }
 
     public Permanent getAttachedPermanent()
