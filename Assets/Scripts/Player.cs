@@ -18,6 +18,8 @@ public class Player : PlayerOwnedNetworkObject
     public GameObject playerDefaultsPrefab;
     private GameObject playerDefaultsGameObject;
 
+    public GameObject playerTurnManagerPrefab;
+
     public override void OnDestroy()
     {
         base.OnDestroy();
@@ -36,9 +38,11 @@ public class Player : PlayerOwnedNetworkObject
             //spawnGridServerRpc();
         }
 
-        if (IsServer)
+        if (IsServer && IsOwner)
         {
-            
+            Debug.Log("Spawning object");
+            GameObject turnManager = Instantiate(playerTurnManagerPrefab, Vector3.zero, Quaternion.identity);
+            turnManager.GetComponent<NetworkObject>().Spawn();
         }
 
         if (IsOwner)

@@ -78,6 +78,7 @@ public class PermanentCell : Selectable
         
         //attach to ourself
         attachPermanent(go.GetComponent<NetworkObject>());
+
         return go.GetComponent<NetworkObject>();
     }
 

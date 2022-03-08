@@ -133,6 +133,9 @@ public class CreatureMovement : PlayerOwnedNetworkObject
         Animator animator = GetComponent<Creature>().getCreatureObject().GetComponent<Animator>();
         if(route.Length > 0)
         {
+            //update grid 
+            grid.permanentMovedToNewCell(GetComponent<NetworkObject>(), route[route.Length - 1], finalOrientation, extraMoveCells);
+
             Vector3 startingPos = transform.position;
             int targetPointIndex = 0;
 
@@ -161,8 +164,6 @@ public class CreatureMovement : PlayerOwnedNetworkObject
 
                 yield return null;
             }
-
-            grid.permanentMovedToNewCell(GetComponent<NetworkObject>(), route[route.Length - 1],finalOrientation, extraMoveCells);
         }
 
         animator.SetBool("Running", false);

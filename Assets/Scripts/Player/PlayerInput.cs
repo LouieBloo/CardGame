@@ -9,16 +9,18 @@ public class PlayerInput : NetworkBehaviour
 
     private CameraTracker cameraTracker;
     private SpellBook spellBook;
+    private PlayerTurnManager turnManager;
 
     // Start is called before the first frame update
     void Start()
     {
-        
         spellBook = GetComponent<SpellBook>();
         if (IsOwner)
         {
             StartCoroutine(pollForInput());
             cameraTracker = Camera.main.GetComponent<CameraTracker>();
+
+            turnManager = GameObject.FindGameObjectsWithTag("Game")[0].GetComponent<PlayerTurnManager>();
         }
     }
 
@@ -53,8 +55,12 @@ public class PlayerInput : NetworkBehaviour
             {
                 cameraTracker.backPressed();
             }
+            if (Input.GetKey(KeyCode.T))
+            {
+                turnManager.recalculateTurnOrder();
+            }
 
-            if(Input.mouseScrollDelta.y != 0)
+            if (Input.mouseScrollDelta.y != 0)
             {
                 cameraTracker.zoom(Input.mouseScrollDelta.y);
             }

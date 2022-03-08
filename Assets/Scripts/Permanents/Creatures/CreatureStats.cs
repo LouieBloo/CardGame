@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CreatureStats : MonoBehaviour
 {
@@ -25,6 +26,7 @@ public class CreatureStats : MonoBehaviour
 
     public GameObject projectilePrefab;
 
+    public Image uiImage;
     public enum CreatureHexSpaces
     {
         Point,

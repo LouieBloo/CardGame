@@ -161,6 +161,8 @@ MonoBehaviour:
     m_InternalValue: {r: 0, g: 0, b: 0, a: 0}
   playerDefaultsPrefab: {fileID: 7181993999541545653, guid: c28a8c017aad26742a912b8a99f0e084,
     type: 3}
+  playerTurnManagerPrefab: {fileID: 5237140264943997716, guid: e34a8eab57acc0b43ae05623e833b070,
+    type: 3}
 --- !u!114 &-4698611565757124795
 MonoBehaviour:
   m_ObjectHideFlags: 0

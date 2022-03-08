@@ -104,6 +104,9 @@ public class Creature : NetworkBehaviour
         creatureMovement.hexSpaceDistance.Value = creatureStats.hexSpaceDistance;
         creatureMovement.speed.Value = creatureStats.baseSpeed;
         creatureMovement.movementRange.Value = creatureStats.baseMovementRange;
+
+        //register this object as something that can take a turn
+        GlobalVars.gv.turnManager.addObjectToTurnOrder(GetComponent<NetworkObject>());
     }
 
     public NetworkObject getCreatureObject(){
@@ -128,6 +131,7 @@ public class Creature : NetworkBehaviour
 
     public void killed()
     {
+        GlobalVars.gv.grid.creatureDiedOnCell(GetComponent<NetworkObject>());
         getCreatureObject().Despawn(true);
         GetComponent<NetworkObject>().Despawn(true);
     }
@@ -146,6 +150,7 @@ public class Creature : NetworkBehaviour
         stats.currentArmor = damageTaker.getArmor();
         stats.currentSpeed = creatureMovement.speed.Value;
         stats.name = baseStats.name;
+        stats.uiImage = baseStats.uiImage;
 
         return stats;
     }

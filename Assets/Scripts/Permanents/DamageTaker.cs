@@ -26,7 +26,7 @@ public class DamageTaker : NetworkBehaviour
 
     public GameObject damageFloatingTextPrefab;
 
-    private void Start()
+    private void Awake()
     {
         permanent = GetComponent<Permanent>();
         modifiable = GetComponent<Modifiable>();

@@ -7,6 +7,9 @@ TagManager:
   - Grid
   - Game
   - Debug1
+  - RGBA
+  - ColorSlider
+  - TurnManager
   layers:
   - Default
   - TransparentFX

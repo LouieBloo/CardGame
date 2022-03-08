@@ -6,4 +6,6 @@ public class GlobalVariables : MonoBehaviour
 {
     public GameUI gameUI;
     public Player player;
+    public Grid grid;
+    public PlayerTurnManager turnManager;
 }

@@ -206,6 +206,11 @@ public class Grid : NetworkBehaviour
         }
     }
 
+    public void creatureDiedOnCell(NetworkObjectReference reference)
+    {
+        GlobalVars.gv.turnManager.removeObjectFromTurnOrder(reference);
+    }
+
     public List<HexCoordinates> findPath(HexCoordinates start, HexCoordinates end)
     {
         List<HexCoordinates> foundPath;
