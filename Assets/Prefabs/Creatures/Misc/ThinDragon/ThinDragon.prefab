@@ -1017,6 +1017,7 @@ MonoBehaviour:
   currentSpeed: 0
   name: Thin Dragon
   projectilePrefab: {fileID: 0}
+  uiImage: {fileID: 21300000, guid: e3e1db78ced82b74691355a08119503f, type: 3}
   hexSpaces: 1
   hexSpaceDistance: 1
 --- !u!1 &5972391637143400841

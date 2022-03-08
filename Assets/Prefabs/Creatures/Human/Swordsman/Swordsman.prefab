@@ -1575,6 +1575,7 @@ MonoBehaviour:
   currentSpeed: 0
   name: Swordsman
   projectilePrefab: {fileID: 0}
+  uiImage: {fileID: 21300000, guid: 6908859d16d809846ab8e3d004aa4a5e, type: 3}
   hexSpaces: 0
   hexSpaceDistance: 0
 --- !u!1 &4731527214890039423

@@ -554,6 +554,7 @@ MonoBehaviour:
   forcingTurnOrder: 1
   turnIndicatorPrefab: {fileID: 7814674336095816870, guid: 7985967ba3411884eabfe06aa7a47eda,
     type: 3}
+  spawnTurnIndicatorTransform: {fileID: 3360512315436120027}
 --- !u!1 &5420312471340341719
 GameObject:
   m_ObjectHideFlags: 0
@@ -750,7 +751,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5279472470499996597}
   m_Direction: 2
   m_Value: 1
-  m_Size: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -875,7 +876,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4034915954624099856}
   m_HandleRect: {fileID: 6508716491487905471}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

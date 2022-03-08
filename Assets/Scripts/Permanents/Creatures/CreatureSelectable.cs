@@ -115,7 +115,6 @@ public class CreatureSelectable : Selectable
 
     public override void onAltClick(Vector3 mousePosition)
     {
-        CreatureStats statsForUI = new CreatureStats();
         activeStatsUI = Instantiate(statsUIPrefab, Vector3.zero, Quaternion.identity);
         activeStatsUI.GetComponent<CreatureStatsUI>().setup(GetComponent<Creature>().getCurrentStats());
         if (RectTransformUtility.ScreenPointToWorldPointInRectangle(activeStatsUI.GetComponent<RectTransform>(), mousePosition, null, out Vector3 worldPosition))

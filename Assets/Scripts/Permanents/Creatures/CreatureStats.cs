@@ -24,9 +24,11 @@ public class CreatureStats : MonoBehaviour
 
     public string name;
 
+    public Color color;
+
     public GameObject projectilePrefab;
 
-    public Image uiImage;
+    public Sprite uiImage;
     public enum CreatureHexSpaces
     {
         Point,

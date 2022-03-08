@@ -12,6 +12,7 @@ public class PlayerTurnManager : NetworkBehaviour
 
     public NetworkList<NetworkObjectReference> objectsInTurnOrder;
     private List<NetworkObjectReference> allObjectsTracking = new List<NetworkObjectReference>();
+    private GameObject[] activeTurnIndicators;
 
     public Transform spawnTurnIndicatorTransform;
 
@@ -107,7 +108,7 @@ public class PlayerTurnManager : NetworkBehaviour
         NetworkObjectReference[] objectsInOrder = new NetworkObjectReference[sortedObjects.Count];
         for(int x = 0; x < sortedObjects.Count; x++) 
         {
-            Debug.Log(sortedObjects[x].stats.name);
+            //Debug.Log(sortedObjects[x].stats.name + ": " + sortedObjects[x].stats.currentSpeed);
             objectsInOrder[x] = sortedObjects[x].networkObject;
             objectsInTurnOrder.Add(sortedObjects[x].networkObject);
         }
@@ -115,17 +116,29 @@ public class PlayerTurnManager : NetworkBehaviour
         displayTurnOrderClientRpc(objectsInOrder);
     }
 
+
+
     [ClientRpc]
     void displayTurnOrderClientRpc(NetworkObjectReference[] objectsInOrder)
     {
+        if(activeTurnIndicators != null)
+        {
+            foreach (GameObject g in activeTurnIndicators)
+            {
+                Destroy(g);
+            }
+        }
+
+        int x = 0;
+        activeTurnIndicators = new GameObject[objectsInOrder.Length];
         foreach (NetworkObjectReference n in objectsInOrder)
         {
             if (n.TryGet(out NetworkObject targetObject))
             {
-                GameObject indicator = Instantiate(turnIndicatorPrefab, spawnTurnIndicatorTransform);
-                indicator.GetComponent<TurnIndicatorUI>().setup(targetObject.GetComponent<Creature>());
+                activeTurnIndicators[x] = Instantiate(turnIndicatorPrefab, spawnTurnIndicatorTransform);
+                activeTurnIndicators[x].GetComponent<TurnIndicatorUI>().setup(targetObject.GetComponent<Creature>());
             }
+            x++;
         }
-        Debug.Log(objectsInOrder.Length);
     }
 }

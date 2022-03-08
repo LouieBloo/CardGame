@@ -1,4 +1,5 @@
 using HexMapTools;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
@@ -6,7 +7,7 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 
-public class Creature : NetworkBehaviour
+public class Creature : NetworkBehaviour, NetworkLoadable
 {
     public enum CreatureActions
     {
@@ -25,7 +26,8 @@ public class Creature : NetworkBehaviour
     private DamageDealer damageDealer;
     private CreatureMovement creatureMovement;
     private Attacker attacker;
-    
+
+    private NetworkVariable<Color> color = new NetworkVariable<Color>();
 
     [System.Serializable]
     public class CreaturePrefab
@@ -57,6 +59,8 @@ public class Creature : NetworkBehaviour
             {
                 creaturePrefabMapping.Add(p.name, p.prefab);
             }
+
+            creatureObjectReference.OnValueChanged += creatureObjectReferenceChanged;
         }
 
         damageTaker = GetComponent<DamageTaker>();
@@ -74,6 +78,11 @@ public class Creature : NetworkBehaviour
         updateUI();
     }
 
+    private void creatureObjectReferenceChanged(NetworkObjectReference previousValue, NetworkObjectReference newValue)
+    {
+        Debug.Log("changeeeeeeee");
+    }
+
     public void setSpawnParameters(string creatureName, HexDirection orientation)
     {
         this.creatureName = creatureName;
@@ -84,15 +93,15 @@ public class Creature : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     void spawnCreatureObjectServerRpc()
     {
-        Debug.Log(creatureName);    
+        //Debug.Log(creatureName);    
         GameObject newObj = Instantiate(creaturePrefabMapping[creatureName], transform.position, Quaternion.identity);
         newObj.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
         newObj.transform.SetParent(transform);
         newObj.transform.localRotation = creaturePrefabMapping[creatureName].transform.rotation;
         newObj.transform.localPosition = new Vector3(newObj.transform.localPosition.x, creaturePrefabMapping[creatureName].transform.position.y, newObj.transform.localPosition.z);
-        creatureObjectReference.Value = newObj;
 
         creatureStats = newObj.GetComponent<CreatureStats>();
+        color.Value = NetworkManager.Singleton.ConnectedClients[OwnerClientId].PlayerObject.GetComponent<Player>().playerColor.Value;
         //setup damage taking and giving
         damageTaker.setup(creatureStats);
         damageDealer.setup(creatureStats);
@@ -104,6 +113,8 @@ public class Creature : NetworkBehaviour
         creatureMovement.hexSpaceDistance.Value = creatureStats.hexSpaceDistance;
         creatureMovement.speed.Value = creatureStats.baseSpeed;
         creatureMovement.movementRange.Value = creatureStats.baseMovementRange;
+
+        creatureObjectReference.Value = newObj;
 
         //register this object as something that can take a turn
         GlobalVars.gv.turnManager.addObjectToTurnOrder(GetComponent<NetworkObject>());
@@ -142,17 +153,18 @@ public class Creature : NetworkBehaviour
         {
             creatureObjectReference = transform.GetChild(1).gameObject;
         }*/
-        CreatureStats stats = new CreatureStats();
+        //CreatureStats stats = new CreatureStats();
         CreatureStats baseStats = getCreatureObject().GetComponent<CreatureStats>();
 
-        stats.currentDamage = damageDealer.getBaseDamage();
-        stats.baseHealth = baseStats.baseHealth;
-        stats.currentArmor = damageTaker.getArmor();
-        stats.currentSpeed = creatureMovement.speed.Value;
-        stats.name = baseStats.name;
-        stats.uiImage = baseStats.uiImage;
+        baseStats.currentDamage = damageDealer.getBaseDamage();
+        //baseStats.baseHealth = baseStats.baseHealth;
+        baseStats.currentArmor = damageTaker.getArmor();
+        baseStats.currentSpeed = creatureMovement.speed.Value;
+        //baseStats.name = baseStats.name;
+        //baseStats.uiImage = baseStats.uiImage;
+        baseStats.color = color.Value;
 
-        return stats;
+        return baseStats;
     }
 
     public void uiNeedsUpdating(int old, int newd)
@@ -167,5 +179,25 @@ public class Creature : NetworkBehaviour
         parms.amount = damageTaker.getAmount();
         parms.health = damageTaker.getHealth();
         ui.updateAll(parms);
+    }
+
+    //note this is for the clients reference
+    public bool isLoaded()
+    {
+        if(getCreatureObject() == null)
+        {
+            return false;
+        }
+        if(damageDealer == null || damageTaker == null || attacker == null)
+        {
+            return false;
+        }
+        if(creatureMovement == null)
+        {
+            return false;
+        }
+
+
+        return true;
     }
 }

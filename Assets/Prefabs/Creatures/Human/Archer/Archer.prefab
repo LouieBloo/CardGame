@@ -5078,6 +5078,7 @@ MonoBehaviour:
   name: Archer
   projectilePrefab: {fileID: 2579953337580206225, guid: 5eea9e8f72cab6341b869a9056069598,
     type: 3}
+  uiImage: {fileID: 21300000, guid: 91751d5399c74d64b921dc8125959d38, type: 3}
   hexSpaces: 0
   hexSpaceDistance: 0
 --- !u!114 &2817276125682464544
