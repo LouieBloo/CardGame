@@ -63,6 +63,7 @@ public class PlayerTurnManager : NetworkBehaviour
         else
         {
             Debug.Log("Need new turn now...");
+            startNewTurn();
         }
     }
 
@@ -106,27 +107,46 @@ public class PlayerTurnManager : NetworkBehaviour
     public void addObjectToTurnOrder(NetworkObjectReference objectNetworkReference)
     {
         allObjectsTracking.Add(objectNetworkReference);
-        recalculateTurnOrder();
+        objectsInTurnOrder.Add(objectNetworkReference);
+        recalculateTurnOrder(networkListToList(objectsInTurnOrder));
     }
 
     public void removeObjectFromTurnOrder(NetworkObjectReference objectNetworkReference)
     {
+        /*if(objectsInTurnOrder[0].NetworkObjectId == objectNetworkReference.NetworkObjectId)
+        {
+            return;
+        }*/
         allObjectsTracking.Remove(objectNetworkReference);
-        recalculateTurnOrder();
+        objectsInTurnOrder.Remove(objectNetworkReference);
+        recalculateTurnOrder(networkListToList(objectsInTurnOrder));
     }
 
-    public void recalculateTurnOrder()
+    public void startNewTurn()
+    {
+        recalculateTurnOrder(allObjectsTracking);
+    }
+
+    private List<NetworkObjectReference> networkListToList(NetworkList<NetworkObjectReference> sourceList)
+    {
+        List<NetworkObjectReference> finalList = new List<NetworkObjectReference>();
+        foreach(NetworkObjectReference n in sourceList)
+        {
+            finalList.Add(n);
+        }
+
+        return finalList;
+    }
+
+    public void recalculateTurnOrder(List<NetworkObjectReference> objectsInTurn)
     {
         if (!IsServer) { return; }
         //Debug.Log("== Recalculating turn order ==");
-
-       // Debug.Log("All Objects in turn: " + allObjectsTracking.Count);
-
-        objectsInTurnOrder.Clear();
+        // Debug.Log("All Objects in turn: " + allObjectsTracking.Count);
 
         //get the creature stats and put them in an object easier to sort
         List<SortableObject> sortedObjects = new List<SortableObject>();
-        foreach(NetworkObjectReference objectRef in allObjectsTracking)
+        foreach(NetworkObjectReference objectRef in objectsInTurn)
         {
             if (objectRef.TryGet(out NetworkObject targetObject))
             {
@@ -157,7 +177,7 @@ public class PlayerTurnManager : NetworkBehaviour
         }
 
         //Debug.Log("Objects in final order: " + sortedObjects.Count);
-
+        objectsInTurnOrder.Clear();
         NetworkObjectReference[] objectsInOrder = new NetworkObjectReference[sortedObjects.Count];
         for(int x = 0; x < sortedObjects.Count; x++) 
         {

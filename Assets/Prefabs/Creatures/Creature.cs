@@ -59,8 +59,6 @@ public class Creature : NetworkBehaviour, NetworkLoadable
             {
                 creaturePrefabMapping.Add(p.name, p.prefab);
             }
-
-            creatureObjectReference.OnValueChanged += creatureObjectReferenceChanged;
         }
 
         damageTaker = GetComponent<DamageTaker>();
@@ -76,11 +74,6 @@ public class Creature : NetworkBehaviour, NetworkLoadable
         }
 
         updateUI();
-    }
-
-    private void creatureObjectReferenceChanged(NetworkObjectReference previousValue, NetworkObjectReference newValue)
-    {
-        Debug.Log("changeeeeeeee");
     }
 
     public void setSpawnParameters(string creatureName, HexDirection orientation)

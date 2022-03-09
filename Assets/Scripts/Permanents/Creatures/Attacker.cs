@@ -239,8 +239,8 @@ public class Attacker : PlayerOwnedNetworkObject
 
     void damageTarget(PermanentCell target)
     {
+        GlobalVars.gv.turnManager.playerMadeMoveServerRpc();//make sure we do this first or else we could double remove from the turn order
         target.getAttachedPermanent().permanentAttacked(GetComponent<NetworkObject>(), Permanent.Type.Creature);
-        GlobalVars.gv.turnManager.playerMadeMoveServerRpc();
     }
 
     public RangeType getAttackType()

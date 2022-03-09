@@ -209,6 +209,16 @@ public class Grid : NetworkBehaviour
     public void creatureDiedOnCell(NetworkObjectReference reference)
     {
         GlobalVars.gv.turnManager.removeObjectFromTurnOrder(reference);
+        if (reference.TryGet(out NetworkObject targetObject))
+        {
+            //first we unattach the cells that this permanent occupies
+            Permanent targetPermanent = targetObject.GetComponent<Permanent>();
+            foreach (Vector3 cellVector in targetPermanent.getCellsOccupied())
+            {
+                HexCoordinates cellCoords = hexCalculator.HexFromPosition(cellVector);
+                cells[cellCoords].unattachPermanent();
+            }
+        }
     }
 
     public List<HexCoordinates> findPath(HexCoordinates start, HexCoordinates end)

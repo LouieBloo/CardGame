@@ -55,10 +55,6 @@ public class PlayerInput : NetworkBehaviour
             {
                 cameraTracker.backPressed();
             }
-            if (Input.GetKey(KeyCode.T))
-            {
-                turnManager.recalculateTurnOrder();
-            }
 
             if (Input.mouseScrollDelta.y != 0)
             {
