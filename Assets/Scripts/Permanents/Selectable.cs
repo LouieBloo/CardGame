@@ -66,6 +66,11 @@ public class Selectable : NetworkBehaviour
         creatureMovement = GetComponent<CreatureMovement>();
     }
 
+    private void OnDestroy()
+    {
+        deHighlight();
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -77,15 +82,23 @@ public class Selectable : NetworkBehaviour
 
     public virtual SelectableHexArea select()
     {
-        if (!selectedIndicator)
-        {
-            selectedIndicator = Instantiate(selectedIndicatorPrefab, new Vector3(transform.position.x, transform.position.y + 3f, transform.position.z), selectedIndicatorPrefab.transform.rotation);
-        }
-
         return null;
     }
 
     public void deselect()
+    {
+        
+    }
+
+    public virtual void highlight()
+    {
+        if (!selectedIndicator)
+        {
+            selectedIndicator = Instantiate(selectedIndicatorPrefab, new Vector3(transform.position.x, transform.position.y + 3f, transform.position.z), selectedIndicatorPrefab.transform.rotation);
+        }
+    }
+
+    public virtual void deHighlight()
     {
         if (selectedIndicator)
         {
@@ -93,7 +106,6 @@ public class Selectable : NetworkBehaviour
             selectedIndicator = null;
         }
     }
-
 
     //When we are selected and the mouse is hovering over another selectable
     public virtual OnHoverOverSelectableResponse onMouseHoverEnter(PermanentCell cell,Selectable selectableMouseIsHoveringOn, HexDirection targetOrientation, HexDirection mouseOrientation)

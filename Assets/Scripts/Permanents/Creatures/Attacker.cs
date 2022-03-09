@@ -6,7 +6,7 @@ using Unity.Netcode;
 using UnityEngine;
 using static Selectable;
 
-public class Attacker : NetworkBehaviour
+public class Attacker : PlayerOwnedNetworkObject
 {
     private GameObject projectilePrefab;
 
@@ -70,6 +70,18 @@ public class Attacker : NetworkBehaviour
     [ServerRpc]
     public void commandIssuedToCellServerRpc(Vector3 target, Vector3[] extraHoveringCells, HexDirection orientation, HexDirection mouseOrientation)
     {
+        if (!GlobalVars.gv.turnManager.isPlayerValidToMakeMove(OwnerClientId))
+        {
+            sendPlayerErrorClientRpc("It is not your turn");
+            return;
+        }
+
+        if (!GlobalVars.gv.turnManager.isObjectValidToMakeMove(GetComponent<NetworkObject>()))
+        {
+            sendPlayerErrorClientRpc("It is not this creatures turn");
+            return;
+        }
+
         //transform our vector3 to permanent cells
         PermanentCell targetCell = grid.cells[grid.getHexCoordinatesFromPosition(target)];
         List<PermanentCell> extraCells = new List<PermanentCell>();
@@ -98,7 +110,7 @@ public class Attacker : NetworkBehaviour
         }
         else
         {
-            creatureMovement.moveToCell(targetCell, extraCells, orientation);
+            creatureMovement.moveToCell(targetCell, extraCells, orientation, creatureFinishedMoving);
         }
     }
 
@@ -109,6 +121,11 @@ public class Attacker : NetworkBehaviour
         {
             GetComponent<CreatureSelectable>().commandFinished();
         }
+    }
+
+    void creatureFinishedMoving(PermanentCell target)
+    {
+        GlobalVars.gv.turnManager.playerMadeMoveServerRpc();
     }
 
     public void targetReadyForAttack(PermanentCell target)
@@ -223,6 +240,7 @@ public class Attacker : NetworkBehaviour
     void damageTarget(PermanentCell target)
     {
         target.getAttachedPermanent().permanentAttacked(GetComponent<NetworkObject>(), Permanent.Type.Creature);
+        GlobalVars.gv.turnManager.playerMadeMoveServerRpc();
     }
 
     public RangeType getAttackType()

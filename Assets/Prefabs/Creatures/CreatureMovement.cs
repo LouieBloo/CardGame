@@ -57,11 +57,11 @@ public class CreatureMovement : PlayerOwnedNetworkObject
         return result;
     }
 
-    public void moveToCell(PermanentCell target, List<PermanentCell> extraHoveringCells, HexDirection orientation)
+    public void moveToCell(PermanentCell target, List<PermanentCell> extraHoveringCells, HexDirection orientation, Action<PermanentCell> callbackWhenDone)
     {
         if (IsServer)
         {
-            moveAndExecuteAction(target, extraHoveringCells, null,Creature.CreatureActions.Move, orientation.ToString(),null);
+            moveAndExecuteAction(target, extraHoveringCells, null,Creature.CreatureActions.Move, orientation.ToString(), callbackWhenDone);
         }
     }
 

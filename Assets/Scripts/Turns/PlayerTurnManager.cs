@@ -11,10 +11,12 @@ public class PlayerTurnManager : NetworkBehaviour
     public GameObject turnIndicatorPrefab;
 
     public NetworkList<NetworkObjectReference> objectsInTurnOrder;
+    private NetworkVariable<int> currentDay = new NetworkVariable<int>(0);
     private List<NetworkObjectReference> allObjectsTracking = new List<NetworkObjectReference>();
-    private GameObject[] activeTurnIndicators;
+    private List<GameObject> activeTurnIndicators;
 
     public Transform spawnTurnIndicatorTransform;
+    private NetworkObject activePermanentInTurnOrder;
 
     private struct SortableObject
     {
@@ -50,6 +52,57 @@ public class PlayerTurnManager : NetworkBehaviour
         
     }
 
+    [ServerRpc]
+    public void playerMadeMoveServerRpc()
+    {
+        objectsInTurnOrder.RemoveAt(0);
+        if(objectsInTurnOrder.Count > 0)
+        {
+            removeHeadOfTurnIndicatorClientRpc(objectsInTurnOrder[0]);
+        }
+        else
+        {
+            Debug.Log("Need new turn now...");
+        }
+    }
+
+    private ulong getActivePlayerId()
+    {
+        if (objectsInTurnOrder.Count > 0)
+        {
+            if (objectsInTurnOrder[0].TryGet(out NetworkObject targetObject))
+            {
+                return targetObject.OwnerClientId;
+            }
+        }
+
+        return 99999;
+    }
+
+    public bool isPlayerValidToMakeMove(ulong playerId)
+    {
+        if (!forcingTurnOrder) { return true; }
+
+        if(getActivePlayerId() != playerId)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public bool isObjectValidToMakeMove(NetworkObjectReference networkObject)
+    {
+        if (!forcingTurnOrder) { return true; }
+
+        if (objectsInTurnOrder.Count > 0 && objectsInTurnOrder[0].NetworkObjectId == networkObject.NetworkObjectId)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public void addObjectToTurnOrder(NetworkObjectReference objectNetworkReference)
     {
         allObjectsTracking.Add(objectNetworkReference);
@@ -65,9 +118,9 @@ public class PlayerTurnManager : NetworkBehaviour
     public void recalculateTurnOrder()
     {
         if (!IsServer) { return; }
-        Debug.Log("== Recalculating turn order ==");
+        //Debug.Log("== Recalculating turn order ==");
 
-        Debug.Log("All Objects in turn: " + allObjectsTracking.Count);
+       // Debug.Log("All Objects in turn: " + allObjectsTracking.Count);
 
         objectsInTurnOrder.Clear();
 
@@ -103,7 +156,7 @@ public class PlayerTurnManager : NetworkBehaviour
             }
         }
 
-        Debug.Log("Objects in final order: " + sortedObjects.Count);
+        //Debug.Log("Objects in final order: " + sortedObjects.Count);
 
         NetworkObjectReference[] objectsInOrder = new NetworkObjectReference[sortedObjects.Count];
         for(int x = 0; x < sortedObjects.Count; x++) 
@@ -130,15 +183,44 @@ public class PlayerTurnManager : NetworkBehaviour
         }
 
         int x = 0;
-        activeTurnIndicators = new GameObject[objectsInOrder.Length];
+        activeTurnIndicators = new List<GameObject>();
         foreach (NetworkObjectReference n in objectsInOrder)
         {
             if (n.TryGet(out NetworkObject targetObject))
             {
-                activeTurnIndicators[x] = Instantiate(turnIndicatorPrefab, spawnTurnIndicatorTransform);
-                activeTurnIndicators[x].GetComponent<TurnIndicatorUI>().setup(targetObject.GetComponent<Creature>());
+                GameObject indicator = Instantiate(turnIndicatorPrefab, spawnTurnIndicatorTransform);
+                indicator.GetComponent<TurnIndicatorUI>().setup(targetObject.GetComponent<Creature>());
+                activeTurnIndicators.Add(indicator);
             }
             x++;
+        }
+
+        highlightActivePermanentInTurnOrderClientRpc(objectsInOrder[0]);
+    }
+
+    [ClientRpc]
+    void removeHeadOfTurnIndicatorClientRpc(NetworkObjectReference newActivePermanent)
+    {
+        if (activeTurnIndicators != null)
+        {
+            Destroy(activeTurnIndicators[0]);
+            activeTurnIndicators.RemoveAt(0);
+            highlightActivePermanentInTurnOrderClientRpc(newActivePermanent);
+        }
+    }
+
+    [ClientRpc]
+    void highlightActivePermanentInTurnOrderClientRpc(NetworkObjectReference activePermanent)
+    {
+        if(activePermanentInTurnOrder != null)
+        {
+            activePermanentInTurnOrder.GetComponent<Selectable>().deHighlight();
+        }
+
+        if (activePermanent.TryGet(out NetworkObject targetObject))
+        {
+            activePermanentInTurnOrder = targetObject;
+            activePermanentInTurnOrder.GetComponent<Selectable>().highlight();
         }
     }
 }

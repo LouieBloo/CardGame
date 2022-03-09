@@ -8,8 +8,6 @@ public class PlayerDefaults : MonoBehaviour
 {
     public string name = "Lukey";
 
-    public GameObject colorPickerPrefab;
-
     Action<Color> colorCallback;
 
     public void setup(Action<Color> colorCallback)
