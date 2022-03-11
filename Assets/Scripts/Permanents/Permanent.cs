@@ -1,4 +1,5 @@
 using HexMapTools;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -22,7 +23,7 @@ public class Permanent : NetworkBehaviour
         cellsOccupied = new NetworkList<Vector3>();
     }
 
-    public void permanentAttacked(NetworkObjectReference attackingPermanent, Type attackingPermanentType)
+    public void permanentAttacked(NetworkObjectReference attackingPermanent, Type attackingPermanentType, Action retaliationCallback)
     {
         if (!IsServer){Debug.Log("Permanent not server"); return;}
 
@@ -30,7 +31,7 @@ public class Permanent : NetworkBehaviour
         {
             if (attackingPermanent.TryGet(out NetworkObject targetObject))
             {
-                GetComponent<Creature>().attacked(targetObject.GetComponent<Creature>().GetComponent<DamageDealer>());
+                GetComponent<Creature>().attacked(targetObject.GetComponent<Creature>().GetComponent<DamageDealer>(), retaliationCallback);
             }
         }
     }

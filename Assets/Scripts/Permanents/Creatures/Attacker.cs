@@ -1,4 +1,5 @@
 using HexMapTools;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
@@ -12,6 +13,7 @@ public class Attacker : PlayerOwnedNetworkObject
 
     private NetworkVariable<int> range = new NetworkVariable<int>();
     private NetworkVariable<FixedString64Bytes> rangeType = new NetworkVariable<FixedString64Bytes>();
+    NetworkVariable<int> retaliationsLeft = new NetworkVariable<int>(1);
 
     private CreatureMovement creatureMovement;
 
@@ -29,6 +31,8 @@ public class Attacker : PlayerOwnedNetworkObject
 
     private PermanentCell tempTarget;
     private Animator animator;
+
+    private Action retaliationCallback = null;
 
     public enum RangeType
     {
@@ -65,6 +69,11 @@ public class Attacker : PlayerOwnedNetworkObject
         projectilePrefab = stats.projectilePrefab;
 
         this.animator = animator;
+    }
+
+    public void resetRetaliation()
+    {
+        retaliationsLeft.Value = 1;
     }
 
     [ServerRpc]
@@ -114,6 +123,29 @@ public class Attacker : PlayerOwnedNetworkObject
         }
     }
 
+    public void retaliate(DamageDealer damageDealer, Action retaliationCallback)
+    {
+        if (IsServer)
+        {
+            if(retaliationsLeft.Value > 0)
+            {
+                HexCoordinates target = grid.getHexCoordinatesFromPosition(damageDealer.transform.position);
+                if (isValidRetaliationTarget(target, damageDealer.OwnerClientId)){
+                    retaliationsLeft.Value -= 1;
+                    this.retaliationCallback = retaliationCallback;
+                    StartCoroutine(creatureMovement.rotateTowardTarget(grid.cells[target], targetReadyForRetaliation));
+
+                    return;
+                }
+            }
+            retaliationCallback();
+        }
+        else
+        {
+            Debug.Log("Cant retaliate as we are not the server");
+        }
+    }
+
     [ClientRpc]
     void wipeObjectSelectorClientRpc()
     {
@@ -143,6 +175,11 @@ public class Attacker : PlayerOwnedNetworkObject
         wipeObjectSelectorClientRpc();
     }
 
+    private void targetReadyForRetaliation(PermanentCell target)
+    {
+        attackTargetMelee(target);
+    }
+
     public bool isValidTarget(HexCoordinates coords,ulong ownerId)
     {
         if(ownerId == OwnerClientId)
@@ -160,6 +197,26 @@ public class Attacker : PlayerOwnedNetworkObject
             //Debug.Log("INVALID TARGET OUT OF RANGE");
         }
         
+        return false;
+    }
+
+    public bool isValidRetaliationTarget(HexCoordinates coords, ulong ownerId)
+    {
+        if (ownerId == OwnerClientId)
+        {
+            //Debug.Log("INVALID TARGET AS ITS OUR TEAM");
+        }
+
+        foreach(Vector3 v in GetComponent<Permanent>().getCellsOccupied())
+        {
+            int distanceToTarget = HexUtility.Distance(grid.getHexCoordinatesFromPosition(v), coords);
+            if (distanceToTarget <= 1)
+            {
+                return true;
+            }
+        }
+        
+        Debug.Log("INVALID RETALIATION OUT OF RANGE");
         return false;
     }
 
@@ -239,8 +296,22 @@ public class Attacker : PlayerOwnedNetworkObject
 
     void damageTarget(PermanentCell target)
     {
+        //we are retaliating
+        if (retaliationCallback != null)
+        {
+            target.getAttachedPermanent().permanentAttacked(GetComponent<NetworkObject>(), Permanent.Type.Creature, null);
+            retaliationCallback();
+            retaliationCallback = null;
+        }
+        else
+        {
+            target.getAttachedPermanent().permanentAttacked(GetComponent<NetworkObject>(), Permanent.Type.Creature, targetRetaliated);
+        }
+    }
+
+    void targetRetaliated()
+    {
         GlobalVars.gv.turnManager.playerMadeMoveServerRpc();//make sure we do this first or else we could double remove from the turn order
-        target.getAttachedPermanent().permanentAttacked(GetComponent<NetworkObject>(), Permanent.Type.Creature);
     }
 
     public RangeType getAttackType()

@@ -52,6 +52,16 @@ public class PlayerTurnManager : NetworkBehaviour
         
     }
 
+    public NetworkObject getActiveObject()
+    {
+        if (objectsInTurnOrder != null && objectsInTurnOrder.Count > 0 && objectsInTurnOrder[0].TryGet(out NetworkObject targetObject))
+        {
+            return targetObject;
+        }
+
+        return null;
+    }
+
     [ServerRpc]
     public void playerMadeMoveServerRpc()
     {
@@ -62,7 +72,6 @@ public class PlayerTurnManager : NetworkBehaviour
         }
         else
         {
-            Debug.Log("Need new turn now...");
             startNewTurn();
         }
     }
@@ -124,6 +133,13 @@ public class PlayerTurnManager : NetworkBehaviour
 
     public void startNewTurn()
     {
+        foreach (NetworkObjectReference n in allObjectsTracking)
+        {
+            if (n.TryGet(out NetworkObject targetObject))
+            {
+                targetObject.GetComponent<Creature>().newTurn();
+            }
+        }
         recalculateTurnOrder(allObjectsTracking);
     }
 
@@ -215,7 +231,10 @@ public class PlayerTurnManager : NetworkBehaviour
             x++;
         }
 
-        highlightActivePermanentInTurnOrderClientRpc(objectsInOrder[0]);
+        if(objectsInOrder != null && objectsInOrder.Length > 0)
+        {
+            highlightActivePermanentInTurnOrderClientRpc(objectsInOrder[0]);
+        }
     }
 
     [ClientRpc]
@@ -241,6 +260,8 @@ public class PlayerTurnManager : NetworkBehaviour
         {
             activePermanentInTurnOrder = targetObject;
             activePermanentInTurnOrder.GetComponent<Selectable>().highlight();
+
+            Camera.main.GetComponent<CameraTracker>().trackTarget(targetObject.transform);
         }
     }
 }

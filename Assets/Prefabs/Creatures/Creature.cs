@@ -121,11 +121,20 @@ public class Creature : NetworkBehaviour, NetworkLoadable
         return null;
     }
 
-    public void attacked(DamageDealer damageDealer)
+    public void newTurn()
+    {
+        attacker.resetRetaliation();
+    }
+
+    public void attacked(DamageDealer damageDealer,Action retaliationCallback)
     {
         if (IsServer)
         {
             DamageCalculator.calculateDamage(damageDealer, this.damageTaker);
+            if(retaliationCallback != null)
+            {
+                attacker.retaliate(damageDealer, retaliationCallback);
+            }
         }
         else
         {

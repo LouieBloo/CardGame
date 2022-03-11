@@ -62,7 +62,7 @@ public class SpellGameObject : NetworkBehaviour
             }
             if(damageDealer != null)
             {
-                target.getAttachedPermanent().GetComponent<Creature>().attacked(damageDealer);
+                target.getAttachedPermanent().GetComponent<Creature>().attacked(damageDealer,null);
             }
             //callback(creatureModification);
         }

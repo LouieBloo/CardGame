@@ -87,20 +87,26 @@ public class CreatureMovement : PlayerOwnedNetworkObject
     {
         if (doingCommand != null) { Debug.Log("Already doing a command...");return; }
 
-
         //make sure there is nothing in this cell
         if (!targetMoveCell || (targetMoveCell.hasPermanent() && targetMoveCell.getAttachedPermanent() != GetComponent<Permanent>())) { Debug.Log("Invalid attack, either no target or target has a permanent"); return; }
 
         //same checks for extra cells
-        foreach(PermanentCell cell in extraMovePositions)
+        List<HexCoordinates> coordinatesToIgnoreInPathFinding = new List<HexCoordinates>();//so our path finding doesnt count us as a blocker
+        if(getHexSpaceType() == CreatureStats.CreatureHexSpaces.Line)
         {
-            if (!cell) { Debug.Log("Line cell extra not real!"); return; }
-            if (cell.hasPermanent() && cell.getAttachedPermanent() != GetComponent<Permanent>()) { Debug.Log("Line cell extra has permanent!"); return; }
+            if(extraMovePositions.Count < 1) { return; }
+            foreach (PermanentCell cell in extraMovePositions)
+            {
+                if (!cell) { Debug.Log("Line cell extra not real!"); return; }
+                if (cell.hasPermanent() && cell.getAttachedPermanent() != GetComponent<Permanent>()) { Debug.Log("Line cell extra has permanent!"); return; }
+                coordinatesToIgnoreInPathFinding.Add(cell.getHexCoordinates());
+            }
         }
-
+        
+        
+        coordinatesToIgnoreInPathFinding.Add(grid.getHexCoordinatesFromPosition(transform.position));//so our path finding doesnt count us as a blocker
         //find
-        //
-        List<Vector3> path = grid.findPathVector3(grid.getHexCoordinatesFromPosition(transform.position), targetMoveCell.getHexCoordinates());
+        List<Vector3> path = grid.findPathVector3(grid.getHexCoordinatesFromPosition(transform.position), targetMoveCell.getHexCoordinates(), coordinatesToIgnoreInPathFinding);
         if (path != null)
         {
             if(path.Count > movementRange.Value)

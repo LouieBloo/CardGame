@@ -94,7 +94,7 @@ public class Selectable : NetworkBehaviour
     {
         if (!selectedIndicator)
         {
-            selectedIndicator = Instantiate(selectedIndicatorPrefab, new Vector3(transform.position.x, transform.position.y + 3f, transform.position.z), selectedIndicatorPrefab.transform.rotation);
+            selectedIndicator = Instantiate(selectedIndicatorPrefab, new Vector3(transform.position.x, transform.position.y + 2.21f, transform.position.z), selectedIndicatorPrefab.transform.rotation);
         }
     }
 

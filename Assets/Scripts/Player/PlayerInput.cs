@@ -20,7 +20,7 @@ public class PlayerInput : NetworkBehaviour
             StartCoroutine(pollForInput());
             cameraTracker = Camera.main.GetComponent<CameraTracker>();
 
-            turnManager = GameObject.FindGameObjectsWithTag("Game")[0].GetComponent<PlayerTurnManager>();
+            turnManager = GlobalVars.gv.turnManager;
         }
     }
 
@@ -59,6 +59,11 @@ public class PlayerInput : NetworkBehaviour
             if (Input.mouseScrollDelta.y != 0)
             {
                 cameraTracker.zoom(Input.mouseScrollDelta.y);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Space) && turnManager.getActiveObject() != null)
+            {
+                cameraTracker.trackTarget(turnManager.getActiveObject().transform);
             }
 
             yield return null;

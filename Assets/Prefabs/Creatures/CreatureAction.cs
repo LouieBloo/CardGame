@@ -11,7 +11,7 @@ public class CreatureAction : NetworkBehaviour
         if(action == Creature.CreatureActions.Attack)
         {
             //if this function is called we know its safe to attack
-            targetActionCell.getAttachedPermanent().permanentAttacked(GetComponent<NetworkObject>(), Permanent.Type.Creature);
+            //targetActionCell.getAttachedPermanent().permanentAttacked(GetComponent<NetworkObject>(), Permanent.Type.Creature);
         }
     }
 }

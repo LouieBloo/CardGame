@@ -17,6 +17,8 @@ public class Grid : NetworkBehaviour
 
     private HexPathFinder pathFinder;
 
+    private List<HexCoordinates> whiteListPathHexes;
+
     private void Start()
     {
         HexGrid hexGrid = GetComponent<HexGrid>();
@@ -221,10 +223,12 @@ public class Grid : NetworkBehaviour
         }
     }
 
-    public List<HexCoordinates> findPath(HexCoordinates start, HexCoordinates end)
+    public List<HexCoordinates> findPath(HexCoordinates start, HexCoordinates end, List<HexCoordinates> whiteList = null)
     {
         List<HexCoordinates> foundPath;
+        whiteListPathHexes = whiteList;
         bool didFindPath = pathFinder.FindPath(start, end, out foundPath);
+        whiteListPathHexes = null;
         //Debug.Log(didFindPath + " " + foundPath.Count);
         if (didFindPath)
         {
@@ -234,9 +238,9 @@ public class Grid : NetworkBehaviour
         return null;
     }
 
-    public List<Vector3> findPathVector3(HexCoordinates start, HexCoordinates end)
+    public List<Vector3> findPathVector3(HexCoordinates start, HexCoordinates end, List<HexCoordinates> whiteList = null)
     {
-        List<HexCoordinates> foundPath = findPath(start, end);
+        List<HexCoordinates> foundPath = findPath(start, end, whiteList);
         if (foundPath != null)
         {
             List<Vector3> returnObj = new List<Vector3>();
@@ -301,7 +305,14 @@ public class Grid : NetworkBehaviour
             return float.PositiveInfinity;
 
         if (cell.hasPermanent())
+        {
+            if (whiteListPathHexes != null && whiteListPathHexes.Contains(b))
+            {
+                return 0;
+            }
+
             return float.PositiveInfinity;
+        }
 
         /*if (cell.Color == CellColor.Blue)
             return blueCost;

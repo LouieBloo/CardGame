@@ -15,6 +15,7 @@ public class CameraTracker : MonoBehaviour
     private Vector3 forwardMoveOffset = new Vector3(0, 0, 1);
     private Vector3 backMoveOffset = new Vector3(0, 0, -1);
 
+    private bool isAutoTracking = true;
 
     private Coroutine trackObjectEnumerator;
 
@@ -33,9 +34,11 @@ public class CameraTracker : MonoBehaviour
         }
 
         trackObjectEnumerator = StartCoroutine(trackTargetRoutine());
+
+        isAutoTracking = true;
     }
 
-    public void stopTargeting()
+    private void stopAutoTargeting()
     {
         if (trackObjectEnumerator != null)
         {
@@ -43,20 +46,22 @@ public class CameraTracker : MonoBehaviour
             trackObjectEnumerator = null;
             trackedObject = null;
         }
+
+        isAutoTracking = false;
     }
 
     IEnumerator trackTargetRoutine()
     {
         float i = 0;
         float rate = 1f / trackSpeed;
-        while(i < 1.0)
+        while(i < 1.0 && trackedObject != null)
         {
             i += Time.deltaTime * rate;
             transform.position = Vector3.Lerp(transform.position, trackedObject.position + trackingOffset, i);
             yield return null;
         }
 
-        while (true)
+        while (true && trackedObject != null)
         {
             transform.position = Vector3.MoveTowards(transform.position, trackedObject.position + trackingOffset, trackSpeed * Time.deltaTime);
             yield return null;
@@ -79,48 +84,48 @@ public class CameraTracker : MonoBehaviour
     public void leftPressed()
     {
         
-        if (!trackedObject)
+        if (!isAutoTracking)
         {
             transform.position = Vector3.MoveTowards(transform.position, transform.position + leftMoveOffset, playerInputMoveSpeed * Time.deltaTime);
         }
-        else { 
-            stopTargeting(); 
+        else {
+            stopAutoTargeting(); 
         }
     }
 
     public void rightPressed()
     {
-        if (!trackedObject)
+        if (!isAutoTracking)
         {
             transform.position = Vector3.MoveTowards(transform.position, transform.position + rightMoveOffset, playerInputMoveSpeed * Time.deltaTime);
         }
         else
         {
-            stopTargeting();
+            stopAutoTargeting();
         }
     }
 
     public void forwardPressed()
     {
-        if (!trackedObject)
+        if (!isAutoTracking)
         {
             transform.position = Vector3.MoveTowards(transform.position, transform.position + forwardMoveOffset, playerInputMoveSpeed * Time.deltaTime);
         }
         else
         {
-            stopTargeting();
+            stopAutoTargeting();
         }
     }
 
     public void backPressed()
     {
-        if (!trackedObject)
+        if (!isAutoTracking)
         {
             transform.position = Vector3.MoveTowards(transform.position, transform.position + backMoveOffset, playerInputMoveSpeed * Time.deltaTime);
         }
         else
         {
-            stopTargeting();
+            stopAutoTargeting();
         }
     }
 

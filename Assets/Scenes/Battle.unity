@@ -19040,7 +19040,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   name: Lukey
-  colorPickerPrefab: {fileID: 0}
 --- !u!1001 &1555924930
 PrefabInstance:
   m_ObjectHideFlags: 0
