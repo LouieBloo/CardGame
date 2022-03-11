@@ -63,7 +63,7 @@ public class PlayerInput : NetworkBehaviour
 
             if (Input.GetKeyDown(KeyCode.Space) && turnManager.getActiveObject() != null)
             {
-                cameraTracker.trackTarget(turnManager.getActiveObject().transform);
+                cameraTracker.trackTarget(turnManager.getActiveObject().transform,true);
             }
 
             yield return null;

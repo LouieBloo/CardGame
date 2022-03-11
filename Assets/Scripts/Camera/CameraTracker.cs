@@ -24,8 +24,10 @@ public class CameraTracker : MonoBehaviour
         trackingOffset = new Vector3(transform.position.x, transform.position.y, transform.position.z);
     }
 
-    public void trackTarget(Transform target)
+    public void trackTarget(Transform target,bool force)
     {
+        if(!isAutoTracking && !force) { return; }
+
         trackedObject = target;
 
         if (trackObjectEnumerator != null)

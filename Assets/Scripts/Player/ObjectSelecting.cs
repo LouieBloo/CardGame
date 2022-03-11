@@ -298,7 +298,7 @@ public class ObjectSelecting : MonoBehaviour
                 else
                 {
                     //we clicked on ourselves, deselect
-                    cameraTracker.trackTarget(selectedPermanent.transform);
+                    cameraTracker.trackTarget(selectedPermanent.transform,true);
                     //deselectPermanent();
                 }
             }
