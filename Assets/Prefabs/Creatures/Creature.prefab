@@ -445,6 +445,8 @@ MonoBehaviour:
   - name: SPIDER
     prefab: {fileID: 9222383047610071377, guid: 330478d7b6983464a9aae0b404ba89b9,
       type: 3}
+  - name: SKELETON
+    prefab: {fileID: 626701574177075033, guid: 25f346e58416f4643834025225645162, type: 3}
 --- !u!114 &4301498901831340213
 MonoBehaviour:
   m_ObjectHideFlags: 0
