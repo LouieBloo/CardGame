@@ -20,6 +20,8 @@ public class Player : PlayerOwnedNetworkObject
 
     public GameObject playerTurnManagerPrefab;
 
+    private PlayerStats playerStats;
+
     public override void OnDestroy()
     {
         base.OnDestroy();
@@ -94,6 +96,10 @@ public class Player : PlayerOwnedNetworkObject
         {
             testServerRpc();
         }
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            GetComponent<PlayerStats>().modifyGoldServerRpc(100);
+        }
 
         if (objectSelector.isEmptyCellTargeted())
         {
@@ -117,6 +123,7 @@ public class Player : PlayerOwnedNetworkObject
             {
                 createCreatureServerRpc(objectSelector.getTargetedCell().getHexCoordinates(), "SKELETON");
             }
+            
         }
         
     }

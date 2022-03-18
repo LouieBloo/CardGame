@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 8005546995691981043}
   - component: {fileID: -4698611565757124795}
   - component: {fileID: 8887222452075092150}
+  - component: {fileID: -5903766760223023557}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -202,3 +203,19 @@ MonoBehaviour:
     spellBookImage: {fileID: 21300000, guid: 504f47b8d2ee35c4b9a0d42a46fb61a1, type: 3}
   spellBookUIPrefab: {fileID: 1785991269721173456, guid: 314f4d165a19eb24bace41c865c0d9da,
     type: 3}
+--- !u!114 &-5903766760223023557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800976583469701204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fe9eb317e686834b88f329a93f3c9da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gold:
+    m_InternalValue: 500
+  mana:
+    m_InternalValue: 10
