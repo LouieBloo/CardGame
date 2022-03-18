@@ -1447,6 +1447,7 @@ GameObject:
   - component: {fileID: -6381309575424665239}
   - component: {fileID: 6954065327863596701}
   - component: {fileID: -760823692550217201}
+  - component: {fileID: 5921287021266925556}
   m_Layer: 0
   m_Name: Swordsman
   m_TagString: Untagged
@@ -1574,10 +1575,24 @@ MonoBehaviour:
   baseSpeed: 3
   currentSpeed: 0
   name: Swordsman
+  color: {r: 0, g: 0, b: 0, a: 0}
   projectilePrefab: {fileID: 0}
   uiImage: {fileID: 21300000, guid: 6908859d16d809846ab8e3d004aa4a5e, type: 3}
   hexSpaces: 0
   hexSpaceDistance: 0
+--- !u!114 &5921287021266925556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4731520841268163385}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad975f1947e7ad84c88455b2c58436ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectileSpawnPosition: {fileID: 0}
 --- !u!1 &4731527214890039423
 GameObject:
   m_ObjectHideFlags: 0

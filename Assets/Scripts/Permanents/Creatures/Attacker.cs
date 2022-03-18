@@ -243,14 +243,32 @@ public class Attacker : PlayerOwnedNetworkObject
 
     private void attackTargetMelee(PermanentCell target)
     {
-        damageTarget(target);
+        tempTarget = target;
+        animator.GetComponent<CreatureAnimatorHelper>().subscribeAttack(attackAnimationFinished);
+        startAttackAnimationClientRpc();
+    }
+
+    private void attackAnimationFinished()
+    {
+        damageTarget(tempTarget);
     }
 
     public void attackTargetRange(PermanentCell target)
     {
         tempTarget = target;
-        animator.GetComponent<CreatureAnimatorHelper>().subscribe(rangePrepAnimationFinished);
+        animator.GetComponent<CreatureAnimatorHelper>().subscribeRangePrep(rangePrepAnimationFinished);
         startRangePrepAnimationClientRpc();
+    }
+
+    [ClientRpc]
+    public void startAttackAnimationClientRpc()
+    {
+        if (!animator)
+        {
+            animator = GetComponent<Creature>().getCreatureObject().GetComponent<Animator>();
+        }
+
+        animator.SetTrigger("Attack");
     }
 
     [ClientRpc]

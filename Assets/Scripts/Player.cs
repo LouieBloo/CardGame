@@ -109,8 +109,11 @@ public class Player : PlayerOwnedNetworkObject
             {
                 createCreatureServerRpc(objectSelector.getTargetedCell().getHexCoordinates(), "ARCHER");
             }
+            if (Input.GetKeyDown(KeyCode.O))
+            {
+                createCreatureServerRpc(objectSelector.getTargetedCell().getHexCoordinates(), "SPIDER");
+            }
 
-            
         }
         
     }

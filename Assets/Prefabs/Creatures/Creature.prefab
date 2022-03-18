@@ -442,6 +442,9 @@ MonoBehaviour:
   - name: ARCHER
     prefab: {fileID: 6022363812095014427, guid: b03d14f85e4e0be47aa0272e8e8b556c,
       type: 3}
+  - name: SPIDER
+    prefab: {fileID: 9222383047610071377, guid: 330478d7b6983464a9aae0b404ba89b9,
+      type: 3}
 --- !u!114 &4301498901831340213
 MonoBehaviour:
   m_ObjectHideFlags: 0
