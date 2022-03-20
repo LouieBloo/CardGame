@@ -498,6 +498,7 @@ MonoBehaviour:
     type: 3}
   southWestMoveTexture: {fileID: 2800000, guid: 38ced33580b075a47aa14ae7839f1954,
     type: 3}
+  pickupTexture: {fileID: 2800000, guid: c32dd3702665fd6408e23f550814964d, type: 3}
   statsUIPrefab: {fileID: 547918047721802203, guid: 1855d64bf326f6744bba520ffc6b0218,
     type: 3}
 --- !u!114 &2301321734742404553

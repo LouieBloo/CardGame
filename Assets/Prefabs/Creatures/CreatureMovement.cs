@@ -65,6 +65,14 @@ public class CreatureMovement : PlayerOwnedNetworkObject
         }
     }
 
+    public void moveToCellAndPickup(PermanentCell target, List<PermanentCell> extraHoveringCells, HexDirection orientation, Action<PermanentCell> callbackWhenDone)
+    {
+        if (IsServer)
+        {
+            moveAndExecuteAction(target, extraHoveringCells, null, Creature.CreatureActions.Pickup, orientation.ToString(), callbackWhenDone);
+        }
+    }
+
     public void moveToCellAndAttack(PermanentCell target, List<PermanentCell> extraHoveringCells, HexDirection orientation, HexDirection mouseOrientation, Action<PermanentCell> callbackWhenDone)
     {
         if (IsServer)
@@ -88,7 +96,8 @@ public class CreatureMovement : PlayerOwnedNetworkObject
         if (doingCommand != null) { Debug.Log("Already doing a command...");return; }
 
         //make sure there is nothing in this cell
-        if (!targetMoveCell || (targetMoveCell.hasPermanent() && targetMoveCell.getAttachedPermanent() != GetComponent<Permanent>())) { Debug.Log("Invalid attack, either no target or target has a permanent"); return; }
+        //note for pickups we ignore if there is a permanent on itf
+        if (!targetMoveCell || (targetMoveCell.hasPermanent() && action != Creature.CreatureActions.Pickup && targetMoveCell.getAttachedPermanent() != GetComponent<Permanent>())) { Debug.Log("Invalid attack, either no target or target has a permanent"); return; }
 
         //same checks for extra cells
         List<HexCoordinates> coordinatesToIgnoreInPathFinding = new List<HexCoordinates>();//so our path finding doesnt count us as a blocker
@@ -103,6 +112,11 @@ public class CreatureMovement : PlayerOwnedNetworkObject
             }
         }
         
+        //ignore the permanent on the pickup spot for pathfinding
+        if(action == Creature.CreatureActions.Pickup)
+        {
+            coordinatesToIgnoreInPathFinding.Add(targetMoveCell.getHexCoordinates());
+        }
         
         coordinatesToIgnoreInPathFinding.Add(grid.getHexCoordinatesFromPosition(transform.position));//so our path finding doesnt count us as a blocker
         //find

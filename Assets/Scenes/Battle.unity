@@ -22395,6 +22395,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3136301328212419489, guid: 828e1bd65e369a5498487f1ccb919cd2,
+        type: 3}
+      propertyPath: objectToSpawnOnStartupName
+      value: TREASURE_CHEST
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 828e1bd65e369a5498487f1ccb919cd2, type: 3}
 --- !u!1001 &1786235797
@@ -25679,6 +25684,18 @@ MonoBehaviour:
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
       Prefab: {fileID: 626701574177075033, guid: 25f346e58416f4643834025225645162,
+        type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 7661535306305911452, guid: d93baa1a6f299f84e9431d6223ff7444,
+        type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 3506522435404078497, guid: 3501ed63ccaa6b64ea43793259c21004,
         type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0

@@ -10,7 +10,7 @@ public class Permanent : NetworkBehaviour
     public enum Type
     {
         Creature,
-        Chest,
+        Pickup,
         Wall
     }
 

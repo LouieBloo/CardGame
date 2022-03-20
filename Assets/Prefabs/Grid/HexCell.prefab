@@ -102,6 +102,8 @@ MonoBehaviour:
   objectSpawnRotation: {x: 0, y: 0, z: 0, w: 0}
   creaturePrefab: {fileID: 6689913824549537717, guid: 1af54562b895b044999bb2bee9428136,
     type: 3}
+  pickupPrefab: {fileID: 3506522435404078497, guid: 3501ed63ccaa6b64ea43793259c21004,
+    type: 3}
   permanentColorSprite: {fileID: 22720902612314029}
   baseColor: {r: 1, g: 1, b: 1, a: 1}
   hoverColor: {r: 0, g: 0, b: 0, a: 1}

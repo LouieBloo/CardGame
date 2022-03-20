@@ -8,10 +8,11 @@ public class PermanentCell : Selectable
 {
     private SpriteRenderer spriteRenderer;
 
-    public GameObject objectToSpawnOnStartup;
+    public string objectToSpawnOnStartupName;
     public Quaternion objectSpawnRotation;
 
     public GameObject creaturePrefab;
+    public GameObject pickupPrefab;
 
     public SpriteRenderer permanentColorSprite; 
 
@@ -36,10 +37,10 @@ public class PermanentCell : Selectable
 
     void OnDrawGizmos()
     {
-        if (objectToSpawnOnStartup)
+        /*if (objectToSpawnOnStartup)
         {
             drawString(objectToSpawnOnStartup.name, transform.position, Color.black, new Vector2(0, 3));
-        }
+        }*/
     }
 
 
@@ -53,11 +54,12 @@ public class PermanentCell : Selectable
         return this.hexCoordinates;
     }
 
-    public GameObject spawnStartingObject()
+    public void spawnStartingObject()
     {
-        return null;
-        if (!objectToSpawnOnStartup) { return null; }
+        //return null;
+        if (objectToSpawnOnStartupName == null || objectToSpawnOnStartupName.Length < 1) { return ; }
         //return spawnCreature(objectToSpawnOnStartup, objectSpawnRotation,0,"PPPP");
+        spawnPickup(Quaternion.identity, 0, objectToSpawnOnStartupName, new Vector3[] { transform.position });
     }
 
     public NetworkObjectReference spawnCreature(Quaternion rotation, ulong ownerId,string creatureName, Vector3[] spawnCells)
@@ -76,6 +78,28 @@ public class PermanentCell : Selectable
         //tell creature what cells they occupy
         go.GetComponent<Permanent>().setOccupiedCellsServerRpc(spawnCells);
         
+        //attach to ourself
+        attachPermanent(go.GetComponent<NetworkObject>());
+
+        return go.GetComponent<NetworkObject>();
+    }
+
+    public NetworkObjectReference spawnPickup(Quaternion rotation, ulong ownerId, string pickupName, Vector3[] spawnCells)
+    {
+        //instantiate the object and set ownership
+        GameObject go = Instantiate(pickupPrefab, transform.position, rotation);
+        go.GetComponent<NetworkObject>().Spawn();
+        if (ownerId > 0)
+        {
+            go.GetComponent<NetworkObject>().ChangeOwnership(ownerId);
+        }
+
+        //tell the pickup what kind they are and orientation
+        go.GetComponent<Pickup>().setSpawnParameters(pickupName, HexDirection.E);
+
+        //tell creature what cells they occupy
+        go.GetComponent<Permanent>().setOccupiedCellsServerRpc(spawnCells);
+
         //attach to ourself
         attachPermanent(go.GetComponent<NetworkObject>());
 
@@ -135,6 +159,26 @@ public class PermanentCell : Selectable
         }
         
         //return attachedNetworkObject && attachedNetworkObject.Value != null;
+    }
+
+    public bool hasSelectablePermanent()
+    {
+        //wrapping this in case its the first thing clicked when the player loads
+        try
+        {
+            if (attachedNetworkObject.Value.TryGet(out NetworkObject targetObject))
+            {
+                if(targetObject.GetComponent<Permanent>().type == Permanent.Type.Creature)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        catch (System.Exception)
+        {
+            return false;
+        }
     }
 
     public void hover()

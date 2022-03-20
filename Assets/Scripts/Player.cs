@@ -54,9 +54,9 @@ public class Player : PlayerOwnedNetworkObject
             ui = Instantiate(uiPrefab, Vector3.zero, Quaternion.identity);
             ui.GetComponent<PlayerUI>().setup(this);
 
-            playerDefaultsGameObject = Instantiate(playerDefaultsPrefab, Vector3.zero, Quaternion.identity);
-            playerDefaultsGameObject.GetComponent<PlayerDefaults>().setup(setColorServerRpc);
-            //setColorServerRpc(objectSelector.GetComponent<PlayerDefaults>().getPlayerColor());
+            //playerDefaultsGameObject = Instantiate(playerDefaultsPrefab, Vector3.zero, Quaternion.identity);
+            //playerDefaultsGameObject.GetComponent<PlayerDefaults>().setup(setColorServerRpc);
+            setColorServerRpc(OwnerClientId == 0 ? Color.green : Color.blue);
 
             GlobalVars.gv.player = this;
         }
@@ -95,10 +95,6 @@ public class Player : PlayerOwnedNetworkObject
         if (Input.GetKeyDown(KeyCode.P))
         {
             testServerRpc();
-        }
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            GetComponent<PlayerStats>().modifyGoldServerRpc(100);
         }
 
         if (objectSelector.isEmptyCellTargeted())

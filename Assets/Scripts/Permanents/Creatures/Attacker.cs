@@ -30,6 +30,7 @@ public class Attacker : PlayerOwnedNetworkObject
     private Grid grid;
 
     private PermanentCell tempTarget;
+    private GameObject tempTargetPermanent;
     private Animator animator;
 
     private Action retaliationCallback = null;
@@ -108,13 +109,20 @@ public class Attacker : PlayerOwnedNetworkObject
         {
             //if(targetActionCell.getAttachedPermanent().GetComponent<NetworkObject>().OwnerClientId == OwnerClientId) { Debug.Log("Invalid attack, target is same team as us!"); return; }
 
-            if (getAttackType() == RangeType.Melee && extraCells.Count > 0)
+            if(targetCell.getAttachedPermanent().type == Permanent.Type.Creature)
             {
-                creatureMovement.moveToCellAndAttack(targetCell, extraCells, orientation, mouseOrientation,targetReadyForAttack);
-            }
-            else if (getAttackType() == RangeType.Ranged && isValidTarget(targetCell.getHexCoordinates(),targetCell.OwnerClientId))
+                if (getAttackType() == RangeType.Melee && extraCells.Count > 0)
+                {
+                    creatureMovement.moveToCellAndAttack(targetCell, extraCells, orientation, mouseOrientation, targetReadyForAttack);
+                }
+                else if (getAttackType() == RangeType.Ranged && isValidTarget(targetCell.getHexCoordinates(), targetCell.OwnerClientId))
+                {
+                    StartCoroutine(creatureMovement.rotateTowardTarget(targetCell, targetReadyForAttack));
+                }
+            }else if(targetCell.getAttachedPermanent().type == Permanent.Type.Pickup)
             {
-                StartCoroutine(creatureMovement.rotateTowardTarget(targetCell, targetReadyForAttack));
+                tempTargetPermanent = targetCell.getAttachedPermanent().gameObject;
+                creatureMovement.moveToCellAndPickup(targetCell, extraCells, orientation, creatureFinishedMovingToPickup);
             }
         }
         else
@@ -158,6 +166,11 @@ public class Attacker : PlayerOwnedNetworkObject
     void creatureFinishedMoving(PermanentCell target)
     {
         GlobalVars.gv.turnManager.playerMadeMoveServerRpc();
+    }
+
+    void creatureFinishedMovingToPickup(PermanentCell target)
+    {
+        tempTargetPermanent.GetComponent<Pickup>().playerPickedUpServerRpc(OwnerClientId);
     }
 
     public void targetReadyForAttack(PermanentCell target)

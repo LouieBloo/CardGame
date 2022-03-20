@@ -14,13 +14,28 @@ public class PlayerStats : NetworkBehaviour
     {
         if (IsServer)
         {
-            gold.Value = 200;
+            gold.Value = 500;
+            mana.Value = 10;
+        }
+    }
+
+    public void modifyGold(int amount)
+    {
+        if (!IsServer) { return; }
+        gold.Value += amount;
+        if(gold.Value < 0)
+        {
+            gold.Value = 0;
         }
     }
 
     [ServerRpc]
-    public void modifyGoldServerRpc(int amount)
+    public void modifyManaServerRpc(int amount)
     {
-        gold.Value += amount;
+        mana.Value += amount;
+        if (mana.Value < 0)
+        {
+            mana.Value = 0;
+        }
     }
 }

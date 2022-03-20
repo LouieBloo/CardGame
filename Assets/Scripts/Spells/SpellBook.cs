@@ -9,8 +9,7 @@ using UnityEngine.UI;
 
 public class SpellBook : NetworkBehaviour
 {
-    public int startingMana = 10;
-
+    public PlayerStats playerStats;
     public SpellBookEntry[] Spells;
     private Dictionary<string, SpellBookEntry> allGameSpells = new Dictionary<string, SpellBookEntry>();
 
@@ -18,7 +17,6 @@ public class SpellBook : NetworkBehaviour
     private GameObject activeSpellBook;
 
     private NetworkList<FixedString64Bytes> spellsInSpellbook;
-    private NetworkVariable<int> mana = new NetworkVariable<int>();
     private ObjectSelecting objectSelector;
 
     private string currentlyCastingSpellId;
@@ -51,8 +49,6 @@ public class SpellBook : NetworkBehaviour
 
         if (IsServer)
         {
-            mana.Value = startingMana;
-
             spellsInSpellbook.Add("Frost Shield");
             spellsInSpellbook.Add("Lightning Bolt");
         }
@@ -84,7 +80,7 @@ public class SpellBook : NetworkBehaviour
     [ServerRpc]
     public void castSpellServerRpc(string spellId,Vector3 target)
     {
-        if (spellsInSpellbook.Contains(spellId) && mana.Value >= allGameSpells[spellId].mana)
+        if (spellsInSpellbook.Contains(spellId) && playerStats.mana.Value >= allGameSpells[spellId].mana)
         {
             GameObject spellGameobject = Instantiate(allGameSpells[spellId].spellPrefab, target, Quaternion.identity);
             if(spellGameobject.GetComponent<NetworkObject>() != null)
@@ -99,11 +95,14 @@ public class SpellBook : NetworkBehaviour
             spellGameobject.transform.SetParent(transform);
             spellGameobject.GetComponent<SpellGameObject>().setup(grid.getPermanentCellAtPosition(target), null);
 
+            //subtract mana from mana total
+            playerStats.modifyManaServerRpc(-allGameSpells[spellId].mana);
+
             wipeObjectSelectorClientRpc();
         }
         else
         {
-            GlobalVars.gv.gameUI.alertMessage("You dont have this spell");
+            GlobalVars.gv.gameUI.alertMessage("Not enough mana!");
         }
     }
 

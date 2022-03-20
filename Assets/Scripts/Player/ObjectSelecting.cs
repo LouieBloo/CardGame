@@ -302,7 +302,7 @@ public class ObjectSelecting : MonoBehaviour
                     //deselectPermanent();
                 }
             }
-            else
+            else if(cell.hasSelectablePermanent())
             {
                 selectedPermanent = cell.getAttachedPermanent().GetComponent<Selectable>();
                 selectHalfHoverPermanents(selectedPermanent.select());

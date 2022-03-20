@@ -17,7 +17,8 @@ public class Selectable : NetworkBehaviour
     {
         Creature,
         HexCell,
-        Spell
+        Spell,
+        Pickup
     }
 
     public enum SelectableHexAreaType

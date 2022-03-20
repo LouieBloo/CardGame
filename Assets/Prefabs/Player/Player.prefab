@@ -189,7 +189,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b447adea2f62df445a123c26a5769aa4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingMana: 10
+  playerStats: {fileID: -5903766760223023557}
   Spells:
   - spellPrefab: {fileID: 4760018694462865891, guid: 559d8e9f1694fcd46ad4c60431c314f7,
       type: 3}

@@ -19,6 +19,8 @@ public class CreatureSelectable : Selectable
     public Texture2D southWestMoveTexture;
     private Dictionary<HexDirection, Texture2D> mouseTextureMoveDirectionMapping = new Dictionary<HexDirection, Texture2D>();
 
+    public Texture2D pickupTexture;
+
     public GameObject statsUIPrefab;
     private GameObject activeStatsUI;
 
@@ -103,6 +105,9 @@ public class CreatureSelectable : Selectable
                 //note the +1 to distance since we start counting from the target, not the move position
                 return new OnHoverOverSelectableResponse(mouseTextureDirectionMapping[mouseOrientation], new SelectableHexArea(SelectableHexAreaType.Line, movementScript.hexSpaceDistance.Value+1, CellHelper.getOppositeOfDirection(mouseOrientation)));
             }*/
+        }else if(selectableMouseIsHoveringOn.Type == SelectableType.Pickup)
+        {
+            return new OnHoverOverSelectableResponse(pickupTexture, new SelectableHexArea(SelectableHexAreaType.Point, 0, orientation));
         }
 
         return null;

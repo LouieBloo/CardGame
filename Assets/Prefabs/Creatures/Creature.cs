@@ -11,7 +11,7 @@ public class Creature : NetworkBehaviour, NetworkLoadable
 {
     public enum CreatureActions
     {
-        Attack, Defend, Move, Interact
+        Attack, Defend, Move, Interact, Pickup
     }
 
     public CreatureStaticUI ui;
@@ -37,7 +37,7 @@ public class Creature : NetworkBehaviour, NetworkLoadable
     }
 
     public CreaturePrefab[] creaturePrefabs;
-    private Dictionary<string, GameObject> creaturePrefabMapping = new Dictionary<string, GameObject>();
+    //private Dictionary<string, GameObject> creaturePrefabMapping = new Dictionary<string, GameObject>();
 
     private string creatureName;
 
@@ -55,10 +55,10 @@ public class Creature : NetworkBehaviour, NetworkLoadable
         if (IsServer)
         {
             //setup the creature prefab mapping for performance reasons
-            foreach (CreaturePrefab p in creaturePrefabs)
+            /*foreach (CreaturePrefab p in creaturePrefabs)
             {
                 creaturePrefabMapping.Add(p.name, p.prefab);
-            }
+            }*/
         }
 
         damageTaker = GetComponent<DamageTaker>();
@@ -86,12 +86,21 @@ public class Creature : NetworkBehaviour, NetworkLoadable
     [ServerRpc(RequireOwnership = false)]
     void spawnCreatureObjectServerRpc()
     {
+        //find the creature we want to spawn
+        GameObject creatureToSpawn=null;
+        foreach (CreaturePrefab c in creaturePrefabs)
+        {
+            if (c.name == this.creatureName)
+            {
+                creatureToSpawn = c.prefab;
+            }
+        }
         //Debug.Log(creatureName);    
-        GameObject newObj = Instantiate(creaturePrefabMapping[creatureName], transform.position, Quaternion.identity);
+        GameObject newObj = Instantiate(creatureToSpawn, transform.position, Quaternion.identity);
         newObj.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
         newObj.transform.SetParent(transform);
-        newObj.transform.localRotation = creaturePrefabMapping[creatureName].transform.rotation;
-        newObj.transform.localPosition = new Vector3(newObj.transform.localPosition.x, creaturePrefabMapping[creatureName].transform.position.y, newObj.transform.localPosition.z);
+        newObj.transform.localRotation = creatureToSpawn.transform.rotation;
+        newObj.transform.localPosition = new Vector3(newObj.transform.localPosition.x, creatureToSpawn.transform.position.y, newObj.transform.localPosition.z);
 
         creatureStats = newObj.GetComponent<CreatureStats>();
         color.Value = NetworkManager.Singleton.ConnectedClients[OwnerClientId].PlayerObject.GetComponent<Player>().playerColor.Value;
