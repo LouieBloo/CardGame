@@ -81,7 +81,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1800976583469701204}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -124,7 +124,7 @@ BoxCollider:
   m_GameObject: {fileID: 1800976583469701204}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -163,6 +163,8 @@ MonoBehaviour:
   playerDefaultsPrefab: {fileID: 7181993999541545653, guid: c28a8c017aad26742a912b8a99f0e084,
     type: 3}
   playerTurnManagerPrefab: {fileID: 5237140264943997716, guid: e34a8eab57acc0b43ae05623e833b070,
+    type: 3}
+  townPrefab: {fileID: 5007011440887985745, guid: e4f145e61627af64eb5fbf7e2260ffaa,
     type: 3}
 --- !u!114 &-4698611565757124795
 MonoBehaviour:

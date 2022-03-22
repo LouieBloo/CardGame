@@ -22,6 +22,9 @@ public class Player : PlayerOwnedNetworkObject
 
     private PlayerStats playerStats;
 
+    public GameObject townPrefab;
+    private Town town;
+
     public override void OnDestroy()
     {
         base.OnDestroy();
@@ -35,10 +38,7 @@ public class Player : PlayerOwnedNetworkObject
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        if (IsServer && IsOwner)
-        {
-            //spawnGridServerRpc();
-        }
+        
 
         if (IsServer && IsOwner)
         {
@@ -59,6 +59,19 @@ public class Player : PlayerOwnedNetworkObject
             setColorServerRpc(OwnerClientId == 0 ? Color.green : Color.blue);
 
             GlobalVars.gv.player = this;
+
+            
+        }
+
+    }
+
+    private void Start()
+    {
+        if (IsServer)
+        {
+            GameObject townObject = Instantiate(townPrefab, transform.position,Quaternion.identity);
+            townObject.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
+            townObject.GetComponent<TownManager>().setup("CASTLE");
         }
     }
 
@@ -91,12 +104,6 @@ public class Player : PlayerOwnedNetworkObject
     {
         if (!IsOwner) { return; }
 
-        //Debug.Log(IsServer);
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            testServerRpc();
-        }
-
         if (objectSelector.isEmptyCellTargeted())
         {
             if (Input.GetKeyDown(KeyCode.J))
@@ -119,7 +126,16 @@ public class Player : PlayerOwnedNetworkObject
             {
                 createCreatureServerRpc(objectSelector.getTargetedCell().getHexCoordinates(), "SKELETON");
             }
-            
+
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                town.buildBuildingServerRpc("BARRACKS");
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                town.buildBuildingServerRpc("TOWN_BASE_UPGRADE");
+            }
+
         }
         
     }
@@ -145,12 +161,4 @@ public class Player : PlayerOwnedNetworkObject
         
     }
 
-    [ServerRpc]
-    void testServerRpc()
-    {
-        Debug.Log("luke: " + GetComponent<NetworkObject>().OwnerClientId);
-    }
-
-
- 
 }
