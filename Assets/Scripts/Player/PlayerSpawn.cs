@@ -20,6 +20,7 @@ public class PlayerSpawn : NetworkBehaviour
         {
             int spawnIndex = NetworkManager.Singleton.ConnectedClientsIds.Count-1;
             NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject.transform.position = playerSpawns[spawnIndex].transform.position;
+            NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject.transform.rotation = playerSpawns[spawnIndex].transform.rotation;
             playerSpawns[spawnIndex].gameObject.SetActive(false);
         }
         else

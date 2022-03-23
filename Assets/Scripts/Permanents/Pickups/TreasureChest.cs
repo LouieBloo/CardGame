@@ -16,7 +16,7 @@ public class TreasureChest : PickupItem
     public override void playerPickedUp(ulong clientId)
     {
         //NetworkManager.ConnectedClients[clientId].PlayerObject.GetComponent<PlayerStats>().modifyGoldServerRpc(gold);
-        NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.GetComponent<PlayerStats>().modifyGold(gold);
+        NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.GetComponent<Player>().playerStats.modifyGold(gold);
         GlobalVars.gv.turnManager.playerMadeMoveServerRpc();
         kill();
     }

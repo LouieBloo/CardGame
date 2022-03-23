@@ -24,11 +24,21 @@ public class PlayerInput : NetworkBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            respondingToInput = !respondingToInput;
+        }
+    }
+
     // Update is called once per frame
     IEnumerator pollForInput()
     {
         while (respondingToInput)
         {
+            Vector3 mousePosition = Input.mousePosition;
+
             if (Input.GetKeyDown(KeyCode.B))
             {
                 spellBook.iconClicked();
@@ -39,21 +49,44 @@ public class PlayerInput : NetworkBehaviour
                 //spellBook.spellActivated(0);
             }
 
+            //seperating keyboard press from mouse edge
             if (Input.GetKey(KeyCode.A))
             {
                 cameraTracker.leftPressed();
             }
+            if (mousePosition.x <= 10)
+            {
+                //cameraTracker.leftPressed(true);
+            }
+
+
             if (Input.GetKey(KeyCode.D))
             {
                 cameraTracker.rightPressed();
             }
+            if (mousePosition.x >= Screen.width - 10)
+            {
+                //cameraTracker.rightPressed(true);
+            }
+
+
             if (Input.GetKey(KeyCode.W))
             {
                 cameraTracker.forwardPressed();
             }
+            if (mousePosition.y >= Screen.height - 10)
+            {
+                //cameraTracker.forwardPressed(true);
+            }
+
+
             if (Input.GetKey(KeyCode.S))
             {
                 cameraTracker.backPressed();
+            }
+            if (mousePosition.y <= 10)
+            {
+                //cameraTracker.backPressed(true);
             }
 
             if (Input.mouseScrollDelta.y != 0)

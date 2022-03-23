@@ -5,7 +5,8 @@ using UnityEngine;
 
 public class PlayerStats : NetworkBehaviour
 {
-
+    public int startingGold;
+    public int startingMana;
     public NetworkVariable<int> gold = new NetworkVariable<int>();
     public NetworkVariable<int> mana = new NetworkVariable<int>();
 
@@ -14,8 +15,8 @@ public class PlayerStats : NetworkBehaviour
     {
         if (IsServer)
         {
-            gold.Value = 500;
-            mana.Value = 10;
+            gold.Value = startingGold;
+            mana.Value = startingMana;
         }
     }
 

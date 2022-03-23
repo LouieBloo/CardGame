@@ -6,8 +6,9 @@ using UnityEngine;
 public class TownManager : NetworkBehaviour
 {
     public TownPrefab[] towns;
-    private Town activeTown;
     private string townName;
+
+    NetworkVariable<NetworkObjectReference> townNetworkReference = new NetworkVariable<NetworkObjectReference>();
 
     [System.Serializable]
     public class TownPrefab
@@ -21,26 +22,39 @@ public class TownManager : NetworkBehaviour
     {
         if (IsOwner)
         {
-            testServerRpc();
-            //townObject.GetComponent<NetworkObject>().Spawn();
+            spawnTownServerRpc(townName);
         }
     }
 
     [ServerRpc]
-    void testServerRpc()
+    void spawnTownServerRpc(string townNameParam)
     {
         TownPrefab newTown = null;
         foreach (TownPrefab t in towns)
         {
-            if (t.name == townName)
+            if (t.name == townNameParam)
             {
                 newTown = t;
                 break;
             }
         }
         //f
-        GameObject townObject = Instantiate(newTown.prefab, transform);
-        activeTown = townObject.GetComponent<Town>();
+        GameObject townObject = Instantiate(newTown.prefab, transform.position, Quaternion.identity);
+        townObject.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
+        townObject.transform.eulerAngles = new Vector3(townObject.transform.eulerAngles.x, transform.eulerAngles.y, townObject.transform.rotation.eulerAngles.z);
+        townObject.transform.SetParent(transform);
+        
+        townNetworkReference.Value = townObject.GetComponent<NetworkObject>();
+    }
+
+    public Town getTown()
+    {
+        if (townNetworkReference.Value.TryGet(out NetworkObject targetObject))
+        {
+            return targetObject.GetComponent<Town>();
+        }
+
+        return null;
     }
 
     public void setup(string townName)

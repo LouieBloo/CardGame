@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class Town : NetworkBehaviour
+public class Town : PlayerOwnedNetworkObject
 {
     public string factionName;
     private string townName;
@@ -83,25 +83,18 @@ public class Town : NetworkBehaviour
     public void buildBuildingServerRpc(string buildingName)
     {
         if(builtBuildings.Find(i => i.name == buildingName) != null){
-            Debug.Log("Already have that building built..");
+            sendPlayerErrorClientRpc("Already have that building built..");
             return;
         }
-        
-        //GameObject newBuilding = Instantiate(factionBuildingMap[buildingName].prefab, transform);
-
-        //builtBuildings.Add(newBuilding);
-
-        //buildBuildingClientRpc(buildingName);
-        foreach (TownBuildingReference t in builtBuildings)
+        if (factionBuildingMap[buildingName].cost > getPlayer().playerStats.gold.Value)
         {
-            if (t.upgradeTrack == factionBuildingMap[buildingName].upgradeTrack)
-            {
-                t.building.gameObject.SetActive(false);
-                break;
-            }
+            sendPlayerErrorClientRpc("Not enough gold!");
+            return;
         }
-        factionBuildingMap[buildingName].building.gameObject.SetActive(true);
-        builtBuildings.Add(factionBuildingMap[buildingName]);
+
+        getPlayer().playerStats.modifyGold(-factionBuildingMap[buildingName].cost);
+
+        buildBuildingClientRpc(buildingName);
     }
 
     [ClientRpc]

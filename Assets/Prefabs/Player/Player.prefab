@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: -4698611565757124795}
   - component: {fileID: 8887222452075092150}
   - component: {fileID: -5903766760223023557}
+  - component: {fileID: -4218248259443283617}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -164,8 +165,10 @@ MonoBehaviour:
     type: 3}
   playerTurnManagerPrefab: {fileID: 5237140264943997716, guid: e34a8eab57acc0b43ae05623e833b070,
     type: 3}
+  playerStats: {fileID: -5903766760223023557}
   townPrefab: {fileID: 5007011440887985745, guid: e4f145e61627af64eb5fbf7e2260ffaa,
     type: 3}
+  townManager: {fileID: -4218248259443283617}
 --- !u!114 &-4698611565757124795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217,7 +220,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fe9eb317e686834b88f329a93f3c9da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startingGold: 5000
+  startingMana: 20
   gold:
     m_InternalValue: 500
   mana:
     m_InternalValue: 10
+--- !u!114 &-4218248259443283617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800976583469701204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a322c891d0e747845b62407c2924bea3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  towns:
+  - name: CASTLE
+    prefab: {fileID: 2373257146195763216, guid: 9a24f1ce19ffdc14498895f1a913f3f8,
+      type: 3}

@@ -14,4 +14,9 @@ public class PlayerOwnedNetworkObject : NetworkBehaviour
             GlobalVars.gv.gameUI.alertMessage(error);
         }
     }
+
+    public Player getPlayer()
+    {
+        return NetworkManager.Singleton.ConnectedClients[OwnerClientId].PlayerObject.GetComponent<Player>();
+    }
 }

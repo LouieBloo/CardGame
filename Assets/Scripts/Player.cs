@@ -20,10 +20,12 @@ public class Player : PlayerOwnedNetworkObject
 
     public GameObject playerTurnManagerPrefab;
 
-    private PlayerStats playerStats;
+    public PlayerStats playerStats;
 
     public GameObject townPrefab;
-    private Town town;
+    public TownManager townManager;
+
+    //only public for debugging
 
     public override void OnDestroy()
     {
@@ -54,25 +56,24 @@ public class Player : PlayerOwnedNetworkObject
             ui = Instantiate(uiPrefab, Vector3.zero, Quaternion.identity);
             ui.GetComponent<PlayerUI>().setup(this);
 
+            townManager.setup("CASTLE");
+
             //playerDefaultsGameObject = Instantiate(playerDefaultsPrefab, Vector3.zero, Quaternion.identity);
             //playerDefaultsGameObject.GetComponent<PlayerDefaults>().setup(setColorServerRpc);
             setColorServerRpc(OwnerClientId == 0 ? Color.green : Color.blue);
 
             GlobalVars.gv.player = this;
-
-            
         }
 
+        if (IsServer)
+        {
+            
+        }
     }
 
     private void Start()
     {
-        if (IsServer)
-        {
-            GameObject townObject = Instantiate(townPrefab, transform.position,Quaternion.identity);
-            townObject.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
-            townObject.GetComponent<TownManager>().setup("CASTLE");
-        }
+        
     }
 
     [ServerRpc]
@@ -104,6 +105,15 @@ public class Player : PlayerOwnedNetworkObject
     {
         if (!IsOwner) { return; }
 
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            townManager.getTown().buildBuildingServerRpc("BARRACKS");
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            townManager.getTown().buildBuildingServerRpc("TOWN_BASE_UPGRADE");
+        }
+
         if (objectSelector.isEmptyCellTargeted())
         {
             if (Input.GetKeyDown(KeyCode.J))
@@ -125,15 +135,6 @@ public class Player : PlayerOwnedNetworkObject
             if (Input.GetKeyDown(KeyCode.P))
             {
                 createCreatureServerRpc(objectSelector.getTargetedCell().getHexCoordinates(), "SKELETON");
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                town.buildBuildingServerRpc("BARRACKS");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                town.buildBuildingServerRpc("TOWN_BASE_UPGRADE");
             }
 
         }

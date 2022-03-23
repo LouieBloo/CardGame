@@ -10,6 +10,7 @@ public class CameraTracker : MonoBehaviour
     public Vector3 trackingOffset;
 
     public float playerInputMoveSpeed;
+    public float playerMouseEdgeMoveSpeed;
     private Vector3 leftMoveOffset = new Vector3(-1,0,0);
     private Vector3 rightMoveOffset = new Vector3(1, 0, 0);
     private Vector3 forwardMoveOffset = new Vector3(0, 0, 1);
@@ -73,9 +74,10 @@ public class CameraTracker : MonoBehaviour
     public void zoom(float amount)
     {
         float delta = amount * zoomSpeed;
-        trackingOffset.y += delta;
+        trackingOffset.y += delta + 0.04f;
         float zDelta = -delta;
-        trackingOffset.z += zDelta * 2f;
+        trackingOffset.z += zDelta + 0.04f;
+        //trackingOffset.z += zDelta + ;
         if (!trackedObject)
         {
             transform.position = new Vector3(transform.position.x, trackingOffset.y, transform.position.z + zDelta);
@@ -83,23 +85,23 @@ public class CameraTracker : MonoBehaviour
         //transform.position
     }
 
-    public void leftPressed()
+    public void leftPressed(bool isEdge = false)
     {
         
         if (!isAutoTracking)
         {
-            transform.position = Vector3.MoveTowards(transform.position, transform.position + leftMoveOffset, playerInputMoveSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, transform.position + leftMoveOffset, (isEdge ? playerMouseEdgeMoveSpeed : playerInputMoveSpeed) * Time.deltaTime);
         }
         else {
             stopAutoTargeting(); 
         }
     }
 
-    public void rightPressed()
+    public void rightPressed(bool isEdge = false)
     {
         if (!isAutoTracking)
         {
-            transform.position = Vector3.MoveTowards(transform.position, transform.position + rightMoveOffset, playerInputMoveSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, transform.position + rightMoveOffset, (isEdge ? playerMouseEdgeMoveSpeed : playerInputMoveSpeed) * Time.deltaTime);
         }
         else
         {
@@ -107,11 +109,11 @@ public class CameraTracker : MonoBehaviour
         }
     }
 
-    public void forwardPressed()
+    public void forwardPressed(bool isEdge = false)
     {
         if (!isAutoTracking)
         {
-            transform.position = Vector3.MoveTowards(transform.position, transform.position + forwardMoveOffset, playerInputMoveSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, transform.position + forwardMoveOffset, (isEdge ? playerMouseEdgeMoveSpeed : playerInputMoveSpeed) * Time.deltaTime);
         }
         else
         {
@@ -119,11 +121,11 @@ public class CameraTracker : MonoBehaviour
         }
     }
 
-    public void backPressed()
+    public void backPressed(bool isEdge = false)
     {
         if (!isAutoTracking)
         {
-            transform.position = Vector3.MoveTowards(transform.position, transform.position + backMoveOffset, playerInputMoveSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, transform.position + backMoveOffset, (isEdge ? playerMouseEdgeMoveSpeed : playerInputMoveSpeed) * Time.deltaTime);
         }
         else
         {

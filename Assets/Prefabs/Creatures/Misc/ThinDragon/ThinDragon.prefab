@@ -889,6 +889,7 @@ GameObject:
   - component: {fileID: 2410671815319552077}
   - component: {fileID: 2410671815319552076}
   - component: {fileID: 6663679002891934030}
+  - component: {fileID: 9165850155249549803}
   m_Layer: 0
   m_Name: ThinDragon
   m_TagString: Untagged
@@ -1016,10 +1017,24 @@ MonoBehaviour:
   baseSpeed: 6
   currentSpeed: 0
   name: Thin Dragon
+  color: {r: 0, g: 0, b: 0, a: 0}
   projectilePrefab: {fileID: 0}
   uiImage: {fileID: 21300000, guid: e3e1db78ced82b74691355a08119503f, type: 3}
   hexSpaces: 1
   hexSpaceDistance: 1
+--- !u!114 &9165850155249549803
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5932788995159726474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad975f1947e7ad84c88455b2c58436ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectileSpawnPosition: {fileID: 0}
 --- !u!1 &5972391637143400841
 GameObject:
   m_ObjectHideFlags: 0
