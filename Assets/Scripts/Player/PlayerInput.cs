@@ -99,6 +99,13 @@ public class PlayerInput : NetworkBehaviour
                 cameraTracker.trackTarget(turnManager.getActiveObject().transform,true);
             }
 
+
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                GetComponent<TownManager>().townButtonPressed();
+                cameraTracker.zoomToTownToggle(GetComponent<Player>().townManager.getTown());
+            }
+
             yield return null;
         }
     }

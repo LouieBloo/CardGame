@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -10,8 +11,11 @@ public class Town : PlayerOwnedNetworkObject
 
     public TownBuildingReference[] factionBuildings;
     private Dictionary<string, TownBuildingReference> factionBuildingMap = new Dictionary<string, TownBuildingReference>();
+    private Dictionary<string, List<TownBuildingReference>> factionBuildingByUpgradeTrack;
 
     private List<TownBuildingReference> builtBuildings = new List<TownBuildingReference>();
+
+    private Action buildingBuiltCallback;
 
     public enum TownBuildingUpgradeTrack
     {
@@ -30,6 +34,7 @@ public class Town : PlayerOwnedNetworkObject
         public TownBuilding building;
         public TownBuildingReference upgradedVersion;
         public TownBuildingUpgradeTrack upgradeTrack;
+        public Sprite uiImage;
         public int spotInUpgradeTrack;
         public int cost;
     }
@@ -38,17 +43,17 @@ public class Town : PlayerOwnedNetworkObject
     void Awake()
     {
         //we sort these references and then assign upgradedVersion to each one so its easy to upgrade
-        Dictionary<string, List<TownBuildingReference>> tempDict = new Dictionary<string, List<TownBuildingReference>>();
+        factionBuildingByUpgradeTrack = new Dictionary<string, List<TownBuildingReference>>();
         foreach(TownBuildingReference tb in factionBuildings)
         {
-            if (tempDict.ContainsKey(tb.upgradeTrack.ToString()))
+            if (factionBuildingByUpgradeTrack.ContainsKey(tb.upgradeTrack.ToString()))
             {
                 bool didInsert = false;
-                for(int x = 0; x < tempDict[tb.upgradeTrack.ToString()].Count; x++)
+                for(int x = 0; x < factionBuildingByUpgradeTrack[tb.upgradeTrack.ToString()].Count; x++)
                 {
-                    if(tempDict[tb.upgradeTrack.ToString()][x].spotInUpgradeTrack > tb.spotInUpgradeTrack)
+                    if(factionBuildingByUpgradeTrack[tb.upgradeTrack.ToString()][x].spotInUpgradeTrack > tb.spotInUpgradeTrack)
                     {
-                        tempDict[tb.upgradeTrack.ToString()].Insert(x, tb);
+                        factionBuildingByUpgradeTrack[tb.upgradeTrack.ToString()].Insert(x, tb);
                         didInsert = true;
                         break;
                     }
@@ -56,20 +61,20 @@ public class Town : PlayerOwnedNetworkObject
 
                 if (!didInsert)
                 {
-                    tempDict[tb.upgradeTrack.ToString()].Add(tb);
+                    factionBuildingByUpgradeTrack[tb.upgradeTrack.ToString()].Add(tb);
                 }
             }
             else
             {
-                tempDict[tb.upgradeTrack.ToString()] = new List<TownBuildingReference>();
-                tempDict[tb.upgradeTrack.ToString()].Add(tb);
+                factionBuildingByUpgradeTrack[tb.upgradeTrack.ToString()] = new List<TownBuildingReference>();
+                factionBuildingByUpgradeTrack[tb.upgradeTrack.ToString()].Add(tb);
             }
 
             factionBuildingMap.Add(tb.name, tb);
         }
 
         //since they are sorted we make the x-1 townReference have a ref to x town ref
-        foreach (KeyValuePair<string, List<TownBuildingReference>> entry in tempDict)
+        foreach (KeyValuePair<string, List<TownBuildingReference>> entry in factionBuildingByUpgradeTrack)
         {
             // do something with entry.Value or entry.Key
             for(int x = 1; x < entry.Value.Count; x++)
@@ -77,6 +82,19 @@ public class Town : PlayerOwnedNetworkObject
                 entry.Value[x - 1].upgradedVersion = entry.Value[x];
             }
         }
+
+
+        builtBuildings.Add(factionBuildingMap["TOWN_BASE"]);
+    }
+
+    private void Start()
+    {
+        
+    }
+
+    public void subscribeToBuiltBuildingCallback(Action builtBuildingCallback)
+    {
+        this.buildingBuiltCallback = builtBuildingCallback;
     }
 
     [ServerRpc]
@@ -105,10 +123,28 @@ public class Town : PlayerOwnedNetworkObject
             if(t.upgradeTrack == factionBuildingMap[buildingName].upgradeTrack)
             {
                 t.building.gameObject.SetActive(false);
+                builtBuildings.Remove(t);
                 break;
             }
         }
         factionBuildingMap[buildingName].building.gameObject.SetActive(true);
+        
         builtBuildings.Add(factionBuildingMap[buildingName]);
+
+        //if we are showing the town building ui we need to update it
+        if(this.buildingBuiltCallback != null)
+        {
+            this.buildingBuiltCallback();
+        }
+    }
+
+    public List<TownBuildingReference> getBuiltBuildings()
+    {
+        return this.builtBuildings;
+    }
+
+    public Dictionary<string, List<TownBuildingReference>> getFactionBuildingByUpgradeTrack()
+    {
+        return this.factionBuildingByUpgradeTrack;
     }
 }

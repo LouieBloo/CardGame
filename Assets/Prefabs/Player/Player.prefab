@@ -238,6 +238,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a322c891d0e747845b62407c2924bea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  townUIPrefab: {fileID: 7921019724030343379, guid: b783a294c634a294c87bee730b210b66,
+    type: 3}
   towns:
   - name: CASTLE
     prefab: {fileID: 2373257146195763216, guid: 9a24f1ce19ffdc14498895f1a913f3f8,

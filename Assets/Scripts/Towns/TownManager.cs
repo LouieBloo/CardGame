@@ -5,9 +5,11 @@ using UnityEngine;
 
 public class TownManager : NetworkBehaviour
 {
+    public GameObject townUIPrefab;
     public TownPrefab[] towns;
-    private string townName;
 
+    private string townName;
+    private TownUI activeTownUI;
     NetworkVariable<NetworkObjectReference> townNetworkReference = new NetworkVariable<NetworkObjectReference>();
 
     [System.Serializable]
@@ -60,5 +62,19 @@ public class TownManager : NetworkBehaviour
     public void setup(string townName)
     {
         this.townName = townName;
+    }
+
+    public void townButtonPressed()
+    {
+        if(activeTownUI != null)
+        {
+            Destroy(activeTownUI.gameObject);
+            activeTownUI = null;
+        }
+        else
+        {
+            activeTownUI = Instantiate(townUIPrefab, Vector3.zero, Quaternion.identity).GetComponent<TownUI>();
+            activeTownUI.setup(getTown());
+        }
     }
 }

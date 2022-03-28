@@ -1031,6 +1031,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80b121d56f4bb974d96d677a2ae1a7ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  humanReadableName: Town Base Upgrade
 --- !u!1 &7876945577208275350
 GameObject:
   m_ObjectHideFlags: 0

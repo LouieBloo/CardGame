@@ -17,6 +17,7 @@ public class CameraTracker : MonoBehaviour
     private Vector3 backMoveOffset = new Vector3(0, 0, -1);
 
     private bool isAutoTracking = true;
+    private bool isZoomedInOnTown = false;
 
     private Coroutine trackObjectEnumerator;
 
@@ -67,6 +68,30 @@ public class CameraTracker : MonoBehaviour
         while (true && trackedObject != null)
         {
             transform.position = Vector3.MoveTowards(transform.position, trackedObject.position + trackingOffset, trackSpeed * Time.deltaTime);
+            yield return null;
+        }
+    }
+
+    public void zoomToTownToggle(Town town)
+    {
+        if (!isZoomedInOnTown)
+        {
+            stopAutoTargeting();
+            StartCoroutine(zoomToTownRoutine(town.transform));
+        }
+
+        isZoomedInOnTown = !isZoomedInOnTown;
+    }
+
+    IEnumerator zoomToTownRoutine(Transform target)
+    {
+        float i = 0;
+        float rate = 1f / 1f;
+        Vector3 startingPos = transform.position;
+        while (i < 1.0)
+        {
+            i += Time.deltaTime * rate;
+            transform.position = Vector3.Lerp(startingPos, target.position + new Vector3(0,7.2f,0), i);
             yield return null;
         }
     }
