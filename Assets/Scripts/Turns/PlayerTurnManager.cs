@@ -261,6 +261,7 @@ public class PlayerTurnManager : NetworkBehaviour
             activePermanentInTurnOrder = targetObject;
             activePermanentInTurnOrder.GetComponent<Selectable>().highlight();
 
+            //tell the camera to track this target
             Camera.main.GetComponent<CameraTracker>().trackTarget(targetObject.transform,false);
         }
     }

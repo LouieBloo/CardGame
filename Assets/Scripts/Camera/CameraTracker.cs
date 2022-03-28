@@ -39,6 +39,9 @@ public class CameraTracker : MonoBehaviour
 
         trackObjectEnumerator = StartCoroutine(trackTargetRoutine());
 
+        //tell object selector to select this target is nothing else is selected
+        GameObject.FindGameObjectsWithTag("Game")[0].GetComponent<ObjectSelecting>().selectNextInTurnOrder(target);
+
         isAutoTracking = true;
     }
 
@@ -91,7 +94,7 @@ public class CameraTracker : MonoBehaviour
         while (i < 1.0)
         {
             i += Time.deltaTime * rate;
-            transform.position = Vector3.Lerp(startingPos, target.position + new Vector3(0,7.2f,0), i);
+            transform.position = Vector3.Lerp(startingPos, target.position + new Vector3(0,7.8f,-4), i);
             yield return null;
         }
     }
