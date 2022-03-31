@@ -285,15 +285,21 @@ public class ObjectSelecting : MonoBehaviour
     //when its a creatures turn we want to auto select it
     public void selectNextInTurnOrder(Transform objectToSelect)
     {
-        if (selectedPermanent)
+        /*if (selectedPermanent)
         {
             deselectPermanent();
         }
         else if(grid.cells[grid.getHexCoordinatesFromPosition(objectToSelect.position)].getAttachedPermanent())
         {
-            /*Debug.Log(objectToSelect.position);
+            *//*Debug.Log(objectToSelect.position);
             Debug.Log(grid.cells[grid.getHexCoordinatesFromPosition(objectToSelect.position)]);
-            Debug.Log(grid.cells[grid.getHexCoordinatesFromPosition(objectToSelect.position)].getAttachedPermanent());*/
+            Debug.Log(grid.cells[grid.getHexCoordinatesFromPosition(objectToSelect.position)].getAttachedPermanent());*//*
+            selectedPermanent = grid.cells[grid.getHexCoordinatesFromPosition(objectToSelect.position)].getAttachedPermanent().GetComponent<Selectable>();
+            selectHalfHoverPermanents(selectedPermanent.select());
+        }*/
+
+       if (grid.cells[grid.getHexCoordinatesFromPosition(objectToSelect.position)].getAttachedPermanent())
+        {
             selectedPermanent = grid.cells[grid.getHexCoordinatesFromPosition(objectToSelect.position)].getAttachedPermanent().GetComponent<Selectable>();
             selectHalfHoverPermanents(selectedPermanent.select());
         }

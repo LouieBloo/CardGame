@@ -25,6 +25,8 @@ public class Player : PlayerOwnedNetworkObject
     public GameObject townPrefab;
     public TownManager townManager;
 
+    public PlayerInput playerInput;
+
     //only public for debugging
 
     public override void OnDestroy()
@@ -73,7 +75,7 @@ public class Player : PlayerOwnedNetworkObject
 
     private void Start()
     {
-        
+        playerInput = GetComponent<PlayerInput>();
     }
 
     [ServerRpc]

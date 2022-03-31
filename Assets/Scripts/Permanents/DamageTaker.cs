@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class DamageTaker : NetworkBehaviour
+public class DamageTaker : NetworkBehaviour, TurnNotifiable
 {
     public enum ArmorType
     {
@@ -25,6 +25,9 @@ public class DamageTaker : NetworkBehaviour
     private Modifiable modifiable;
 
     public GameObject damageFloatingTextPrefab;
+
+    public GameObject defendActionModifierPrefab;
+    private CreatureModification defendActionActiveModification;
 
     private void Awake()
     {
@@ -97,6 +100,34 @@ public class DamageTaker : NetworkBehaviour
         damageFloatingTextPrefab.GetComponent<DamageNumber>().Spawn(new Vector3(transform.position.x, transform.position.y + 1, transform.position.z), damage);
     }
 
+    public void defendAction()
+    {
+        if (IsOwner)
+        {
+            defendActionServerRpc();
+        }
+    }
+
+    [ServerRpc]
+    private void defendActionServerRpc()
+    {
+        if(defendActionActiveModification == null && GlobalVars.gv.turnManager.isObjectValidToMakeMove(this.GetComponent<NetworkObject>()))
+        {
+            GameObject newDefendObject = Instantiate(defendActionModifierPrefab, transform.position,Quaternion.identity);
+            newDefendObject.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
+            newDefendObject.GetComponent<SpellGameObject>().setup(this.gameObject, null);
+            defendActionActiveModification = newDefendObject.GetComponent<CreatureModification>();
+            //GetComponent<Modifiable>().applyModification(newDefendObject.GetComponent<NetworkObject>());
+
+            GlobalVars.gv.turnManager.playerMadeMoveServerRpc();
+        }
+        else
+        {
+            Debug.Log("Not users turn or they are already defended");
+        }
+        
+    }
+
     private void die()
     {
         if(IsServer && amount.Value <= 0)
@@ -123,5 +154,25 @@ public class DamageTaker : NetworkBehaviour
     public int getAmount()
     {
         return amount.Value;
+    }
+
+    public void turnStarted()
+    {
+        
+    }
+
+    public void turnEnded()
+    {
+    }
+
+    public void takePriority()
+    {
+        if (!IsServer) { return; }
+        if (defendActionActiveModification != null)
+        {
+            defendActionActiveModification.GetComponent<SpellGameObject>().destroy();
+            Destroy(defendActionActiveModification.gameObject);
+            defendActionActiveModification = null;
+        }
     }
 }

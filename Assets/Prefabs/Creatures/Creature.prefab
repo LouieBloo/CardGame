@@ -698,6 +698,8 @@ MonoBehaviour:
     m_InternalValue: 1
   damageFloatingTextPrefab: {fileID: 3811703216433348034, guid: a73e55093e9dbeb439bdd6df258ff5fe,
     type: 3}
+  defendActionModifierPrefab: {fileID: 7568954877174817596, guid: 7f775d09cc92b2046b16d044598572be,
+    type: 3}
 --- !u!114 &-4037839420428402356
 MonoBehaviour:
   m_ObjectHideFlags: 0

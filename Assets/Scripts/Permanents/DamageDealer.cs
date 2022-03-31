@@ -70,4 +70,12 @@ public class DamageDealer : NetworkBehaviour
     {
         return 0;
     }
+
+    public void turnStarted()
+    {
+    }
+
+    public void turnEnded()
+    {
+    }
 }

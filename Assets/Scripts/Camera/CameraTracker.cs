@@ -21,6 +21,9 @@ public class CameraTracker : MonoBehaviour
 
     private Coroutine trackObjectEnumerator;
 
+    private Vector3 positionBeforeTownZoom;
+    private Vector3 rotationBeforeTownZoom;
+
     private void Start()
     {
         trackingOffset = new Vector3(transform.position.x, transform.position.y, transform.position.z);
@@ -39,7 +42,7 @@ public class CameraTracker : MonoBehaviour
 
         trackObjectEnumerator = StartCoroutine(trackTargetRoutine());
 
-        //tell object selector to select this target is nothing else is selected
+        //tell object selector to select this target if nothing else is selected
         GameObject.FindGameObjectsWithTag("Game")[0].GetComponent<ObjectSelecting>().selectNextInTurnOrder(target);
 
         isAutoTracking = true;
@@ -82,19 +85,46 @@ public class CameraTracker : MonoBehaviour
             stopAutoTargeting();
             StartCoroutine(zoomToTownRoutine(town.transform));
         }
+        else
+        {
+            transform.position = positionBeforeTownZoom;
+            transform.eulerAngles = rotationBeforeTownZoom;
+        }
 
         isZoomedInOnTown = !isZoomedInOnTown;
     }
 
     IEnumerator zoomToTownRoutine(Transform target)
     {
+        Vector3 positionOffset;
+        Vector3 finalRotation;
+        if (target.eulerAngles.y >= 260 && target.eulerAngles.y <= 280)
+        {
+            positionOffset = new Vector3(11, 7.8f, 0);
+            finalRotation = new Vector3(45f, -90f, 0f);
+        }
+        else
+        {
+            positionOffset = new Vector3(-11, 7.8f, 0);
+            finalRotation = new Vector3(45f, 90f, 0f);
+        }
+
+
+        positionBeforeTownZoom = transform.position;
+        rotationBeforeTownZoom = transform.eulerAngles;
+        Quaternion transformRotationBefore = transform.rotation;
+
         float i = 0;
         float rate = 1f / 1f;
         Vector3 startingPos = transform.position;
         while (i < 1.0)
         {
             i += Time.deltaTime * rate;
-            transform.position = Vector3.Lerp(startingPos, target.position + new Vector3(0,7.8f,-4), i);
+            transform.position = Vector3.Lerp(startingPos, target.position + positionOffset, i);
+
+            Quaternion qr = Quaternion.Euler(finalRotation);
+            transform.rotation = Quaternion.Lerp(transformRotationBefore, qr, i);
+
             yield return null;
         }
     }

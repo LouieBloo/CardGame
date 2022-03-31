@@ -15,7 +15,9 @@ public class SpellGameObject : NetworkBehaviour
     private AudioSource audioSource;
     private DamageDealer damageDealer;
 
+    //note we have two targets, one is best for netwroking, the other is just a raw object for the server
     private PermanentCell target;
+    private GameObject targetGameObject;
     public GameObject objectToDisableWhenAnimationDone;
 
     // Start is called before the first frame update
@@ -39,6 +41,12 @@ public class SpellGameObject : NetworkBehaviour
         this.callback = callback;
     }
 
+    public void setup(GameObject target, Action<CreatureModification> callback)
+    {
+        this.targetGameObject = target;
+        this.callback = callback;
+    }
+
     IEnumerator waitBeforeApplyingModification()
     {
         yield return new WaitForSecondsRealtime(delayBeforeApplyingModification);
@@ -58,7 +66,14 @@ public class SpellGameObject : NetworkBehaviour
             Debug.Log("Apply spell");
             if(creatureModification != null)
             {
-                target.getAttachedPermanent().GetComponent<Modifiable>().applyModification(GetComponent<NetworkObject>());
+                if(target != null)
+                {
+                    target.getAttachedPermanent().GetComponent<Modifiable>().applyModification(GetComponent<NetworkObject>());
+                }else if(targetGameObject != null)
+                {
+                    targetGameObject.GetComponent<Modifiable>().applyModification(GetComponent<NetworkObject>());
+                }
+                
             }
             if(damageDealer != null)
             {
@@ -92,5 +107,23 @@ public class SpellGameObject : NetworkBehaviour
     public void OnParticleSystemStopped()
     {
         Debug.Log("stopped");
+    }
+
+    public void destroy()
+    {
+        if (IsServer)
+        {
+            if (creatureModification != null)
+            {
+                if (target != null)
+                {
+                    target.getAttachedPermanent().GetComponent<Modifiable>().removeModification(GetComponent<NetworkObject>());
+                }
+                else if (targetGameObject != null)
+                {
+                    targetGameObject.GetComponent<Modifiable>().removeModification(GetComponent<NetworkObject>());
+                }
+            }
+        }
     }
 }

@@ -11,13 +11,15 @@ public class PlayerInput : NetworkBehaviour
     private SpellBook spellBook;
     private PlayerTurnManager turnManager;
 
+    private Coroutine pollingRoutine;
+
     // Start is called before the first frame update
     void Start()
     {
         spellBook = GetComponent<SpellBook>();
         if (IsOwner)
         {
-            StartCoroutine(pollForInput());
+            startRespondingToInput();
             cameraTracker = Camera.main.GetComponent<CameraTracker>();
 
             turnManager = GlobalVars.gv.turnManager;
@@ -32,10 +34,31 @@ public class PlayerInput : NetworkBehaviour
         }
     }
 
+    public void startRespondingToInput()
+    {
+        respondingToInput = true;
+        if(pollingRoutine == null)
+        {
+            pollingRoutine = StartCoroutine(pollForInput());
+        }
+    }
+
+    public void stopRespondingToInput()
+    {
+        respondingToInput = false;
+        if (pollingRoutine != null)
+        {
+            StopCoroutine(pollingRoutine);
+            pollingRoutine = null;
+        }
+    }
+
+
     // Update is called once per frame
     IEnumerator pollForInput()
     {
-        while (respondingToInput)
+        yield return null;
+        while (true)
         {
             Vector3 mousePosition = Input.mousePosition;
 
@@ -104,6 +127,15 @@ public class PlayerInput : NetworkBehaviour
             {
                 GetComponent<TownManager>().townButtonPressed();
                 cameraTracker.zoomToTownToggle(GetComponent<Player>().townManager.getTown());
+            }
+
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                NetworkObject activeCreature = turnManager.getActiveObject();
+                if(activeCreature != null)
+                {
+                    activeCreature.GetComponent<DamageTaker>().defendAction();
+                }
             }
 
             yield return null;

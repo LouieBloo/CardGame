@@ -70,11 +70,13 @@ public class TownManager : NetworkBehaviour
         {
             Destroy(activeTownUI.gameObject);
             activeTownUI = null;
+            GetComponent<Player>().playerInput.startRespondingToInput();
         }
         else
         {
             activeTownUI = Instantiate(townUIPrefab, Vector3.zero, Quaternion.identity).GetComponent<TownUI>();
-            activeTownUI.setup(getTown());
+            activeTownUI.setup(getTown(),this);
+            GetComponent<Player>().playerInput.stopRespondingToInput();
         }
     }
 }

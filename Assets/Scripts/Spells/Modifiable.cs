@@ -26,6 +26,14 @@ public class Modifiable : NetworkBehaviour
         }
     }
 
+    public void removeModification(NetworkObjectReference modificationReference)
+    {
+        if (IsServer)
+        {
+            attachedModifications.Remove(modificationReference);
+        }
+    }
+
     public int getArmorModification()
     {
         int returnTotal = 0;
@@ -33,12 +41,14 @@ public class Modifiable : NetworkBehaviour
         {
             if (networkRef.TryGet(out NetworkObject targetObject))
             {
-                CreatureModification modifier = targetObject.GetComponent<CreatureModification>();
-                returnTotal += modifier.armorDelta;
+                foreach(CreatureModification modifier in targetObject.GetComponents<CreatureModification>())
+                {
+                    //CreatureModification modifier = targetObject.GetComponent<CreatureModification>();
+                    returnTotal += modifier.armorDelta;
+                }
             }
             
         }
-
 
         return returnTotal;
     }

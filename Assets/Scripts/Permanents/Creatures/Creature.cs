@@ -7,7 +7,7 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 
-public class Creature : NetworkBehaviour, NetworkLoadable
+public class Creature : NetworkBehaviour, NetworkLoadable, TurnNotifiable
 {
     public enum CreatureActions
     {
@@ -130,9 +130,19 @@ public class Creature : NetworkBehaviour, NetworkLoadable
         return null;
     }
 
-    public void newTurn()
+    public void turnStarted()
     {
-        attacker.resetRetaliation();
+        attacker.turnStarted();
+        
+    }
+
+    public void turnEnded()
+    {
+    }
+
+    public void takePriority()
+    {
+        damageTaker.takePriority();
     }
 
     public void attacked(DamageDealer damageDealer,Action retaliationCallback)
@@ -211,4 +221,6 @@ public class Creature : NetworkBehaviour, NetworkLoadable
 
         return true;
     }
+
+    
 }

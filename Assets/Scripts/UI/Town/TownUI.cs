@@ -6,6 +6,7 @@ using UnityEngine;
 public class TownUI : MonoBehaviour
 {
     private Town town;
+    private TownManager townManager;
     public GameObject townUIButtonPrefab;
     public Transform buttonSpawnLocation;
 
@@ -16,9 +17,18 @@ public class TownUI : MonoBehaviour
         
     }
 
-    public void setup(Town town)
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            closeButtonPressed();
+        }
+    }
+
+    public void setup(Town town,TownManager townManager)
     {
         this.town = town;
+        this.townManager = townManager;
         this.town.subscribeToBuiltBuildingCallback(buildingBuilt);
         int index = 0;
         foreach (KeyValuePair<string, List<Town.TownBuildingReference>> entry in town.getFactionBuildingByUpgradeTrack())
@@ -56,11 +66,17 @@ public class TownUI : MonoBehaviour
 
     private void buildingBuilt()
     {
-        setup(this.town);
+        setup(this.town,this.townManager);
     }
 
     private void buildingClicked(Town.TownBuildingReference obj)
     {
         town.buildBuildingServerRpc(obj.name);
+    }
+
+    public void closeButtonPressed()
+    {
+        townManager.townButtonPressed();
+        Camera.main.GetComponent<CameraTracker>().zoomToTownToggle(null);
     }
 }

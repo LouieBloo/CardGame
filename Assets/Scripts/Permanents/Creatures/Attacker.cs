@@ -7,7 +7,7 @@ using Unity.Netcode;
 using UnityEngine;
 using static Selectable;
 
-public class Attacker : PlayerOwnedNetworkObject
+public class Attacker : PlayerOwnedNetworkObject, TurnNotifiable
 {
     private GameObject projectilePrefab;
 
@@ -72,9 +72,12 @@ public class Attacker : PlayerOwnedNetworkObject
         this.animator = animator;
     }
 
-    public void resetRetaliation()
+    private void resetRetaliation()
     {
-        retaliationsLeft.Value = 1;
+        if (IsServer)
+        {
+            retaliationsLeft.Value = 1;
+        }
     }
 
     [ServerRpc]
@@ -349,5 +352,20 @@ public class Attacker : PlayerOwnedNetworkObject
     {
         RangeType.TryParse(rangeType.Value.ToString(), out RangeType result);
         return result;
+    }
+
+    public void turnStarted()
+    {
+        resetRetaliation();
+    }
+
+    public void turnEnded()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void takePriority()
+    {
+
     }
 }

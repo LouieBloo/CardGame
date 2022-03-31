@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class PickupItem : MonoBehaviour
+public class PickupItem : NetworkBehaviour
 {
     Action killCallback;
     // Start is called before the first frame update

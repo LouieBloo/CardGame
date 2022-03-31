@@ -193,16 +193,20 @@ public class CreatureMovement : PlayerOwnedNetworkObject
         {
             //rotate towards action target
             yield return StartCoroutine(rotateTowardsPoint(targetActionCell.transform.position));
+            //set final orientation of our object 
+            facingOrientation.Value = finalOrientation;
         }
         else
         {
             //rotate towards final orientation
-            HexCoordinates neighbor = HexUtility.GetNeighbour(grid.getHexCoordinatesFromPosition(transform.position), CellHelper.getDirectionFromString(finalOrientation));
-            yield return StartCoroutine(rotateTowardsPoint(grid.getPositionFromHexCoordinates(neighbor)));
+            //HexCoordinates neighbor = HexUtility.GetNeighbour(grid.getHexCoordinatesFromPosition(transform.position), CellHelper.getDirectionFromString(finalOrientation));
+            //yield return StartCoroutine(rotateTowardsPoint(grid.getPositionFromHexCoordinates(neighbor)));
+
+            //set the oriernation to whatever we happened to stop moving at
+            facingOrientation.Value = CellHelper.rotationToHexDirection(transform.rotation.eulerAngles.y).ToString();
         }
 
-        //set final orientation of our object 
-        facingOrientation.Value = finalOrientation;
+       
 
         if(callbackWhenDone != null)
         {

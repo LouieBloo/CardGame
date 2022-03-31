@@ -68,6 +68,9 @@ public class PlayerTurnManager : NetworkBehaviour
         objectsInTurnOrder.RemoveAt(0);
         if(objectsInTurnOrder.Count > 0)
         {
+            //tell first in line they have priority
+            getActiveObject().GetComponent<Creature>().takePriority();
+            //tell players to update their ui
             removeHeadOfTurnIndicatorClientRpc(objectsInTurnOrder[0]);
         }
         else
@@ -137,7 +140,7 @@ public class PlayerTurnManager : NetworkBehaviour
         {
             if (n.TryGet(out NetworkObject targetObject))
             {
-                targetObject.GetComponent<Creature>().newTurn();
+                targetObject.GetComponent<Creature>().turnStarted();
             }
         }
         recalculateTurnOrder(allObjectsTracking);
@@ -200,6 +203,12 @@ public class PlayerTurnManager : NetworkBehaviour
             //Debug.Log(sortedObjects[x].stats.name + ": " + sortedObjects[x].stats.currentSpeed);
             objectsInOrder[x] = sortedObjects[x].networkObject;
             objectsInTurnOrder.Add(sortedObjects[x].networkObject);
+        }
+
+        //tell the first object in line that they have priority
+        if(objectsInTurn.Count > 0)
+        {
+            getActiveObject().GetComponent<Creature>().takePriority();
         }
 
         displayTurnOrderClientRpc(objectsInOrder);

@@ -140,3 +140,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gold: 1000
+  goldTextPrefab: {fileID: 6645258955986777214, guid: b01abd1932fa3774daed48fa9d83d5e4,
+    type: 3}
