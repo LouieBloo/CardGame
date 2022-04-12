@@ -12,6 +12,7 @@ public class PermanentCell : Selectable
     public Quaternion objectSpawnRotation;
 
     public GameObject creaturePrefab;
+    public GameObject townPermanentPrefab;
     public GameObject pickupPrefab;
 
     public SpriteRenderer permanentColorSprite; 
@@ -73,11 +74,33 @@ public class PermanentCell : Selectable
         }
 
         //tell the creature what kind they are and orientation
-        go.GetComponent<Creature>().setSpawnParameters(creatureName,HexDirection.E);
+        go.GetComponent<Creature>().setSpawnParameters(creatureName, CellHelper.getDirectionFromString(NetworkManager.Singleton.ConnectedClients[ownerId].PlayerObject.GetComponent<Player>().facingOrientation.Value.ToString()));
 
         //tell creature what cells they occupy
         go.GetComponent<Permanent>().setOccupiedCellsServerRpc(spawnCells);
         
+        //attach to ourself
+        attachPermanent(go.GetComponent<NetworkObject>());
+
+        return go.GetComponent<NetworkObject>();
+    }
+
+    public NetworkObjectReference spawnTownPermanent(Quaternion rotation, ulong ownerId, string townPermanentName, Vector3[] spawnCells)
+    {
+        //instantiate the object and set ownership
+        GameObject go = Instantiate(townPermanentPrefab, transform.position, rotation);
+        go.GetComponent<NetworkObject>().Spawn();
+        if (ownerId > 0)
+        {
+            go.GetComponent<NetworkObject>().ChangeOwnership(ownerId);
+        }
+
+        //tell the town what kind they are and orientation
+        go.GetComponent<TownPermanent>().setSpawnParameters(townPermanentName, CellHelper.getDirectionFromString(NetworkManager.Singleton.ConnectedClients[ownerId].PlayerObject.GetComponent<Player>().facingOrientation.Value.ToString()));
+
+        //tell creature what cells they occupy
+        go.GetComponent<Permanent>().setOccupiedCellsServerRpc(spawnCells);
+
         //attach to ourself
         attachPermanent(go.GetComponent<NetworkObject>());
 

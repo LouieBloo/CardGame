@@ -112,7 +112,7 @@ public class Attacker : PlayerOwnedNetworkObject, TurnNotifiable
         {
             //if(targetActionCell.getAttachedPermanent().GetComponent<NetworkObject>().OwnerClientId == OwnerClientId) { Debug.Log("Invalid attack, target is same team as us!"); return; }
 
-            if(targetCell.getAttachedPermanent().type == Permanent.Type.Creature)
+            if(targetCell.getAttachedPermanent().type == Permanent.Type.Creature || targetCell.getAttachedPermanent().type == Permanent.Type.Town)
             {
                 if (getAttackType() == RangeType.Melee && extraCells.Count > 0)
                 {

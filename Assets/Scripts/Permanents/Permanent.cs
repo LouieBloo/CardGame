@@ -11,7 +11,8 @@ public class Permanent : NetworkBehaviour
     {
         Creature,
         Pickup,
-        Wall
+        Wall,
+        Town
     }
 
     public Type type = Type.Creature;
@@ -32,6 +33,14 @@ public class Permanent : NetworkBehaviour
             if (attackingPermanent.TryGet(out NetworkObject targetObject))
             {
                 GetComponent<Creature>().attacked(targetObject.GetComponent<Creature>().GetComponent<DamageDealer>(), retaliationCallback);
+            }
+        }
+        else if(type == Type.Town)
+        {
+            if (attackingPermanent.TryGet(out NetworkObject targetObject))
+            {
+                DamageCalculator.calculateDamage(targetObject.GetComponent<Creature>().GetComponent<DamageDealer>(), GetComponent<DamageTaker>());
+                retaliationCallback();
             }
         }
     }

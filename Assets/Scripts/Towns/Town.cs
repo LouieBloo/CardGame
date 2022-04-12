@@ -17,6 +17,8 @@ public class Town : PlayerOwnedNetworkObject
 
     private Action buildingBuiltCallback;
 
+    [SerializeField] private NetworkVariable<int> health = new NetworkVariable<int>();
+
     public enum TownBuildingUpgradeTrack
     {
         Base,
@@ -42,6 +44,11 @@ public class Town : PlayerOwnedNetworkObject
     // Start is called before the first frame update
     void Awake()
     {
+        if (IsServer)
+        {
+            health.Value = 100;
+        }
+
         //we sort these references and then assign upgradedVersion to each one so its easy to upgrade
         factionBuildingByUpgradeTrack = new Dictionary<string, List<TownBuildingReference>>();
         foreach(TownBuildingReference tb in factionBuildings)
@@ -87,9 +94,9 @@ public class Town : PlayerOwnedNetworkObject
         builtBuildings.Add(factionBuildingMap["TOWN_BASE"]);
     }
 
-    private void Start()
+    public void takeDamage(int damage)
     {
-        
+        this.health.Value -= damage;
     }
 
     public void subscribeToBuiltBuildingCallback(Action builtBuildingCallback)

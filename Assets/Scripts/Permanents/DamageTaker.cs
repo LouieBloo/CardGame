@@ -12,6 +12,8 @@ public class DamageTaker : NetworkBehaviour, TurnNotifiable
         Magical,
     }
 
+    public bool damagesHero = false;
+
     public ArmorType armorType = ArmorType.Physical;
 
     [SerializeField] private int baseHealth = 0;
@@ -64,32 +66,38 @@ public class DamageTaker : NetworkBehaviour, TurnNotifiable
     {
         if (IsServer)
         {
-            if(damage > 0)
+            if (!damagesHero)
             {
-                int healthAfterDamage = health.Value - damage;
-                if (healthAfterDamage > 0)
+                if (damage > 0)
                 {
-                    health.Value -= damage;
+                    int healthAfterDamage = health.Value - damage;
+                    if (healthAfterDamage > 0)
+                    {
+                        health.Value -= damage;
+                    }
+                    else
+                    {
+                        float totalHealth = health.Value + (baseHealth * (amount.Value - 1));
+                        float remainingHealth = totalHealth - damage;
+                        amount.Value = Mathf.CeilToInt(remainingHealth / baseHealth);
+                        health.Value = (int)(remainingHealth % baseHealth);
+                    }
                 }
                 else
                 {
-                    float totalHealth = health.Value + (baseHealth * (amount.Value - 1));
-                    float remainingHealth = totalHealth - damage;
-                    amount.Value = Mathf.CeilToInt(remainingHealth / baseHealth);
-                    health.Value = (int)(remainingHealth % baseHealth);
+                    //so the user doesnt see negative numbers
+                    damage = 0;
+                }
+                spawnDamageFloatingTextClientRpc(damage);
+                if (amount.Value <= 0)
+                {
+                    die();
                 }
             }
             else
             {
-                //so the user doesnt see negative numbers
-                damage = 0;
-            }
-            
-            spawnDamageFloatingTextClientRpc(damage);
-
-            if(amount.Value <= 0)
-            {
-                die();
+                NetworkManager.Singleton.ConnectedClients[OwnerClientId].PlayerObject.GetComponent<TownManager>().getTown().takeDamage(damage);
+                spawnDamageFloatingTextClientRpc(damage);
             }
         }
     }

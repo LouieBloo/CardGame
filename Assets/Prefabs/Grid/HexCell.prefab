@@ -98,9 +98,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectedIndicatorPrefab: {fileID: 0}
-  objectToSpawnOnStartup: {fileID: 0}
+  objectToSpawnOnStartupName: 
   objectSpawnRotation: {x: 0, y: 0, z: 0, w: 0}
   creaturePrefab: {fileID: 6689913824549537717, guid: 1af54562b895b044999bb2bee9428136,
+    type: 3}
+  townPermanentPrefab: {fileID: 3557096479138190236, guid: ec1924b427b066e45b8db1bb07bf34aa,
     type: 3}
   pickupPrefab: {fileID: 3506522435404078497, guid: 3501ed63ccaa6b64ea43793259c21004,
     type: 3}

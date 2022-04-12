@@ -170,6 +170,36 @@ public class Grid : NetworkBehaviour
         }
     }
 
+    public void createTownPermanentOnCell(HexCoordinates[] spawnCells, ulong ownerId, string townPermanentName)
+    {
+        //verify there is nothing else on these cells
+        bool okToSpawn = true;
+        foreach (HexCoordinates h in spawnCells)
+        {
+            if (!isCellOktoSpawn(h))
+            {
+                Debug.Log("Cant spawn town object, already a permanent");
+                okToSpawn = false;
+            }
+        }
+
+        if (okToSpawn)
+        {
+            //transform our hex coordinates into vector 3 for the permanent
+            Vector3[] creatureCellPositions = new Vector3[spawnCells.Length];
+            for (int x = 0; x < spawnCells.Length; x++)
+            {
+                creatureCellPositions[x] = getPositionFromHexCoordinates(spawnCells[x]);
+            }
+            NetworkObjectReference spawnedCreatureReference = cells[spawnCells[0]].spawnTownPermanent(Quaternion.identity, ownerId, townPermanentName, creatureCellPositions);
+            //tell all the other cells that will be occupied that they are occupied
+            for (int x = 1; x < spawnCells.Length; x++)
+            {
+                cells[spawnCells[x]].attachPermanent(spawnedCreatureReference);
+            }
+        }
+    }
+
     //we assume all security testing was done before this call
     public void permanentMovedToNewCell(NetworkObjectReference permanent, Vector3 endPosition, string finalOrientation, List<PermanentCell> extraSpaces)
     {

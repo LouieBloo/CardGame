@@ -4,6 +4,8 @@ using Unity.Netcode;
 using UnityEngine.Networking;
 using UnityEngine;
 using HexMapTools;
+using Unity.Collections;
+using System;
 
 public class Player : PlayerOwnedNetworkObject
 {
@@ -14,6 +16,7 @@ public class Player : PlayerOwnedNetworkObject
     private GameObject ui;
 
     public NetworkVariable<Color> playerColor = new NetworkVariable<Color>();
+    public NetworkVariable<FixedString64Bytes> facingOrientation = new NetworkVariable<FixedString64Bytes>();
 
     public GameObject playerDefaultsPrefab;
     private GameObject playerDefaultsGameObject;
@@ -27,6 +30,7 @@ public class Player : PlayerOwnedNetworkObject
 
     public PlayerInput playerInput;
 
+    private Action readyCallback;
     //only public for debugging
 
     public override void OnDestroy()
@@ -60,9 +64,9 @@ public class Player : PlayerOwnedNetworkObject
 
             townManager.setup("CASTLE");
 
-            //playerDefaultsGameObject = Instantiate(playerDefaultsPrefab, Vector3.zero, Quaternion.identity);
-            //playerDefaultsGameObject.GetComponent<PlayerDefaults>().setup(setColorServerRpc);
-            setColorServerRpc(OwnerClientId == 0 ? Color.green : Color.blue);
+            playerDefaultsGameObject = Instantiate(playerDefaultsPrefab, Vector3.zero, Quaternion.identity);
+            playerDefaultsGameObject.GetComponent<PlayerDefaults>().setup(setColorServerRpc);
+            //setColorServerRpc(OwnerClientId == 0 ? Color.green : Color.blue);
 
             GlobalVars.gv.player = this;
         }
@@ -76,6 +80,11 @@ public class Player : PlayerOwnedNetworkObject
     private void Start()
     {
         playerInput = GetComponent<PlayerInput>();
+    }
+
+    public void setReadyCallback(Action readyCallback)
+    {
+        this.readyCallback = readyCallback;
     }
 
     [ServerRpc]
@@ -92,6 +101,8 @@ public class Player : PlayerOwnedNetworkObject
         Debug.Log("Server got color: " + c);
         playerColor.Value = c;
         destroyDefaultsClientRpc();
+
+        readyCallback();
     }
 
     [ClientRpc]
