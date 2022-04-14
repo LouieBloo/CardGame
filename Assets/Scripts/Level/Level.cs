@@ -54,14 +54,25 @@ public class Level : NetworkBehaviour
     {
         if(!waitForAllPlayers || NetworkManager.Singleton.ConnectedClientsIds.Count >= playerStarts.Length)
         {
-            for(int x = 0; x < playerStarts.Length; x++)
+            for (int x = 0; x < playerStarts.Length; x++)
             {
-                foreach(GameObject g in playerStarts[x].baseCells)
+                foreach (GameObject g in playerStarts[x].baseCells)
                 {
-                    if(allPlayers.Count-1 >= x)
+                    if (allPlayers.Count - 1 >= x)
                     {
                         GlobalVars.gv.grid.createTownPermanentOnCell(new HexCoordinates[] { GlobalVars.gv.grid.getHexCoordinatesFromPosition(g.transform.position) }, allPlayers[x].OwnerClientId, "CastleTownPermanent");
                     }
+                }
+
+                if (allPlayers.Count - 1 >= x)
+                {
+                    NetworkObjectReference[] allPlayersReferences = new NetworkObjectReference[allPlayers.Count];
+                    for(int y = 0; y < allPlayers.Count; y++)
+                    {
+                        allPlayersReferences[y] = allPlayers[y].GetComponent<NetworkObject>();
+                    }
+
+                    allPlayers[x].spawnSetupUIClientRpc(allPlayersReferences);
                 }
             }
         }

@@ -7,7 +7,7 @@ using HexMapTools;
 using Unity.Collections;
 using System;
 
-public class Player : PlayerOwnedNetworkObject
+public class Player : PlayerOwnedNetworkObject, NetworkLoadable
 {
     private ObjectSelecting objectSelector;
     private Grid grid;
@@ -17,6 +17,7 @@ public class Player : PlayerOwnedNetworkObject
 
     public NetworkVariable<Color> playerColor = new NetworkVariable<Color>();
     public NetworkVariable<FixedString64Bytes> facingOrientation = new NetworkVariable<FixedString64Bytes>();
+    private NetworkVariable<FixedString64Bytes> name = new NetworkVariable<FixedString64Bytes>();
 
     public GameObject playerDefaultsPrefab;
     private GameObject playerDefaultsGameObject;
@@ -65,7 +66,7 @@ public class Player : PlayerOwnedNetworkObject
             townManager.setup("CASTLE");
 
             playerDefaultsGameObject = Instantiate(playerDefaultsPrefab, Vector3.zero, Quaternion.identity);
-            playerDefaultsGameObject.GetComponent<PlayerDefaults>().setup(setColorServerRpc);
+            playerDefaultsGameObject.GetComponent<PlayerDefaults>().setup(playerInfoGatheredServerRpc);
             //setColorServerRpc(OwnerClientId == 0 ? Color.green : Color.blue);
 
             GlobalVars.gv.player = this;
@@ -88,18 +89,19 @@ public class Player : PlayerOwnedNetworkObject
     }
 
     [ServerRpc]
-    void setColorServerRpc(Color c) {
+    void playerInfoGatheredServerRpc(PlayerDefaults.PlayerDefaultInfo info) {
         foreach(NetworkClient n in NetworkManager.Singleton.ConnectedClientsList)
         {
-            if(n.PlayerObject.GetComponent<Player>().playerColor.Value == c)
+            if(n.PlayerObject.GetComponent<Player>().playerColor.Value == info.color)
             {
                 sendPlayerErrorClientRpc("That color has already been taken!");
                 return;
             }
         }
 
-        Debug.Log("Server got color: " + c);
-        playerColor.Value = c;
+        playerColor.Value = info.color;
+        name.Value = info.name;
+
         destroyDefaultsClientRpc();
 
         readyCallback();
@@ -175,4 +177,43 @@ public class Player : PlayerOwnedNetworkObject
         
     }
 
+    public string getName()
+    {
+        return name.Value.ToString();
+    }
+
+    [ClientRpc]
+    public void spawnSetupUIClientRpc(NetworkObjectReference[] allPlayers)
+    {
+        if (IsOwner)
+        {
+            Debug.Log(allPlayers.Length);
+            List<Player> players = new List<Player>();
+            foreach(NetworkObjectReference r in allPlayers)
+            {
+                if (r.TryGet(out NetworkObject targetObject))
+                {
+                    players.Add(targetObject.GetComponent<Player>());
+                }
+            }
+            ui.GetComponent<PlayerUI>().createPlayerFaces(players);
+        }
+    }
+
+    public bool isLoaded()
+    {
+        try
+        {
+            if (name.Value.ToString() != "")
+            {
+                return true;
+            }
+        }
+        catch(Exception e)
+        {
+        }
+        
+
+        return false;
+    }
 }

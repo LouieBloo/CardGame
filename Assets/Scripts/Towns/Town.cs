@@ -17,7 +17,7 @@ public class Town : PlayerOwnedNetworkObject
 
     private Action buildingBuiltCallback;
 
-    [SerializeField] private NetworkVariable<int> health = new NetworkVariable<int>();
+    [SerializeField] public NetworkVariable<int> health = new NetworkVariable<int>();
 
     public enum TownBuildingUpgradeTrack
     {
