@@ -22,8 +22,6 @@ public class Player : PlayerOwnedNetworkObject, NetworkLoadable
     public GameObject playerDefaultsPrefab;
     private GameObject playerDefaultsGameObject;
 
-    public GameObject playerTurnManagerPrefab;
-
     public PlayerStats playerStats;
 
     public GameObject townPrefab;
@@ -47,14 +45,6 @@ public class Player : PlayerOwnedNetworkObject, NetworkLoadable
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        
-
-        if (IsServer && IsOwner)
-        {
-            Debug.Log("Spawning object");
-            GameObject turnManager = Instantiate(playerTurnManagerPrefab, Vector3.zero, Quaternion.identity);
-            turnManager.GetComponent<NetworkObject>().Spawn();
-        }
 
         if (IsOwner)
         {
@@ -198,6 +188,15 @@ public class Player : PlayerOwnedNetworkObject, NetworkLoadable
             }
             ui.GetComponent<PlayerUI>().createPlayerFaces(players);
         }
+    }
+
+    public PlayerUI getUI()
+    {
+        if (ui)
+        {
+            return ui.GetComponent<PlayerUI>();
+        }
+        return null;
     }
 
     public bool isLoaded()

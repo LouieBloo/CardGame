@@ -9,7 +9,6 @@ public class PlayerInput : NetworkBehaviour
 
     private CameraTracker cameraTracker;
     private SpellBook spellBook;
-    private PlayerTurnManager turnManager;
 
     private Coroutine pollingRoutine;
 
@@ -21,8 +20,6 @@ public class PlayerInput : NetworkBehaviour
         {
             startRespondingToInput();
             cameraTracker = Camera.main.GetComponent<CameraTracker>();
-
-            turnManager = GlobalVars.gv.turnManager;
         }
     }
 
@@ -117,9 +114,9 @@ public class PlayerInput : NetworkBehaviour
                 cameraTracker.zoom(Input.mouseScrollDelta.y);
             }
 
-            if (Input.GetKeyDown(KeyCode.Space) && turnManager.getActiveObject() != null)
+            if (Input.GetKeyDown(KeyCode.Space) && GlobalVars.gv.turnManager.getActiveObject() != null)
             {
-                cameraTracker.trackTarget(turnManager.getActiveObject().transform,true);
+                cameraTracker.trackTarget(GlobalVars.gv.turnManager.getActiveObject().transform,true);
             }
 
 
@@ -131,10 +128,19 @@ public class PlayerInput : NetworkBehaviour
 
             if (Input.GetKeyDown(KeyCode.E))
             {
-                NetworkObject activeCreature = turnManager.getActiveObject();
+                NetworkObject activeCreature = GlobalVars.gv.turnManager.getActiveObject();
                 if(activeCreature != null)
                 {
                     activeCreature.GetComponent<DamageTaker>().defendAction();
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                //this isnt safe but works for now
+                if(GlobalVars.gv.turnManager.getActivePlayer().OwnerClientId == OwnerClientId)
+                {
+                    GlobalVars.gv.turnManager.playerPassedRoundPriorityServerRpc();
                 }
             }
 

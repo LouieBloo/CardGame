@@ -83,7 +83,7 @@ public class Attacker : PlayerOwnedNetworkObject, TurnNotifiable
     [ServerRpc]
     public void commandIssuedToCellServerRpc(Vector3 target, Vector3[] extraHoveringCells, HexDirection orientation, HexDirection mouseOrientation)
     {
-        if (!GlobalVars.gv.turnManager.isPlayerValidToMakeMove(OwnerClientId))
+        if (!GlobalVars.gv.turnManager.isPlayerValidToMakeCreatureMove(OwnerClientId))
         {
             sendPlayerErrorClientRpc("It is not your turn");
             return;

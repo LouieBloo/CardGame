@@ -15,6 +15,7 @@ public class PlayerUI : MonoBehaviour
     public Transform playerFaceSpawnTransform;
 
     private Player myPlayer;
+    private List<PlayerFaceUI> playerFaces = new List<PlayerFaceUI>();
 
     // Start is called before the first frame update
     void Start()
@@ -51,7 +52,23 @@ public class PlayerUI : MonoBehaviour
         {
             GameObject g = Instantiate(playerFaceUIPrefab, playerFaceSpawnTransform);
             g.GetComponent<PlayerFaceUI>().setup(p);
+            playerFaces.Add(g.GetComponent<PlayerFaceUI>());
         }
         
+    }
+
+    public void selectActivePlayerFace(ulong playerId)
+    {
+        foreach(PlayerFaceUI face in playerFaces)
+        {
+            if(face.player.OwnerClientId == playerId)
+            {
+                face.setActiveTurn(true);
+            }
+            else
+            {
+                face.setActiveTurn(false);
+            }
+        }
     }
 }

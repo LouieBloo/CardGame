@@ -7,9 +7,16 @@ using UnityEngine;
 public class Level : NetworkBehaviour
 {
     public PlayerStart[] playerStarts;
-    public List<Player> allPlayers;
+    private List<Player> allPlayers = new List<Player>();
+
+    public GameObject playerTurnManagerPrefab;
 
     public bool waitForAllPlayers = false;
+
+    public GameObject waitInputOption;
+
+    int readiedPlayerCount = 0;
+
     [System.Serializable]
     public class PlayerStart
     {
@@ -30,7 +37,6 @@ public class Level : NetworkBehaviour
     {
         if (IsServer)
         {
-
             int spawnIndex = NetworkManager.Singleton.ConnectedClientsIds.Count - 1;
             
             NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject.transform.position = playerStarts[spawnIndex].spawnLocation.transform.position;
@@ -52,7 +58,8 @@ public class Level : NetworkBehaviour
 
     void playerReady()
     {
-        if(!waitForAllPlayers || NetworkManager.Singleton.ConnectedClientsIds.Count >= playerStarts.Length)
+        readiedPlayerCount++;
+        if (!waitForAllPlayers || readiedPlayerCount >= NetworkManager.Singleton.ConnectedClientsIds.Count)
         {
             for (int x = 0; x < playerStarts.Length; x++)
             {
@@ -75,6 +82,18 @@ public class Level : NetworkBehaviour
                     allPlayers[x].spawnSetupUIClientRpc(allPlayersReferences);
                 }
             }
+
+            GameObject turnManager = Instantiate(playerTurnManagerPrefab, Vector3.zero, Quaternion.identity);
+            turnManager.GetComponent<NetworkObject>().Spawn();
+            turnManager.GetComponent<PlayerTurnManager>().start(allPlayers);
+
+            Destroy(waitInputOption);
         }
+    }
+
+
+    public void waitForTurnCheckbox(bool value)
+    {
+        this.waitForAllPlayers = value;
     }
 }

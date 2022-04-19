@@ -10,13 +10,24 @@ public class PlayerTurnManager : NetworkBehaviour
 
     public GameObject turnIndicatorPrefab;
 
+    private NetworkList<NetworkObjectReference> playersInTurnOrder;
+    private NetworkVariable<int> currentRound = new NetworkVariable<int>(0);
+
     public NetworkList<NetworkObjectReference> objectsInTurnOrder;
     private NetworkVariable<int> currentDay = new NetworkVariable<int>(0);
     private List<NetworkObjectReference> allObjectsTracking = new List<NetworkObjectReference>();
     private List<GameObject> activeTurnIndicators;
 
+    private List<Player> allPlayers;
+
     public Transform spawnTurnIndicatorTransform;
     private NetworkObject activePermanentInTurnOrder;
+
+    private enum Round
+    {
+        BuildCastCardsRecruit,
+        CreatureMovement
+    }
 
     private struct SortableObject
     {
@@ -36,22 +47,135 @@ public class PlayerTurnManager : NetworkBehaviour
         if (IsServer)
         {
             objectsInTurnOrder = new NetworkList<NetworkObjectReference>();
+            playersInTurnOrder = new NetworkList<NetworkObjectReference>();
         }
     }
 
-    public override void OnNetworkSpawn()
+    public void start(List<Player> allPlayers)
     {
-        
+        this.allPlayers = allPlayers;
+        startNewDay();
+    }
 
+    private void Update()
+    {
+        if (IsServer)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha9))
+            {
+                playerPassedRoundPriorityServerRpc();
+            }
+        }
+    }
+
+    ///////////////////////////////////////
+    /////////// ROUNDS //////////////////////////
+    //////////////////////////////////////////
+    private void startNewDay()
+    {
+        currentRound.Value = 0;
+        playersInTurnOrder.Clear();
+        calculatePlayerTurnOrder();
+
+        startBuildingRound();
+
+        updatePlayerFaceUIClientRpc(getActivePlayer().OwnerClientId);
+    }
+
+    void calculatePlayerTurnOrder()
+    {
+        foreach (Player p in allPlayers)
+        {
+            playersInTurnOrder.Add(p.GetComponent<NetworkObject>());
+        }
+    }
+
+    private void startNewRound()
+    {
+        currentRound.Value += 1;
+        if(currentRound.Value > 2)
+        {
+            startNewDay();
+        }
+        //creature movement
+        else if(currentRound.Value == 1)
+        {
+            calculatePlayerTurnOrder();
+            alertCreaturesOfNewTurn();
+            startCreatureMovementRound();
+        }
+        //final build/recruit/cast
+        else if (currentRound.Value == 2)
+        {
+            clearCreatureTurnIndicatorClientRpc();
+            calculatePlayerTurnOrder();
+            startBuildingRound();
+        }
+    }
+
+    [ServerRpc (RequireOwnership =false)]
+    public void playerPassedRoundPriorityServerRpc()
+    {
+        playersInTurnOrder.RemoveAt(0);
+        if(playersInTurnOrder.Count > 0)
+        {
+            //creature movement
+            if (currentRound.Value == 1)
+            {
+                startCreatureMovementRound();
+            }
+            else if (currentRound.Value == 0 || currentRound.Value == 2 )
+            {
+                startBuildingRound();
+            }
+        }
+        else
+        {
+            startNewRound();
+        }
         
     }
 
-    // Start is called before the first frame update
-    void Start()
+    void startCreatureMovementRound()
     {
-        
+        Debug.Log("Starting Creature Round...");
+        //recalculateTurnOrder(networkListToList(objectsInTurnOrder));
+        recalculateTurnOrder(allObjectsTracking);
+        updatePlayerFaceUIClientRpc(getActivePlayer().OwnerClientId);
     }
 
+    void startBuildingRound()
+    {
+        Debug.Log("Starting Building Round...");
+        updatePlayerFaceUIClientRpc(getActivePlayer().OwnerClientId);
+    }
+
+    public NetworkObject getActivePlayer()
+    {
+        if (playersInTurnOrder.Count > 0)
+        {
+            if (playersInTurnOrder[0].TryGet(out NetworkObject targetObject))
+            {
+                return targetObject;
+            }
+        }
+
+        return null;
+    }
+
+    [ClientRpc]
+    private void updatePlayerFaceUIClientRpc(ulong activePlayerId)
+    {
+        GlobalVars.gv.player.getUI().selectActivePlayerFace(activePlayerId);
+    }
+    ///////////////////////////////////////
+    /////////// END ROUNDS /////////////
+    //////////////////////////////////////////
+
+    /// <summary>
+    /// Returns the active creature in the move phase
+    /// </summary>
+    /// <returns></returns>
     public NetworkObject getActiveObject()
     {
         if (objectsInTurnOrder != null && objectsInTurnOrder.Count > 0 && objectsInTurnOrder[0].TryGet(out NetworkObject targetObject))
@@ -62,11 +186,15 @@ public class PlayerTurnManager : NetworkBehaviour
         return null;
     }
 
+    /// <summary>
+    /// When a player does an action on a creature such as move, defend, etc
+    /// </summary>
     [ServerRpc]
     public void playerMadeMoveServerRpc()
     {
         objectsInTurnOrder.RemoveAt(0);
-        if(objectsInTurnOrder.Count > 0)
+
+        if (objectsInTurnOrder.Count > 0)
         {
             //tell first in line they have priority
             getActiveObject().GetComponent<Creature>().takePriority();
@@ -75,7 +203,7 @@ public class PlayerTurnManager : NetworkBehaviour
         }
         else
         {
-            startNewTurn();
+            playerPassedRoundPriorityServerRpc();
         }
     }
 
@@ -92,7 +220,7 @@ public class PlayerTurnManager : NetworkBehaviour
         return 99999;
     }
 
-    public bool isPlayerValidToMakeMove(ulong playerId)
+    public bool isPlayerValidToMakeCreatureMove(ulong playerId)
     {
         if (!forcingTurnOrder) { return true; }
 
@@ -120,7 +248,7 @@ public class PlayerTurnManager : NetworkBehaviour
     {
         allObjectsTracking.Add(objectNetworkReference);
         objectsInTurnOrder.Add(objectNetworkReference);
-        recalculateTurnOrder(networkListToList(objectsInTurnOrder));
+        //recalculateTurnOrder(networkListToList(objectsInTurnOrder));
     }
 
     public void removeObjectFromTurnOrder(NetworkObjectReference objectNetworkReference)
@@ -134,7 +262,10 @@ public class PlayerTurnManager : NetworkBehaviour
         recalculateTurnOrder(networkListToList(objectsInTurnOrder));
     }
 
-    public void startNewTurn()
+    /// <summary>
+    /// Calls the turn started function on all creatures
+    /// </summary>
+    private void alertCreaturesOfNewTurn()
     {
         foreach (NetworkObjectReference n in allObjectsTracking)
         {
@@ -143,7 +274,7 @@ public class PlayerTurnManager : NetworkBehaviour
                 targetObject.GetComponent<Creature>().turnStarted();
             }
         }
-        recalculateTurnOrder(allObjectsTracking);
+        //recalculateTurnOrder(allObjectsTracking);
     }
 
     private List<NetworkObjectReference> networkListToList(NetworkList<NetworkObjectReference> sourceList)
@@ -163,12 +294,17 @@ public class PlayerTurnManager : NetworkBehaviour
         //Debug.Log("== Recalculating turn order ==");
         // Debug.Log("All Objects in turn: " + allObjectsTracking.Count);
 
+        ulong activePlayerId = getActivePlayer().OwnerClientId;
+
         //get the creature stats and put them in an object easier to sort
         List<SortableObject> sortedObjects = new List<SortableObject>();
         foreach(NetworkObjectReference objectRef in objectsInTurn)
         {
             if (objectRef.TryGet(out NetworkObject targetObject))
             {
+                //dont add creatures whos turn it is now
+                if(targetObject.OwnerClientId != activePlayerId) { continue; }
+
                 SortableObject newCreatureObject = new SortableObject(targetObject.GetComponent<Creature>().getCurrentStats(), targetObject);
 
                 //sorting logic
@@ -254,6 +390,20 @@ public class PlayerTurnManager : NetworkBehaviour
             Destroy(activeTurnIndicators[0]);
             activeTurnIndicators.RemoveAt(0);
             highlightActivePermanentInTurnOrderClientRpc(newActivePermanent);
+        }
+    }
+
+    [ClientRpc]
+    void clearCreatureTurnIndicatorClientRpc()
+    {
+        if (activeTurnIndicators != null)
+        {
+            for(int x = 0; x < activeTurnIndicators.Count; x++)
+            {
+                Destroy(activeTurnIndicators[x]);
+            }
+
+            activeTurnIndicators.Clear();
         }
     }
 
