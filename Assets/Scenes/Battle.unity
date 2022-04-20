@@ -1450,7 +1450,7 @@ MonoBehaviour:
     gateCells: []
   playerTurnManagerPrefab: {fileID: 5237140264943997716, guid: e34a8eab57acc0b43ae05623e833b070,
     type: 3}
-  waitForAllPlayers: 0
+  waitForAllPlayers: 1
   waitInputOption: {fileID: 371500868}
 --- !u!1001 &93672760
 PrefabInstance:
@@ -4883,7 +4883,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  m_IsOn: 0
+  m_IsOn: 1
 --- !u!224 &371500870
 RectTransform:
   m_ObjectHideFlags: 0

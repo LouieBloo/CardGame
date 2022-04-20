@@ -30,8 +30,7 @@ public class PlayerStats : NetworkBehaviour
         }
     }
 
-    [ServerRpc]
-    public void modifyManaServerRpc(int amount)
+    public void modifyMana(int amount)
     {
         mana.Value += amount;
         if (mana.Value < 0)

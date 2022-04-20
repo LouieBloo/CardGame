@@ -161,14 +161,82 @@ MonoBehaviour:
     type: 3}
   playerColor:
     m_InternalValue: {r: 0, g: 0, b: 0, a: 0}
+  facingOrientation:
+    m_InternalValue:
+      utf8LengthInBytes: 0
+      bytes:
+        offset0000:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        offset0016:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        offset0032:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        byte0048: 0
+        byte0049: 0
+        byte0050: 0
+        byte0051: 0
+        byte0052: 0
+        byte0053: 0
+        byte0054: 0
+        byte0055: 0
+        byte0056: 0
+        byte0057: 0
+        byte0058: 0
+        byte0059: 0
+        byte0060: 0
+        byte0061: 0
   playerDefaultsPrefab: {fileID: 7181993999541545653, guid: c28a8c017aad26742a912b8a99f0e084,
-    type: 3}
-  playerTurnManagerPrefab: {fileID: 5237140264943997716, guid: e34a8eab57acc0b43ae05623e833b070,
     type: 3}
   playerStats: {fileID: -5903766760223023557}
   townPrefab: {fileID: 5007011440887985745, guid: e4f145e61627af64eb5fbf7e2260ffaa,
     type: 3}
   townManager: {fileID: -4218248259443283617}
+  playerInput: {fileID: 0}
 --- !u!114 &-4698611565757124795
 MonoBehaviour:
   m_ObjectHideFlags: 0

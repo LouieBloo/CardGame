@@ -74,12 +74,15 @@ public class PlayerTurnManager : NetworkBehaviour
     private void startNewDay()
     {
         currentRound.Value = 0;
+        currentDay.Value++;
+
         playersInTurnOrder.Clear();
         calculatePlayerTurnOrder();
 
         startBuildingRound();
 
         updatePlayerFaceUIClientRpc(getActivePlayer().OwnerClientId);
+        updatePlayerRoundPanelClientRpc(currentRound.Value, currentDay.Value);
     }
 
     void calculatePlayerTurnOrder()
@@ -111,6 +114,8 @@ public class PlayerTurnManager : NetworkBehaviour
             calculatePlayerTurnOrder();
             startBuildingRound();
         }
+
+        
     }
 
     [ServerRpc (RequireOwnership =false)]
@@ -142,12 +147,14 @@ public class PlayerTurnManager : NetworkBehaviour
         //recalculateTurnOrder(networkListToList(objectsInTurnOrder));
         recalculateTurnOrder(allObjectsTracking);
         updatePlayerFaceUIClientRpc(getActivePlayer().OwnerClientId);
+        updatePlayerRoundPanelClientRpc(currentRound.Value, currentDay.Value);
     }
 
     void startBuildingRound()
     {
         Debug.Log("Starting Building Round...");
         updatePlayerFaceUIClientRpc(getActivePlayer().OwnerClientId);
+        updatePlayerRoundPanelClientRpc(currentRound.Value, currentDay.Value);
     }
 
     public NetworkObject getActivePlayer()
@@ -167,6 +174,12 @@ public class PlayerTurnManager : NetworkBehaviour
     private void updatePlayerFaceUIClientRpc(ulong activePlayerId)
     {
         GlobalVars.gv.player.getUI().selectActivePlayerFace(activePlayerId);
+    }
+
+    [ClientRpc]
+    private void updatePlayerRoundPanelClientRpc(int roundNumber,int dayNumber)
+    {
+        GlobalVars.gv.player.getUI().changeRoundUIUpdate(roundNumber,dayNumber);
     }
     ///////////////////////////////////////
     /////////// END ROUNDS /////////////

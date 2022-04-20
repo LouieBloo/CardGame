@@ -96,7 +96,7 @@ public class SpellBook : NetworkBehaviour
             spellGameobject.GetComponent<SpellGameObject>().setup(grid.getPermanentCellAtPosition(target), null);
 
             //subtract mana from mana total
-            playerStats.modifyManaServerRpc(-allGameSpells[spellId].mana);
+            playerStats.modifyMana(-allGameSpells[spellId].mana);
 
             wipeObjectSelectorClientRpc();
         }
