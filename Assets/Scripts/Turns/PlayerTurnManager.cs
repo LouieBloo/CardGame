@@ -7,6 +7,8 @@ using UnityEngine;
 public class PlayerTurnManager : NetworkBehaviour
 {
     public bool forcingTurnOrder = true;
+    public int buildTurnOrderTimeLimit = 4;
+    public int creatureMoveTimeLimit = 5;
 
     public GameObject turnIndicatorPrefab;
 
@@ -22,6 +24,8 @@ public class PlayerTurnManager : NetworkBehaviour
 
     public Transform spawnTurnIndicatorTransform;
     private NetworkObject activePermanentInTurnOrder;
+
+    private NetworkedTimer timer;
 
     private enum Round
     {
@@ -44,11 +48,14 @@ public class PlayerTurnManager : NetworkBehaviour
     private void Awake()
     {
         GlobalVars.gv.turnManager = this;
+        timer = GetComponent<NetworkedTimer>();
         if (IsServer)
         {
             objectsInTurnOrder = new NetworkList<NetworkObjectReference>();
             playersInTurnOrder = new NetworkList<NetworkObjectReference>();
         }
+
+        timer.subscribeToChanges(GlobalVars.gv.player.getUI().timerText);
     }
 
     public void start(List<Player> allPlayers)
@@ -63,7 +70,6 @@ public class PlayerTurnManager : NetworkBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Alpha9))
             {
-                playerPassedRoundPriorityServerRpc();
             }
         }
     }
@@ -118,8 +124,7 @@ public class PlayerTurnManager : NetworkBehaviour
         
     }
 
-    [ServerRpc (RequireOwnership =false)]
-    public void playerPassedRoundPriorityServerRpc()
+    public void playerPassedRoundPriority()
     {
         playersInTurnOrder.RemoveAt(0);
         if(playersInTurnOrder.Count > 0)
@@ -138,7 +143,6 @@ public class PlayerTurnManager : NetworkBehaviour
         {
             startNewRound();
         }
-        
     }
 
     void startCreatureMovementRound()
@@ -148,6 +152,7 @@ public class PlayerTurnManager : NetworkBehaviour
         recalculateTurnOrder(allObjectsTracking);
         updatePlayerFaceUIClientRpc(getActivePlayer().OwnerClientId);
         updatePlayerRoundPanelClientRpc(currentRound.Value, currentDay.Value);
+        resetTimer(creatureMoveTimeLimit);
     }
 
     void startBuildingRound()
@@ -155,6 +160,7 @@ public class PlayerTurnManager : NetworkBehaviour
         Debug.Log("Starting Building Round...");
         updatePlayerFaceUIClientRpc(getActivePlayer().OwnerClientId);
         updatePlayerRoundPanelClientRpc(currentRound.Value, currentDay.Value);
+        resetTimer(buildTurnOrderTimeLimit);
     }
 
     public NetworkObject getActivePlayer()
@@ -168,6 +174,38 @@ public class PlayerTurnManager : NetworkBehaviour
         }
 
         return null;
+    }
+
+    void resetTimer(float time)
+    {
+        if(time > 0f)
+        {
+            timer.start(time,timerPopped);
+        }
+        else
+        {
+            timer.start(time, null);
+        }
+        
+        startTimerClientRpc(time);
+    }
+
+
+    void timerPopped()
+    {
+        if (IsServer)
+        {
+            playerPassedRoundPriority();
+        }
+    }
+
+    [ClientRpc]
+    private void startTimerClientRpc(float time)
+    {
+        if (!IsServer)
+        {
+            timer.start(time,null);
+        }
     }
 
     [ClientRpc]
@@ -202,9 +240,10 @@ public class PlayerTurnManager : NetworkBehaviour
     /// <summary>
     /// When a player does an action on a creature such as move, defend, etc
     /// </summary>
-    [ServerRpc]
-    public void playerMadeMoveServerRpc()
+    public void playerMadeCreatureMove(ulong creatureNetworkId)
     {
+        if(currentRound.Value != 1 || getActiveObject().NetworkObjectId != creatureNetworkId) { return; }
+
         objectsInTurnOrder.RemoveAt(0);
 
         if (objectsInTurnOrder.Count > 0)
@@ -216,7 +255,7 @@ public class PlayerTurnManager : NetworkBehaviour
         }
         else
         {
-            playerPassedRoundPriorityServerRpc();
+            playerPassedRoundPriority();
         }
     }
 

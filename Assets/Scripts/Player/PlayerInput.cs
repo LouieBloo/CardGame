@@ -137,11 +137,7 @@ public class PlayerInput : NetworkBehaviour
 
             if (Input.GetKeyDown(KeyCode.Q))
             {
-                //this isnt safe but works for now
-                if(GlobalVars.gv.turnManager.getActivePlayer().OwnerClientId == OwnerClientId)
-                {
-                    GlobalVars.gv.turnManager.playerPassedRoundPriorityServerRpc();
-                }
+                GlobalVars.gv.player.passPriorityServerRpc();
             }
 
             yield return null;

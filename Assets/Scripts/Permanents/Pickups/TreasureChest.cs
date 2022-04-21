@@ -19,7 +19,7 @@ public class TreasureChest : PickupItem
     {
         //NetworkManager.ConnectedClients[clientId].PlayerObject.GetComponent<PlayerStats>().modifyGoldServerRpc(gold);
         NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.GetComponent<Player>().playerStats.modifyGold(gold);
-        GlobalVars.gv.turnManager.playerMadeMoveServerRpc();
+        //GlobalVars.gv.turnManager.playerMadeCreatureMove(creatureNetworkId);
         spawnGoldTextClientRpc(gold);
         kill();
     }

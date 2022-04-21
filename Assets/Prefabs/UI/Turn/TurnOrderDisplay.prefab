@@ -435,6 +435,7 @@ GameObject:
   - component: {fileID: 5237140264943997723}
   - component: {fileID: 28433928}
   - component: {fileID: 6039618868897258371}
+  - component: {fileID: 6778140502827319668}
   m_Layer: 5
   m_Name: TurnOrderDisplay
   m_TagString: TurnManager
@@ -552,9 +553,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   forcingTurnOrder: 1
+  buildTurnOrderTimeLimit: 0
+  creatureMoveTimeLimit: 0
   turnIndicatorPrefab: {fileID: 7814674336095816870, guid: 7985967ba3411884eabfe06aa7a47eda,
     type: 3}
   spawnTurnIndicatorTransform: {fileID: 3360512315436120027}
+--- !u!114 &6778140502827319668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5237140264943997716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da127e0cc6446c043b40af10c96c0f78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5420312471340341719
 GameObject:
   m_ObjectHideFlags: 0

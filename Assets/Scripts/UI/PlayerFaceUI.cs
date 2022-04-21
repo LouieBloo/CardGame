@@ -11,6 +11,7 @@ public class PlayerFaceUI : MonoBehaviour
     public TextMeshProUGUI nameText;
     public Image backgroundImage;
     public Image activeTurnImage;
+    public Image imageOutlineImage;
 
     public Player player;
 
@@ -23,6 +24,7 @@ public class PlayerFaceUI : MonoBehaviour
     {
         this.player = player;
         player.townManager.getTown().health.OnValueChanged += townHealthChanged;
+        
 
         StartCoroutine(waitUntilPlayerLoads());
     }
@@ -36,7 +38,8 @@ public class PlayerFaceUI : MonoBehaviour
 
         townHealthChanged(0, player.townManager.getTown().health.Value);
         nameText.text = player.getName();
-        backgroundImage.color = new Color(player.playerColor.Value.r, player.playerColor.Value.g, player.playerColor.Value.b, 200);
+        //imageOutlineImage.color = new Color(player.playerColor.Value.r, player.playerColor.Value.g, player.playerColor.Value.b, 200);
+        imageOutlineImage.color = new Color(player.playerColor.Value.r, player.playerColor.Value.g, player.playerColor.Value.b, player.playerColor.Value.a);
     }
 
     private void townHealthChanged(int previousValue, int newValue)

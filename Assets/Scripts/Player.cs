@@ -177,7 +177,6 @@ public class Player : PlayerOwnedNetworkObject, NetworkLoadable
     {
         if (IsOwner)
         {
-            Debug.Log(allPlayers.Length);
             List<Player> players = new List<Player>();
             foreach(NetworkObjectReference r in allPlayers)
             {
@@ -189,6 +188,26 @@ public class Player : PlayerOwnedNetworkObject, NetworkLoadable
             ui.GetComponent<PlayerUI>().createPlayerFaces(players);
         }
     }
+
+    [ServerRpc]
+    public void passPriorityServerRpc()
+    {
+        //this isnt safe but works for now
+        if (GlobalVars.gv.turnManager.getActivePlayer().OwnerClientId == OwnerClientId)
+        {
+            GlobalVars.gv.turnManager.playerPassedRoundPriority();
+        }
+    }
+
+    /*[ServerRpc]
+    public void passCreatureMovePriorityServerRpc()
+    {
+        //this isnt safe but works for now
+        if (GlobalVars.gv.turnManager.isPlayerValidToMakeCreatureMove(OwnerClientId))
+        {
+            GlobalVars.gv.turnManager.playerMadeCreatureMove();
+        }
+    }*/
 
     public PlayerUI getUI()
     {

@@ -168,12 +168,13 @@ public class Attacker : PlayerOwnedNetworkObject, TurnNotifiable
 
     void creatureFinishedMoving(PermanentCell target)
     {
-        GlobalVars.gv.turnManager.playerMadeMoveServerRpc();
+        GlobalVars.gv.turnManager.playerMadeCreatureMove(NetworkObjectId);
     }
 
     void creatureFinishedMovingToPickup(PermanentCell target)
     {
         tempTargetPermanent.GetComponent<Pickup>().playerPickedUpServerRpc(OwnerClientId);
+        GlobalVars.gv.turnManager.playerMadeCreatureMove(NetworkObjectId);
     }
 
     public void targetReadyForAttack(PermanentCell target)
@@ -345,7 +346,7 @@ public class Attacker : PlayerOwnedNetworkObject, TurnNotifiable
 
     void targetRetaliated()
     {
-        GlobalVars.gv.turnManager.playerMadeMoveServerRpc();//make sure we do this first or else we could double remove from the turn order
+        GlobalVars.gv.turnManager.playerMadeCreatureMove(NetworkObjectId);//make sure we do this first or else we could double remove from the turn order
     }
 
     public RangeType getAttackType()

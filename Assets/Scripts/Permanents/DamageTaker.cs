@@ -127,7 +127,7 @@ public class DamageTaker : NetworkBehaviour, TurnNotifiable
             defendActionActiveModification = newDefendObject.GetComponent<CreatureModification>();
             //GetComponent<Modifiable>().applyModification(newDefendObject.GetComponent<NetworkObject>());
 
-            GlobalVars.gv.turnManager.playerMadeMoveServerRpc();
+            GlobalVars.gv.turnManager.playerMadeCreatureMove(NetworkObjectId);
         }
         else
         {
