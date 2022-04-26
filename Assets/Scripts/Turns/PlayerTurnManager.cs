@@ -163,7 +163,7 @@ public class PlayerTurnManager : NetworkBehaviour
         resetTimer(buildTurnOrderTimeLimit);
     }
 
-    public NetworkObject getActivePlayer()
+    NetworkObject getActivePlayer()
     {
         if (playersInTurnOrder.Count > 0)
         {
@@ -174,6 +174,14 @@ public class PlayerTurnManager : NetworkBehaviour
         }
 
         return null;
+    }
+
+    public bool isPlayerAbleToBuildAndCast(ulong playerId)
+    {
+        if (!IsServer) { return false; }
+
+        if(getActivePlayer().OwnerClientId == playerId) { return true; }
+        return false;
     }
 
     void resetTimer(float time)
@@ -276,7 +284,7 @@ public class PlayerTurnManager : NetworkBehaviour
     {
         if (!forcingTurnOrder) { return true; }
 
-        if(getActivePlayerId() != playerId)
+        if(getActivePlayerId() != playerId || currentRound.Value != 1)
         {
             return false;
         }
@@ -288,7 +296,7 @@ public class PlayerTurnManager : NetworkBehaviour
     {
         if (!forcingTurnOrder) { return true; }
 
-        if (objectsInTurnOrder.Count > 0 && objectsInTurnOrder[0].NetworkObjectId == networkObject.NetworkObjectId)
+        if (currentRound.Value == 1 && objectsInTurnOrder.Count > 0 && objectsInTurnOrder[0].NetworkObjectId == networkObject.NetworkObjectId)
         {
             return true;
         }

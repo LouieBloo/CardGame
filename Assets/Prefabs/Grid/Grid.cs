@@ -19,8 +19,15 @@ public class Grid : NetworkBehaviour
 
     private List<HexCoordinates> whiteListPathHexes;
 
+    private void Awake()
+    {
+        
+    }
+
     private void Start()
     {
+        //GlobalVars.gv.grid = this;
+
         HexGrid hexGrid = GetComponent<HexGrid>();
 
         hexCalculator = hexGrid.HexCalculator;

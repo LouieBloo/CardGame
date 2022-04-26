@@ -7,7 +7,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SpellBook : NetworkBehaviour
+public class SpellBook : PlayerOwnedNetworkObject
 {
     public PlayerStats playerStats;
     public SpellBookEntry[] Spells;
@@ -20,7 +20,7 @@ public class SpellBook : NetworkBehaviour
     private ObjectSelecting objectSelector;
 
     private string currentlyCastingSpellId;
-    private Grid grid;
+    //private Grid grid;
 
     [System.Serializable]
     public class SpellBookEntry
@@ -54,7 +54,7 @@ public class SpellBook : NetworkBehaviour
         }
 
         objectSelector = GameObject.FindGameObjectsWithTag("Game")[0].GetComponent<ObjectSelecting>();
-        grid = GameObject.FindGameObjectsWithTag("Grid")[0].GetComponent<Grid>();
+        //grid = GameObject.FindGameObjectsWithTag("Grid")[0].GetComponent<Grid>();
     }
 
     private void spellActivated(SpellBookEntry spell)
@@ -80,6 +80,8 @@ public class SpellBook : NetworkBehaviour
     [ServerRpc]
     public void castSpellServerRpc(string spellId,Vector3 target)
     {
+        if (!GlobalVars.gv.turnManager.isPlayerAbleToBuildAndCast(OwnerClientId)) { sendPlayerErrorClientRpc("Not your turn!"); return; }
+
         if (spellsInSpellbook.Contains(spellId) && playerStats.mana.Value >= allGameSpells[spellId].mana)
         {
             GameObject spellGameobject = Instantiate(allGameSpells[spellId].spellPrefab, target, Quaternion.identity);
@@ -93,7 +95,7 @@ public class SpellBook : NetworkBehaviour
             }
             
             spellGameobject.transform.SetParent(transform);
-            spellGameobject.GetComponent<SpellGameObject>().setup(grid.getPermanentCellAtPosition(target), null);
+            spellGameobject.GetComponent<SpellGameObject>().setup(GlobalVars.gv.grid.getPermanentCellAtPosition(target), null);
 
             //subtract mana from mana total
             playerStats.modifyMana(-allGameSpells[spellId].mana);
@@ -102,7 +104,7 @@ public class SpellBook : NetworkBehaviour
         }
         else
         {
-            GlobalVars.gv.gameUI.alertMessage("Not enough mana!");
+            sendPlayerErrorClientRpc("Not enough mana!");
         }
     }
 
@@ -115,7 +117,7 @@ public class SpellBook : NetworkBehaviour
 
         GameObject spellGameobject = Instantiate(allGameSpells[spellId].spellPrefab, target, Quaternion.identity);
         spellGameobject.transform.SetParent(transform);
-        spellGameobject.GetComponent<SpellGameObject>().setup(grid.getPermanentCellAtPosition(target), null);
+        spellGameobject.GetComponent<SpellGameObject>().setup(GlobalVars.gv.grid.getPermanentCellAtPosition(target), null);
     }
 
     [ClientRpc]

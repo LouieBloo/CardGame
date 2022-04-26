@@ -132,13 +132,16 @@ public class CameraTracker : MonoBehaviour
     public void zoom(float amount)
     {
         float delta = amount * zoomSpeed;
-        trackingOffset.y += delta + 0.04f;
-        float zDelta = -delta;
-        trackingOffset.z += zDelta + 0.04f;
-        //trackingOffset.z += zDelta + ;
+
+        float yDelta = delta + -(amount * 0.3f);//we times by amount because it wil always be -1 or 1 and we need the sign
+        trackingOffset.y += yDelta;
+
+        float zDelta = -delta + -(amount * 0.10f);
+        trackingOffset.z += zDelta;
+
         if (!trackedObject)
         {
-            transform.position = new Vector3(transform.position.x, trackingOffset.y, transform.position.z + zDelta);
+            transform.position = new Vector3(transform.position.x, trackingOffset.y, trackingOffset.z);
         }
         //transform.position
     }

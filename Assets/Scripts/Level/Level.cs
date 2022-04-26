@@ -15,6 +15,8 @@ public class Level : NetworkBehaviour
 
     public GameObject waitInputOption;
 
+    public GameObject gridToSpawn;
+
     int readiedPlayerCount = 0;
 
     [System.Serializable]
@@ -23,6 +25,7 @@ public class Level : NetworkBehaviour
         public HexDirection facingDirection;
         public GameObject spawnLocation;
         public GameObject[] baseCells;
+        public GameObject[] spawnCells;
         public GameObject[] gateCells;
     }
    
@@ -63,6 +66,9 @@ public class Level : NetworkBehaviour
         {
             for (int x = 0; x < playerStarts.Length; x++)
             {
+                //GameObject grid = Instantiate(gridToSpawn, Vector3.zero, Quaternion.identity);
+                //grid.GetComponent<NetworkObject>().Spawn();
+
                 foreach (GameObject g in playerStarts[x].baseCells)
                 {
                     if (allPlayers.Count - 1 >= x)
@@ -80,6 +86,10 @@ public class Level : NetworkBehaviour
                     }
 
                     allPlayers[x].spawnSetupUIClientRpc(allPlayersReferences);
+
+
+                    //tell town to spawn starting creatures
+                    allPlayers[x].townManager.getTown().startGame(playerStarts[x]);
                 }
             }
 

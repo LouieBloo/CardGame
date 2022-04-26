@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 
 public class ObjectSelecting : MonoBehaviour
 {
-    public Grid grid;
+    private Grid grid;
     public CameraTracker cameraTracker;
 
     private Selectable selectedPermanent;
@@ -57,7 +57,15 @@ public class ObjectSelecting : MonoBehaviour
     IEnumerator pollingForInput()
     {
         //yield first so our grid is loaded
-        yield return null;
+        while (grid == null)
+        {
+            if(GlobalVars.gv != null)
+            {
+                grid = GlobalVars.gv.grid;
+            }
+            yield return null;
+        }
+        
         while (true)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);

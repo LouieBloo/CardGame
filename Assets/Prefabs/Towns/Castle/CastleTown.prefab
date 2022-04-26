@@ -91,6 +91,13 @@ MonoBehaviour:
     uiImage: {fileID: 21300000, guid: b1820722136bc5146b592819d31392a9, type: 3}
     spotInUpgradeTrack: 1
     cost: 1000
+  townCreatures:
+  - name: SWORDSMAN
+    upgradeTrack: 1
+  - name: ARCHER
+    upgradeTrack: 2
+  health:
+    m_InternalValue: 0
 --- !u!114 &2563740544777020402
 MonoBehaviour:
   m_ObjectHideFlags: 0

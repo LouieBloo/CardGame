@@ -24,7 +24,6 @@ public class Player : PlayerOwnedNetworkObject, NetworkLoadable
 
     public PlayerStats playerStats;
 
-    public GameObject townPrefab;
     public TownManager townManager;
 
     public PlayerInput playerInput;
@@ -49,7 +48,7 @@ public class Player : PlayerOwnedNetworkObject, NetworkLoadable
         if (IsOwner)
         {
             objectSelector = GameObject.FindGameObjectsWithTag("Game")[0].GetComponent<ObjectSelecting>();
-            grid = GameObject.FindGameObjectsWithTag("Grid")[0].GetComponent<Grid>();
+            //grid = GameObject.FindGameObjectsWithTag("Grid")[0].GetComponent<Grid>();
             ui = Instantiate(uiPrefab, Vector3.zero, Quaternion.identity);
             ui.GetComponent<PlayerUI>().setup(this);
 
@@ -193,7 +192,7 @@ public class Player : PlayerOwnedNetworkObject, NetworkLoadable
     public void passPriorityServerRpc()
     {
         //this isnt safe but works for now
-        if (GlobalVars.gv.turnManager.getActivePlayer().OwnerClientId == OwnerClientId)
+        if (GlobalVars.gv.turnManager.isPlayerAbleToBuildAndCast(OwnerClientId))
         {
             GlobalVars.gv.turnManager.playerPassedRoundPriority();
         }

@@ -1,3 +1,4 @@
+using HexMapTools;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +17,10 @@ public class Town : PlayerOwnedNetworkObject
     private List<TownBuildingReference> builtBuildings = new List<TownBuildingReference>();
 
     private Action buildingBuiltCallback;
+
+    public TownCreature[] townCreatures;
+
+    private Level.PlayerStart playerStart;
 
     [SerializeField] public NetworkVariable<int> health = new NetworkVariable<int>();
 
@@ -39,6 +44,13 @@ public class Town : PlayerOwnedNetworkObject
         public Sprite uiImage;
         public int spotInUpgradeTrack;
         public int cost;
+    }
+
+    [System.Serializable]
+    public class TownCreature
+    {
+        public string name;
+        public TownBuildingUpgradeTrack upgradeTrack;
     }
 
     // Start is called before the first frame update
@@ -102,6 +114,14 @@ public class Town : PlayerOwnedNetworkObject
     public void subscribeToBuiltBuildingCallback(Action builtBuildingCallback)
     {
         this.buildingBuiltCallback = builtBuildingCallback;
+    }
+
+    public void startGame(Level.PlayerStart playerStart)
+    {
+        this.playerStart = playerStart;
+
+        GlobalVars.gv.grid.createCreatureOnCell(new HexCoordinates[] { GlobalVars.gv.grid.getHexCoordinatesFromPosition(playerStart.spawnCells[0].transform.position) }, OwnerClientId, townCreatures[0].name);
+        GlobalVars.gv.grid.createCreatureOnCell(new HexCoordinates[] { GlobalVars.gv.grid.getHexCoordinatesFromPosition(playerStart.spawnCells[1].transform.position) }, OwnerClientId, townCreatures[1].name);
     }
 
     [ServerRpc]

@@ -5,7 +5,7 @@ using UnityEngine;
 public class UIDontRotate : MonoBehaviour
 {
     public Transform rotateAgainst;
-    public RectTransform myTransform;
+    public Transform myTransform;
 
     // Update is called once per frame
     void Update()
