@@ -24,8 +24,8 @@ public class Level : NetworkBehaviour
     {
         public HexDirection facingDirection;
         public GameObject spawnLocation;
-        public GameObject[] baseCells;
-        public GameObject[] spawnCells;
+        public Vector3[] baseCells;
+        public Vector3[] spawnCells;
         public GameObject[] gateCells;
     }
    
@@ -69,11 +69,11 @@ public class Level : NetworkBehaviour
                 //GameObject grid = Instantiate(gridToSpawn, Vector3.zero, Quaternion.identity);
                 //grid.GetComponent<NetworkObject>().Spawn();
 
-                foreach (GameObject g in playerStarts[x].baseCells)
+                foreach (Vector3 g in playerStarts[x].baseCells)
                 {
                     if (allPlayers.Count - 1 >= x)
                     {
-                        GlobalVars.gv.grid.createTownPermanentOnCell(new HexCoordinates[] { GlobalVars.gv.grid.getHexCoordinatesFromPosition(g.transform.position) }, allPlayers[x].OwnerClientId, "CastleTownPermanent");
+                        GlobalVars.gv.grid.createTownPermanentOnCell(new HexCoordinates[] { GlobalVars.gv.grid.getHexCoordinatesFromPosition(g) }, allPlayers[x].OwnerClientId, "CastleTownPermanent");
                     }
                 }
 

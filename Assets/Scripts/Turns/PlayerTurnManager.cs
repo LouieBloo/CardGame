@@ -27,6 +27,13 @@ public class PlayerTurnManager : NetworkBehaviour
 
     private NetworkedTimer timer;
 
+    public static event EventHandler NewWeekStarted;
+
+    public void NewWeekEvent(EventArgs e)
+    {
+        NewWeekStarted?.Invoke(this, e);
+    }
+
     private enum Round
     {
         BuildCastCardsRecruit,
@@ -81,6 +88,12 @@ public class PlayerTurnManager : NetworkBehaviour
     {
         currentRound.Value = 0;
         currentDay.Value++;
+
+        //check if new week
+        if(currentDay.Value % 7 == 1)
+        {
+            NewWeekEvent(null);
+        }
 
         playersInTurnOrder.Clear();
         calculatePlayerTurnOrder();

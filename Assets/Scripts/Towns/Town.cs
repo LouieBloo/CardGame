@@ -120,8 +120,8 @@ public class Town : PlayerOwnedNetworkObject
     {
         this.playerStart = playerStart;
 
-        GlobalVars.gv.grid.createCreatureOnCell(new HexCoordinates[] { GlobalVars.gv.grid.getHexCoordinatesFromPosition(playerStart.spawnCells[0].transform.position) }, OwnerClientId, townCreatures[0].name);
-        GlobalVars.gv.grid.createCreatureOnCell(new HexCoordinates[] { GlobalVars.gv.grid.getHexCoordinatesFromPosition(playerStart.spawnCells[1].transform.position) }, OwnerClientId, townCreatures[1].name);
+        GlobalVars.gv.grid.createCreatureOnCell(new HexCoordinates[] { GlobalVars.gv.grid.getHexCoordinatesFromPosition(playerStart.spawnCells[0]) }, OwnerClientId, townCreatures[0].name);
+        GlobalVars.gv.grid.createCreatureOnCell(new HexCoordinates[] { GlobalVars.gv.grid.getHexCoordinatesFromPosition(playerStart.spawnCells[1]) }, OwnerClientId, townCreatures[1].name);
     }
 
     [ServerRpc]

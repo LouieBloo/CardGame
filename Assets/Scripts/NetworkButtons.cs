@@ -1,9 +1,11 @@
 
 using Unity.Netcode;
+using Unity.Netcode.Transports.UNET;
 using UnityEngine;
 
 public class NetworkButtons : MonoBehaviour
 {
+    public UNetTransport transport;
     void OnGUI()
     {
         GUILayout.BeginArea(new Rect(10, 10, 300, 300));
@@ -37,5 +39,9 @@ public class NetworkButtons : MonoBehaviour
         GUILayout.Label("Mode: " + mode);
     }
 
+    public void setIP(string ip)
+    {
+        transport.ConnectAddress = ip;
+    }
 
 }
